@@ -1,6 +1,7 @@
 const { ethers, network } = require("hardhat");
 const fs = require("fs");
 const path = require("path");
+const { exportarABIs, exportarEnderecos } = require("./exportar-frontend");
 
 /**
  * Implantação dos três contratos, na ordem de dependência.
@@ -60,6 +61,13 @@ async function main() {
   fs.writeFileSync(destino, JSON.stringify(registro, null, 2));
 
   console.log(`Registro salvo em ${destino}`);
+
+  const arquivosABI = exportarABIs();
+  const arquivoEnderecos = exportarEnderecos(network.name, registro);
+  console.log("\nABIs e endereços exportados para a interface React:");
+  for (const arquivo of arquivosABI) console.log(`  ${arquivo}`);
+  console.log(`  ${arquivoEnderecos}`);
+
   console.log("\nProximo passo: conceder os papeis as contas de teste.");
   console.log("O numero do bloco do ContratoLote serve de ancora para as");
   console.log("consultas por eventos feitas pela interface.");

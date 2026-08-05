@@ -11,6 +11,10 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "compilador:local": "node scripts/preparar-compilador.js",
+    "node:local": "hardhat node",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "fluxo:local": "hardhat run scripts/fluxo-local.js --network localhost",
+    "frontend:abi": "node scripts/exportar-frontend.js",
     "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia"
   },
   "devDependencies": {

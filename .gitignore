@@ -3,6 +3,7 @@ artifacts/
 cache/
 coverage/
 typechain-types/
+dist/
 
 coverage.json
 
@@ -11,3 +12,14 @@ coverage.json
 .env.*.local
 
 *.log
+
+# Registro de implantação local: efêmero, muda a cada `hardhat node` novo.
+# O registro da Sepolia (implantacao-sepolia.json) permanece versionado,
+# como evidência da implantação.
+/contratos/implantacao-localhost.json
+
+# ABIs e endereços exportados para a interface: gerados por
+# `npm run compile` / `npm run deploy:local` / `npm run deploy:sepolia`
+# dentro de contratos/. Regenerar em vez de versionar.
+/frontend/src/contracts/abi/
+/frontend/src/contracts/enderecos.*.json

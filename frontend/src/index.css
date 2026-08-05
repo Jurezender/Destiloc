@@ -1,0 +1,169 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cor-borda: color-mix(in srgb, currentColor 20%, transparent);
+  --cor-fundo-suave: color-mix(in srgb, currentColor 6%, transparent);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layout__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.layout__titulo {
+  font-weight: 600;
+}
+
+.layout__nav {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+}
+
+.layout__nav a {
+  text-decoration: none;
+}
+
+.layout__nav a.active {
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.layout__conteudo {
+  padding: 1.5rem;
+  max-width: 60rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.consulta-publica {
+  padding: 1.5rem;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.aviso-acesso {
+  padding: 1.5rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: 0.5rem;
+  max-width: 32rem;
+}
+
+fieldset {
+  border: 1px solid var(--cor-borda);
+  border-radius: 0.5rem;
+  margin-block: 1rem;
+  padding: 1rem;
+}
+
+fieldset label {
+  display: block;
+  margin-block: 0.5rem;
+}
+
+fieldset input {
+  display: block;
+  width: 100%;
+  max-width: 28rem;
+  padding: 0.35rem 0.5rem;
+}
+
+.acoes {
+  display: flex;
+  gap: 0.5rem;
+  margin-block: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.checkboxes {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-block: 0.5rem;
+}
+
+.grade-formularios,
+.grade-listas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-block: 0.5rem;
+}
+
+th,
+td {
+  border: 1px solid var(--cor-borda);
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.erro {
+  color: #c0392b;
+}
+
+.ok {
+  color: #27ae60;
+}
+
+.dica {
+  opacity: 0.75;
+  font-size: 0.9rem;
+}
+
+.qr-garrafa {
+  background: var(--cor-fundo-suave);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  display: inline-block;
+  margin-block: 1rem;
+}
+
+.qr-garrafa__url {
+  font-size: 0.8rem;
+  word-break: break-all;
+  max-width: 180px;
+}
+
+.lista-lotes,
+.lista-garrafas {
+  list-style: none;
+  padding: 0;
+}
+
+.lista-garrafas > li {
+  border: 1px solid var(--cor-borda);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-block: 0.5rem;
+}
+
+.construtor-sequencia ol {
+  padding-left: 1.25rem;
+}
+
+.status-carteira {
+  font-size: 0.9rem;
+}

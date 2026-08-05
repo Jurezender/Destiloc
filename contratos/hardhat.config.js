@@ -15,6 +15,13 @@ module.exports = {
   networks: {
     // Rede local em memória (padrão dos testes automatizados)
     hardhat: {},
+    // Nó local persistente (`npm run node:local`), usado para validar o fluxo
+    // completo com a interface e a MetaMask antes de cogitar a Sepolia.
+    // Sem `accounts` explícito: usa "remote", que consulta as contas já
+    // disponíveis no próprio nó (as 20 contas padrão do `hardhat node`).
+    localhost: {
+      url: "http://127.0.0.1:8545",
+    },
     // Sepolia Testnet — preencha o .env antes de usar
     sepolia: {
       url: SEPOLIA_RPC_URL || "",

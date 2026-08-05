@@ -1,16 +1,19 @@
-# Protótipo de rastreabilidade de bebidas destiladas — contratos
+# Protótipo de rastreabilidade de bebidas destiladas
 
-Contratos inteligentes e suíte de testes do TCC de Julia Rezende Rodrigues,
-Bacharelado em Sistemas de Informação, Ifes Cachoeiro de Itapemirim.
+TCC de Julia Rezende Rodrigues, Bacharelado em Sistemas de Informação, Ifes
+Cachoeiro de Itapemirim. Contratos inteligentes (`contratos/`, com a suíte
+de testes) e interface web (`frontend/`, React + MetaMask + IPFS/Kubo).
 
 ## Estado atual
 
 | Etapa | Situação |
 |---|---|
 | Refatoração dos contratos | concluída |
-| Suíte de testes local | 92 testes, todos passando |
-| Integração com o IPFS | não iniciada |
-| Interface web | não iniciada |
+| Suíte de testes local (contratos) | 92 testes, todos passando |
+| Scripts de implantação (local + Sepolia) | concluídos, testados na rede `localhost` |
+| Interface web (React + MetaMask) | implementada, testada na rede `localhost` (sem MetaMask real neste ambiente — ver `frontend/README.md`) |
+| Integração com o IPFS (Kubo local) | implementada, **não testada ao vivo** — sem daemon Kubo disponível neste ambiente |
+| Fluxo completo em Hardhat local | validado de ponta a ponta por script (`contratos/scripts/fluxo-local.js`) e pela consulta pública real |
 | Implantação na Sepolia | **não realizada**, aguarda autorização |
 
 ## Versões exatas
@@ -79,6 +82,25 @@ Dois arquivos de apoio não geram contrato implantável: `TiposCadeia.sol`, com 
 enums e a validação sintática de referências IPFS, e `AcessoProtegido.sol`, com
 o controle de acesso compartilhado.
 
+## Interface web
+
+Em `frontend/`: React + Vite + TypeScript, com MetaMask para as rotas
+operacionais e IPFS/Kubo local para os metadados. Não contém regra de
+negócio própria — só lê e escreve nos três contratos, e sobe/recupera JSON
+no IPFS. Ver `frontend/README.md` para como rodar, configurar o CORS do
+Kubo, adicionar a rede local na MetaMask, e o roteiro de teste manual do
+fluxo completo.
+
+Os endereços e as ABIs consumidos pela interface são gerados por
+`contratos/scripts/exportar-frontend.js`, chamado automaticamente pelo
+script de implantação (local ou Sepolia) — não são versionados, ficam em
+`frontend/src/contracts/`.
+
+A consulta pública (`/consulta/:chainId/:tokenId`, acessada pelo QR code
+impresso no rótulo) é somente leitura e não usa a MetaMask: lê diretamente
+de um `JsonRpcProvider` apontado para a RPC configurada em
+`frontend/.env`.
+
 ## Sequência produtiva
 
 Cada lote declara, no cadastro, a sequência que seu processo executa. A
@@ -127,9 +149,28 @@ detentores por papel.
 
 ## Implantação
 
-A implantação na Sepolia depende de autorização e ainda não foi realizada.
-Quando autorizada, o script registra endereços, hashes, blocos e gas em
-`implantacao-sepolia.json`.
+### Rede local (Hardhat), para desenvolvimento e teste
+
+```bash
+cd contratos
+npm run node:local        # em um terminal à parte, deixa rodando
+npm run deploy:local      # em outro terminal — implanta e exporta para o frontend
+npm run fluxo:local       # opcional: roda o fluxo completo por script, sem interface
+```
+
+### Sepolia
+
+A implantação na Sepolia depende de autorização e **ainda não foi
+realizada**. Quando autorizada, o script registra endereços, hashes, blocos
+e gas em `implantacao-sepolia.json`, e exporta os mesmos dados para
+`frontend/src/contracts/enderecos.sepolia.json`.
+
+Checklist antes de rodar `deploy:sepolia`:
+
+- [ ] `npm run compile && npm test` limpos (33 arquivos, 92 testes) na versão que será implantada.
+- [ ] `contratos/.env` preenchido com `SEPOLIA_RPC_URL` e `PRIVATE_KEY` de uma conta de teste, sem fundos reais além do necessário para o gas.
+- [ ] Saldo de teste (Sepolia ETH) suficiente na conta implantadora.
+- [ ] Autorização expressa do responsável pelo projeto para implantar nesta execução.
 
 ```bash
 npm run deploy:sepolia   # requer .env preenchido e autorizacao expressa
