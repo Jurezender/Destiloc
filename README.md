@@ -1,25 +1,29 @@
 # Protótipo de rastreabilidade de bebidas destiladas
 
-TCC de Julia Rezende Rodrigues, Bacharelado em Sistemas de Informação, Ifes
-Cachoeiro de Itapemirim. Contratos inteligentes (`contratos/`, com a suíte
-de testes) e interface web (`frontend/`, React + MetaMask + IPFS/Kubo).
+Este é o protótipo do meu TCC (Bacharelado em Sistemas de Informação, Ifes
+Cachoeiro de Itapemirim): rastreabilidade de bebidas destiladas usando
+blockchain, do lote de produção até a garrafa individual. Duas partes:
+contratos inteligentes em `contratos/` (com a suíte de testes) e a interface
+web em `frontend/` (React + MetaMask + IPFS/Kubo).
 
-## Estado atual
+## Onde as coisas estão
 
-| Etapa | Situação |
-|---|---|
-| Refatoração dos contratos | concluída |
-| Suíte de testes local (contratos) | 92 testes, todos passando |
-| Scripts de implantação (local + Sepolia) | concluídos, testados na rede `localhost` |
-| Interface web (React + MetaMask) | implementada, testada na rede `localhost` (sem MetaMask real neste ambiente — ver "Interface web", abaixo) |
-| Integração com o IPFS (Kubo local) | implementada, **não testada ao vivo** — sem daemon Kubo disponível neste ambiente |
-| Fluxo completo em Hardhat local | validado de ponta a ponta por script (`contratos/scripts/fluxo-local.js`) e pela consulta pública real |
-| Implantação na Sepolia | **não realizada**, aguarda autorização |
+Os contratos estão prontos: refatorados, com 92 testes passando localmente e
+os scripts de implantação testados na rede `localhost`. A interface web
+também está implementada e testada na rede local, mas não tenho como testar
+com a extensão MetaMask de verdade neste ambiente — o roteiro pra fazer isso
+manualmente está mais abaixo, em "Interface web". A integração com IPFS
+(Kubo local) está implementada, mas também não testada ao vivo, porque não
+tenho um daemon Kubo disponível aqui. O fluxo completo, do cadastro do lote
+até a consulta pública, já validei de ponta a ponta pelo script
+`contratos/scripts/fluxo-local.js`. A implantação na Sepolia eu ainda não
+fiz — é a próxima etapa, só não dá pra fazer tudo de uma vez.
 
 ## Versões exatas
 
-As dependências estão fixadas sem intervalos, para que a instalação seja
-reproduzível. O `package-lock.json` acompanha o projeto e deve ser versionado.
+Fixei as dependências sem intervalo (sem `^` nem `~`) pra instalação ficar
+reproduzível. O `package-lock.json` vai junto no repositório, não é pra
+ignorar.
 
 | Dependência | Versão |
 |---|---|
@@ -29,46 +33,47 @@ reproduzível. O `package-lock.json` acompanha o projeto e deve ser versionado.
 | dotenv | 16.6.1 |
 | solc | 0.8.24 |
 
-Ambiente de referência: Node.js 22.22.2 e npm 10.9.7. O compilador Solidity é o
-0.8.24, com otimizador ativo e alvo de EVM `cancun`, conforme `hardhat.config.js`.
+Desenvolvi usando Node.js 22.22.2 e npm 10.9.7. O compilador Solidity é o
+0.8.24, com otimizador ligado e alvo de EVM `cancun` (ver `hardhat.config.js`).
 
 ## Como executar
 
-Use `npm ci`, e não `npm install`. O `ci` instala exatamente o que está no
-lockfile e falha se houver divergência, que é o comportamento desejado para
-reproduzir os resultados.
+Uso `npm ci` em vez de `npm install` de propósito: ele instala exatamente o
+que está no lockfile e falha se houver qualquer divergência, que é o que eu
+quero pra garantir que o resultado é reproduzível.
 
 ```bash
+cd contratos
 npm ci
 npm run compile
 npm test
 ```
 
-O resultado esperado é a compilação de 33 arquivos sem avisos e 92 testes
-aprovados.
+O esperado é compilar 33 arquivos sem avisos e passar os 92 testes.
 
 ### Se a compilação não conseguir baixar o solc
 
-O Hardhat obtém o compilador de `binaries.soliditylang.org` na primeira
-compilação. Em redes que bloqueiam esse endereço, prepare o compilador a partir
-do pacote npm `solc`, que já está entre as dependências:
+O Hardhat busca o compilador em `binaries.soliditylang.org` na primeira
+compilação. Se a sua rede bloquear esse endereço (foi o meu caso), dá pra
+preparar o compilador a partir do pacote `solc` do npm, que já está entre as
+dependências:
 
 ```bash
 npm run compilador:local
 npm run compile
 ```
 
-O script copia o compilador 0.8.24 distribuído pelo npm para o cache local do
-Hardhat. Ele não faz nada quando o compilador nativo já está instalado e
-operante, de modo que é seguro executá-lo em qualquer ambiente. Esse foi o
-caminho utilizado durante a implementação do protótipo.
+Esse script copia o compilador 0.8.24 do npm pro cache local do Hardhat. Se
+o compilador nativo já estiver instalado e funcionando, ele não faz nada —
+então é seguro rodar em qualquer ambiente. Foi o caminho que usei durante
+todo o desenvolvimento.
 
 ### Frontend
 
-O frontend tem sua própria suíte, cobrindo a lógica pura de validação
-(construtor de sequência produtiva e validação de referência IPFS), em
-`frontend/src/lib/*.test.ts`. Não exige contratos implantados, nó local,
-MetaMask nem Kubo:
+O frontend tem sua própria suíte, mas cobre só a lógica pura de validação
+(o construtor de sequência produtiva e a validação de referência IPFS), em
+`frontend/src/lib/*.test.ts`. Não precisa de contratos implantados, nó
+local, MetaMask nem Kubo pra rodar:
 
 ```bash
 cd frontend
@@ -77,13 +82,13 @@ npm test        # vitest run
 npm run typecheck
 ```
 
-O restante da interface (leitura/escrita nos contratos, MetaMask, upload no
-IPFS) não tem cobertura automatizada — é verificado pelo checklist manual em
-"Interface web", abaixo, e por `contratos/scripts/fluxo-local.js`.
+O resto da interface — leitura/escrita nos contratos, MetaMask, upload no
+IPFS — não tem cobertura automatizada. Isso eu verifico pelo checklist
+manual lá embaixo, em "Interface web", e pelo `contratos/scripts/fluxo-local.js`.
 
 ## Arquitetura
 
-Três contratos implantáveis, em cadeia estritamente linear de dependências.
+São três contratos implantáveis, numa cadeia de dependência bem linear:
 
 ```
 ContratoLote ◄────── ContratoTokenizacao ◄────── ContratoRastreamento
@@ -96,38 +101,37 @@ ContratoLote ◄────── ContratoTokenizacao ◄────── Con
 | `ContratoTokenizacao` | Garrafa | Identidade digital individual, não transferível |
 | `ContratoRastreamento` | Garrafa | Custódia posterior à emissão |
 
-Dois arquivos de apoio não geram contrato implantável: `TiposCadeia.sol`, com os
-enums e a validação sintática de referências IPFS, e `AcessoProtegido.sol`, com
-o controle de acesso compartilhado.
+Tem mais dois arquivos de apoio que não geram contrato implantável:
+`TiposCadeia.sol`, com os enums e a validação sintática de referências IPFS,
+e `AcessoProtegido.sol`, com o controle de acesso compartilhado entre os
+outros três.
 
 ## Interface web
 
-Em `frontend/`: React + Vite + TypeScript, com MetaMask para as rotas
-operacionais e IPFS/Kubo local para os metadados. Não contém regra de
-negócio própria — só lê e escreve nos três contratos, e sobe/recupera JSON
-no IPFS.
+Em `frontend/`: React + Vite + TypeScript, MetaMask nas rotas operacionais e
+IPFS/Kubo local pros metadados. Não tem regra de negócio própria — só lê e
+escreve nos três contratos, e sobe/recupera JSON no IPFS.
 
-Os endereços e as ABIs consumidos pela interface são gerados por
+Os endereços e as ABIs que a interface consome são gerados por
 `contratos/scripts/exportar-frontend.js`, chamado automaticamente pelo
-script de implantação (local ou Sepolia) — não são versionados, ficam em
-`frontend/src/contracts/`. Sem eles, a interface sobe normalmente, mas
-mostra um aviso claro em vez de travar (ver `ContratosIndisponiveisError`
-em `frontend/src/contracts/index.ts`).
+script de implantação (local ou Sepolia). Não versiono esses arquivos —
+ficam em `frontend/src/contracts/`. Sem eles a interface ainda sobe, só
+mostra um aviso claro em vez de travar (dá uma olhada em
+`ContratosIndisponiveisError`, em `frontend/src/contracts/index.ts`).
 
-A consulta pública (`/consulta/:chainId/:tokenId`, acessada pelo QR code
-impresso no rótulo) é somente leitura e não usa a MetaMask: lê diretamente
-de um `JsonRpcProvider` apontado para a RPC configurada em
-`frontend/.env`.
+A consulta pública (`/consulta/:chainId/:tokenId`, a rota do QR code
+impresso no rótulo) é só leitura e não usa MetaMask: lê direto de um
+`JsonRpcProvider` apontado pra RPC configurada em `frontend/.env`.
 
 ### Como rodar
 
-Depende dos contratos implantados numa rede local (ver "Rede local" em
+Precisa dos contratos já implantados numa rede local (ver "Rede local" em
 Implantação, mais abaixo):
 
 ```bash
 cd frontend
 npm ci
-cp .env.example .env    # ajuste se os padrões locais não servirem
+cp .env.example .env    # ajuste se os padrões locais não servirem pro seu caso
 npm run dev
 ```
 
@@ -135,77 +139,77 @@ Abre em `http://localhost:5173`.
 
 ### Kubo/IPFS local
 
-A interface envia e recupera metadados via a API HTTP do Kubo
-(`VITE_KUBO_API_URL`, padrão `http://127.0.0.1:5001`) e um gateway
+A interface manda e busca metadados pela API HTTP do Kubo
+(`VITE_KUBO_API_URL`, padrão `http://127.0.0.1:5001`) e por um gateway
 (`VITE_KUBO_GATEWAY_URL`, padrão `http://127.0.0.1:8080`), com um gateway
-público (`ipfs.io`) como reserva de leitura se o nó local não responder.
+público (`ipfs.io`) de reserva pra leitura, caso o nó local não responda.
 
-Por padrão, o Kubo recusa requisições `POST` vindas de outra origem (a
-página em `localhost:5173`). Rode uma vez, com o daemon **parado**:
+Por padrão o Kubo recusa requisição `POST` vinda de outra origem (a página
+em `localhost:5173` conta como outra origem). Rode isto uma vez, com o
+daemon **parado**:
 
 ```bash
 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["http://localhost:5173"]'
 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["PUT","POST","GET"]'
 ```
 
-Depois inicie o daemon normalmente (`ipfs daemon`) e reinicie a cada vez que
-a porta ou a origem mudarem.
+Depois é só iniciar o daemon normalmente (`ipfs daemon`), e repetir sempre
+que a porta ou a origem mudarem.
 
 ### Rede na MetaMask (Hardhat local)
 
-Adicione manualmente, se ainda não existir:
+Se ainda não tiver, adicione manualmente:
 
 - Nome: `Hardhat Local`
 - RPC: `http://127.0.0.1:8545`
 - Chain ID: `31337`
 - Moeda: `ETH`
 
-Importe uma das contas de teste impressas por `npm run node:local` (nunca
-use essas chaves privadas fora de uma rede local — são públicas e
-conhecidas).
+E importe uma das contas de teste que aparecem no terminal quando roda
+`npm run node:local` (essas chaves privadas são públicas e conhecidas —
+nunca use fora de uma rede local).
 
 ### Checklist manual do fluxo completo (com MetaMask de verdade)
 
-O que dá para verificar sem a extensão MetaMask real já está coberto por
-`contratos/scripts/fluxo-local.js` (roda o fluxo inteiro por script) e por
-navegação automatizada nas rotas que não exigem assinatura — inclusive
-`/consulta/:chainId/:tokenId`, testada de verdade contra dados reais gerados
-pelo script. O que exige clicar de fato numa extensão MetaMask instalada
-fica para este roteiro:
+O que dá pra verificar sem a extensão MetaMask instalada eu já cobri com o
+`contratos/scripts/fluxo-local.js` (roda o fluxo inteiro por script) e com
+navegação automatizada nas rotas que não pedem assinatura — inclusive
+`/consulta/:chainId/:tokenId`, testada de verdade com dados reais gerados
+pelo script. O que exige clicar de fato numa MetaMask instalada, fica pra
+esse roteiro:
 
-1. `cd contratos && npm run node:local` (deixe rodando) e, em outro
+1. `cd contratos && npm run node:local` (deixa rodando) e, em outro
    terminal, `npm run deploy:local`.
-2. Configure a rede "Hardhat Local" na MetaMask (ver seção acima) e importe
-   uma das contas de teste impressas pelo `node:local`.
-3. Opcional: rode `npm run fluxo:local` em `contratos/` para já ter um lote
-   e uma garrafa prontos, ou cadastre os seus pela interface.
-4. `cd ../frontend && npm run dev`, abra `http://localhost:5173`.
-5. **Participantes**: com a conta administradora, conceda `FABRICANTE_ROLE`
+2. Configura a rede "Hardhat Local" na MetaMask (seção acima) e importa uma
+   das contas de teste que o `node:local` imprimiu.
+3. Opcional: roda `npm run fluxo:local` em `contratos/` pra já ter um lote e
+   uma garrafa prontos, ou cadastra os seus pela interface mesmo.
+4. `cd ../frontend && npm run dev`, abre `http://localhost:5173`.
+5. **Participantes**: com a conta administradora, concede `FABRICANTE_ROLE`
    a uma segunda conta (nos três contratos), e `DISTRIBUIDOR_ROLE`/
    `VAREJISTA_ROLE` a outras duas, em "Participantes".
-6. **Lote**: em "Lotes", registre um lote com o construtor de sequência, e
-   registre cada etapa até o engarrafamento.
-7. **Emissão**: com a produção concluída, gere os metadados no IPFS (exige
-   o daemon Kubo rodando com CORS liberado, ver seção acima) e emita a
+6. **Lote**: em "Lotes", registra um lote pelo construtor de sequência, e
+   registra cada etapa até o engarrafamento.
+7. **Emissão**: com a produção concluída, gera os metadados no IPFS (precisa
+   do daemon Kubo rodando com o CORS liberado, seção acima) e emite a
    garrafa.
-8. **Expedição/confirmação**: em "Garrafas", expeça para o distribuidor;
-   troque de conta na MetaMask para a do distribuidor e confirme o
-   recebimento.
-9. **Consulta pública**: copie o link/QR code da garrafa (mostrado no
-   detalhe da garrafa) e abra numa aba anônima, sem a MetaMask conectada —
-   confirme que o histórico completo aparece mesmo assim.
+8. **Expedição/confirmação**: em "Garrafas", expede pro distribuidor; troca
+   de conta na MetaMask pra do distribuidor e confirma o recebimento.
+9. **Consulta pública**: copia o link/QR code da garrafa (aparece no detalhe
+   dela) e abre numa aba anônima, sem a MetaMask conectada — confere que o
+   histórico completo aparece mesmo assim.
 
-Cada uma dessas ações passa pelas validações da lista do pedido (lote/
+Cada uma dessas ações passa pelas validações que defini no pedido (lote ou
 garrafa inexistente, papel ausente, emissão antes da conclusão, referência
-IPFS inválida, expedição com pendência aberta, confirmação por destinatário
-errado, papel revogado) — tente forçar alguns desses casos (ex.: confirmar
-com a conta errada) para ver a mensagem amigável em vez do erro cru da
-MetaMask.
+IPFS inválida, expedição com pendência aberta, confirmação pelo destinatário
+errado, papel revogado) — vale tentar forçar alguns desses casos (por
+exemplo, confirmar com a conta errada) só pra ver a mensagem amigável
+aparecendo em vez do erro cru da MetaMask.
 
 ## Sequência produtiva
 
-Cada lote declara, no cadastro, a sequência que seu processo executa. A
-gramática aceita é:
+No cadastro, cada lote declara a sequência que o processo vai seguir. A
+gramática que aceito é:
 
 ```
 RecebimentoMateriaPrima
@@ -214,25 +218,26 @@ TransformacaoDestilacao+
 Engarrafamento
 ```
 
-A repetição de `TransformacaoDestilacao` existe porque determinados processos
-possuem mais de um ciclo de transformação e destilação. O modelo não impõe uma
-quantidade universal.
+A repetição de `TransformacaoDestilacao` existe porque alguns processos
+passam por mais de um ciclo de transformação e destilação — não quis travar
+o modelo numa quantidade fixa.
 
-A emissão de garrafas é permitida somente após o registro digital da conclusão
-da produção e do engarrafamento.
+A emissão de garrafas só é permitida depois que a conclusão da produção e o
+engarrafamento estiverem registrados na cadeia.
 
 ## Papéis
 
-Os três papéis operacionais do `ContratoRastreamento` são mutuamente exclusivos.
-Uma conta pode acumular a administração com um papel operacional, mas não pode
-deter dois papéis operacionais ao mesmo tempo. Sem essa regra, o varejista não
-seria terminal, já que uma conta com os papéis de varejista e distribuidor
-poderia receber como varejista e expedir como distribuidor.
+Os três papéis operacionais do `ContratoRastreamento` são mutuamente
+exclusivos. Uma conta pode acumular a administração com um papel
+operacional, mas não pode ter dois papéis operacionais ao mesmo tempo. Sem
+essa regra o varejista deixaria de ser terminal — uma conta com os papéis de
+varejista e distribuidor ao mesmo tempo poderia receber como varejista e
+expedir como distribuidor, o que não faz sentido no fluxo.
 
-A saída do papel de administração, por revogação ou renúncia, é recusada quando
-a conta seria a última administradora. A contagem vem de
+A saída do papel de administração, seja por revogação ou renúncia, é
+recusada quando a conta seria a última administradora. Essa contagem vem do
 `AccessControlEnumerable`, extensão do OpenZeppelin que mantém o conjunto de
-detentores por papel.
+quem tem cada papel.
 
 ## Suíte de testes
 
@@ -250,7 +255,7 @@ detentores por papel.
 
 ## Implantação
 
-### Rede local (Hardhat), para desenvolvimento e teste
+### Rede local (Hardhat), pra desenvolvimento e teste
 
 ```bash
 cd contratos
@@ -261,18 +266,17 @@ npm run fluxo:local       # opcional: roda o fluxo completo por script, sem inte
 
 ### Sepolia
 
-A implantação na Sepolia depende de autorização e **ainda não foi
-realizada**. Quando autorizada, o script registra endereços, hashes, blocos
-e gas em `implantacao-sepolia.json`, e exporta os mesmos dados para
+Ainda não implantei na Sepolia — ainda não chegou a vez dessa etapa. Quando
+implantar, o script vai registrar endereços, hashes, blocos e gas em
+`implantacao-sepolia.json`, e exportar os mesmos dados pra
 `frontend/src/contracts/enderecos.sepolia.json`.
 
-Checklist antes de rodar `deploy:sepolia`:
+Checklist que sigo antes de rodar `deploy:sepolia`:
 
-- [ ] `npm run compile && npm test` limpos (33 arquivos, 92 testes) na versão que será implantada.
-- [ ] `contratos/.env` preenchido com `SEPOLIA_RPC_URL` e `PRIVATE_KEY` de uma conta de teste, sem fundos reais além do necessário para o gas.
+- [ ] `npm run compile && npm test` limpos (33 arquivos, 92 testes) na versão que vou implantar.
+- [ ] `contratos/.env` preenchido com `SEPOLIA_RPC_URL` e `PRIVATE_KEY` de uma conta de teste, sem fundos reais além do necessário pro gas.
 - [ ] Saldo de teste (Sepolia ETH) suficiente na conta implantadora.
-- [ ] Autorização expressa do responsável pelo projeto para implantar nesta execução.
 
 ```bash
-npm run deploy:sepolia   # requer .env preenchido e autorizacao expressa
+npm run deploy:sepolia   # requer .env preenchido
 ```
