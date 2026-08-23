@@ -243,8 +243,8 @@ veracidade dos documentos.
 
 ## 6.2 Avaliação por produtor
 
-Somente contas com `PRODUTOR_ROLE`, consultado no `ContratoAcesso`, podem
-registrar avaliações.
+Para registrar uma nova avaliação, a conta deve possuir `PRODUTOR_ROLE` no
+`ContratoAcesso` no momento da operação.
 
 `ResultadoAvaliacao` possui os valores:
 
@@ -261,25 +261,29 @@ observações e/ou evidências no IPFS.
 Reavaliações são permitidas. O histórico é append-only, nunca é sobrescrito e
 a avaliação mais recente daquele produtor para aquele insumo é a vigente.
 
-A perda posterior de `PRODUTOR_ROLE` não apaga nem invalida avaliações
-registradas enquanto a conta estava autorizada.
+Avaliações já registradas continuam no histórico mesmo se o
+`PRODUTOR_ROLE` da conta for revogado posteriormente.
 
 Nesta versão, não é mantido um índice global de todos os produtores que
 avaliaram um insumo.
 
 ## 6.3 Correção documental
 
-O fornecedor original pode adicionar registros de correção com novos
-`metadataURI`. As correções são append-only e o `metadataURI` original não é
-sobrescrito.
+Para adicionar um registro de correção documental, a conta deve ser o
+fornecedor original daquele lote e possuir `FORNECEDOR_ROLE` no
+`ContratoAcesso` no momento da operação.
+
+As correções usam novos `metadataURI`, são append-only e não sobrescrevem o
+`metadataURI` original.
 
 Correção documental não equivale à invalidação do lote.
 
 ## 6.4 Invalidação
 
-Somente o fornecedor original pode invalidar seu lote de insumo. Ser
-administrador não concede permissão para invalidar lotes, e produtores podem
-rejeitar um insumo para si, mas não invalidá-lo globalmente.
+Para invalidar um lote de insumo, a conta deve ser o fornecedor original
+daquele lote e possuir `FORNECEDOR_ROLE` no `ContratoAcesso` no momento da
+operação. Ser administrador não concede permissão para invalidar lotes, e
+produtores podem rejeitar um insumo para si, mas não invalidá-lo globalmente.
 
 A invalidação:
 
@@ -287,6 +291,19 @@ A invalidação:
 - exige `metadataURI`;
 - registra timestamp;
 - preserva para consulta os dados, correções e avaliações anteriores.
+
+Depois de invalidado, o lote fica definitivamente encerrado para novas
+operações. Ele continua totalmente consultável e preserva seu cadastro, suas
+correções e suas avaliações anteriores, mas:
+
+- não aceita novas avaliações;
+- não aceita novas correções documentais;
+- não pode ser invalidado novamente;
+- não pode ser reativado.
+
+A autoria histórica do lote permanece mesmo se o `FORNECEDOR_ROLE` do
+fornecedor for revogado posteriormente, mas a conta sem o papel vigente não
+pode registrar novas correções nem invalidar o lote.
 
 Um lote invalidado nunca é considerado aprovado para novos usos, mesmo que a
 avaliação vigente de determinado produtor seja `Aprovado`.
