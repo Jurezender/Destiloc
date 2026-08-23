@@ -717,7 +717,194 @@ apenas uma vez na relação reversa daquele insumo.
 
 ---
 
-# 12. Regras que não devem ser implementadas
+# 12. Regras de envasamento
+
+## 12.1 Responsabilidade e acesso
+
+O `ContratoEnvasamento` depende do `ContratoAcesso` e do `ContratoProducao`.
+
+Somente contas com `ENVASADOR_ROLE` vigente podem registrar envasamentos e
+emitir novas garrafas. Uma mesma conta pode possuir `PRODUTOR_ROLE` e
+`ENVASADOR_ROLE`.
+
+O contrato registra declarações do envasador autorizado e preserva autoria,
+timestamp e relacionamentos. Ele não comprova a verdade física da declaração.
+
+## 12.2 Envasamento
+
+Cada envasamento referencia exatamente um lote de produção. Somente lotes de
+produção existentes e concluídos podem ser envasados. Uma produção pode
+possuir vários envasamentos.
+
+A estrutura conceitual é:
+
+```solidity
+struct Envasamento {
+    uint256 loteProducaoId;
+    address envasador;
+    uint256 quantidadeDeclarada;
+    uint256 quantidadeEmitida;
+    uint64 registradoEm;
+    uint64 concluidoEm;
+    string metadataURI;
+}
+```
+
+Os IDs de envasamento são `uint256`, sequenciais e começam em 1.
+
+O registro usa uma operação equivalente a:
+
+```solidity
+registrarEnvasamento(
+    uint256 loteProducaoId,
+    uint256 quantidadeDeclarada,
+    string metadataURI
+)
+```
+
+Para registrar:
+
+- a conta deve possuir `ENVASADOR_ROLE` vigente;
+- a produção deve existir e estar concluída;
+- `quantidadeDeclarada` deve ser maior que zero;
+- `metadataURI` deve ser obrigatória e válida;
+- o envasador deve ser `msg.sender`;
+- `quantidadeEmitida` deve iniciar em 0;
+- `concluidoEm` deve iniciar em 0.
+
+Uma produção pode possuir vários envasamentos. O contrato não controla estoque
+ou saldo físico do lote de produção e não verifica se a quantidade física
+declarada realmente existe.
+
+## 12.3 Garrafas
+
+As garrafas são identificadas individualmente por tokens ERC-721. Os token IDs
+são `uint256`, globais, sequenciais e começam em 1.
+
+A estrutura conceitual é:
+
+```solidity
+struct Garrafa {
+    uint256 envasamentoId;
+    uint64 emitidaEm;
+}
+```
+
+A emissão pode ocorrer em múltiplas chamadas equivalentes a:
+
+```solidity
+emitirGarrafas(
+    uint256 envasamentoId,
+    uint256 quantidade
+)
+```
+
+Cada chamada pode emitir múltiplas garrafas. Nesta versão, não existe limite
+arbitrário de quantidade por transação. Emissões grandes podem ser divididas
+pelo frontend em várias transações para respeitar limites de gas.
+
+Para emitir:
+
+- `quantidade` deve ser maior que zero;
+- a conta deve ser o envasador original;
+- a conta deve possuir `ENVASADOR_ROLE` vigente;
+- a emissão não pode ultrapassar `quantidadeDeclarada`.
+
+`quantidadeEmitida` acumula as emissões realizadas e nunca pode ultrapassar
+`quantidadeDeclarada`.
+
+Quando `quantidadeEmitida` atingir `quantidadeDeclarada`:
+
+- `concluidoEm` recebe `block.timestamp`;
+- o envasamento passa a ser considerado completo;
+- não existe conclusão manual adicional.
+
+Garrafas já emitidas permanecem válidas se o `ENVASADOR_ROLE` for revogado
+posteriormente. A revogação impede apenas novas emissões.
+
+## 12.4 Identidade digital não transferível
+
+O ERC-721 é utilizado apenas como identidade digital individual da garrafa. As
+garrafas são não transferíveis.
+
+O ERC-721 possui:
+
+- nome `Destiloc Garrafa`;
+- símbolo `DSG`.
+
+Devem ser bloqueados:
+
+- `transferFrom`;
+- `safeTransferFrom`;
+- `approve`;
+- `setApprovalForAll`;
+- `burn`.
+
+Não deve existir função pública de `burn`. A implementação também deve impedir
+que tokens já emitidos sejam destruídos por qualquer mecanismo de
+transferência ou atualização do ERC-721. Uma garrafa emitida permanece
+registrada permanentemente.
+
+O token pode ser emitido para o endereço do envasador responsável. `ownerOf` é
+somente uma característica técnica do ERC-721 e não representa propriedade
+jurídica, posse física ou autenticidade da garrafa.
+
+Nesta versão, não existe `metadataURI` individual obrigatória para cada
+garrafa. A `metadataURI` pertence ao envasamento e pode ser compartilhada por
+suas garrafas. A individualização ocorre pelo `tokenId`, e `tokenURI(tokenId)`
+pode retornar a `metadataURI` do envasamento correspondente.
+
+## 12.5 Relacionamentos e consultas
+
+A relação on-chain permite percorrer:
+
+tokenId → envasamento → lote de produção
+
+Também deve existir rastreabilidade reversa:
+
+lote de produção → envasamentos → garrafas
+
+As coleções usam consultas por total e índice.
+
+O contrato deve oferecer consultas equivalentes a:
+
+- `envasamentoExiste`;
+- `obterEnvasamento`;
+- `envasamentoConcluido`;
+- `totalEnvasamentos`;
+- `totalEnvasamentosDaProducao`;
+- `envasamentoDaProducaoPorIndice`;
+- `totalGarrafas`;
+- `garrafaExiste`;
+- `obterGarrafa`;
+- `envasamentoDaGarrafa`;
+- `totalGarrafasDoEnvasamento`;
+- `garrafaDoEnvasamentoPorIndice`.
+
+O QR Code não é armazenado on-chain. Ele é gerado no frontend e referencia o
+`tokenId`.
+
+A consulta pública segue:
+
+tokenId → envasamento → produção → etapas → insumos → fornecedores/evidências
+
+## 12.6 Fora do escopo
+
+O `ContratoEnvasamento` não implementa:
+
+- transporte;
+- custódia;
+- distribuidor;
+- varejista;
+- venda;
+- propriedade do consumidor;
+- estoque físico;
+- transferência física;
+- validação de autenticidade física.
+
+---
+
+# 13. Regras que não devem ser implementadas
 
 O contrato não deve validar:
 
@@ -740,7 +927,7 @@ A blockchain valida:
 
 ---
 
-# 13. Princípio principal do desenvolvimento
+# 14. Princípio principal do desenvolvimento
 
 O agente de código deve implementar esta especificação.
 
