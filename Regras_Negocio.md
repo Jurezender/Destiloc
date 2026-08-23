@@ -122,7 +122,12 @@ Responsável por:
 - cadastro dos insumos;
 - documentos e evidências;
 - avaliação pelo produtor;
-- aprovação/rejeição.
+- aprovação/rejeição;
+- correções documentais;
+- invalidação de lotes de insumo.
+
+O contrato mantém uma referência `immutable` ao `ContratoAcesso`. Seu
+construtor deve rejeitar `address(0)` e endereço sem código.
 
 Fluxo:
 
@@ -190,23 +195,125 @@ Armazena:
 
 A blockchain guarda a referência ao conteúdo.
 
+As referências IPFS armazenadas on-chain usam URI completa no formato
+`ipfs://<CID>` e recebem o nome `metadataURI` no código.
+
+Nesta versão, a validação é apenas sintática: verifica o prefixo `ipfs://` e
+limites de comprimento. O contrato não valida existência, disponibilidade,
+autenticidade nem conteúdo do CID.
+
 ---
 
 # 6. Regras de insumos
 
+## 6.1 Cadastro do lote de insumo
+
+Somente contas com `FORNECEDOR_ROLE`, consultado no `ContratoAcesso`, podem
+registrar lotes de insumo.
+
+Cada lote de insumo possui:
+
+- identificador único on-chain do tipo `uint256`;
+- fornecedor responsável;
+- tipo do insumo;
+- `metadataURI` obrigatório;
+- timestamp do registro.
+
+Formatos visuais como `INS-001` pertencem ao frontend e não são armazenados
+como identificador on-chain.
+
+`TipoInsumo` possui os valores:
+
+- `NaoDefinido`;
+- `MateriaPrimaAgricola`;
+- `BaseAlcoolica`;
+- `Agua`;
+- `Levedura`;
+- `Zimbro`;
+- `Botanico`;
+- `Outro`.
+
+`Zimbro` inclui bagas ou derivados/extrato de zimbro. Os detalhes ficam no
+metadata referenciado por `metadataURI`.
+
+Documentos, fotos, laudos, informações de procedência e detalhes técnicos não
+são armazenados diretamente on-chain. A blockchain registra autoria,
+referência e histórico, sem validar autenticidade física, qualidade química ou
+veracidade dos documentos.
+
+## 6.2 Avaliação por produtor
+
+Somente contas com `PRODUTOR_ROLE`, consultado no `ContratoAcesso`, podem
+registrar avaliações.
+
+`ResultadoAvaliacao` possui os valores:
+
+- `NaoAvaliado`;
+- `Aprovado`;
+- `Rejeitado`.
+
+A avaliação é específica para o par produtor e lote de insumo. Não existe
+aprovação global: um produtor pode aprovar um insumo enquanto outro o rejeita.
+
+Toda avaliação exige `metadataURI`, usada para registrar justificativa,
+observações e/ou evidências no IPFS.
+
+Reavaliações são permitidas. O histórico é append-only, nunca é sobrescrito e
+a avaliação mais recente daquele produtor para aquele insumo é a vigente.
+
+A perda posterior de `PRODUTOR_ROLE` não apaga nem invalida avaliações
+registradas enquanto a conta estava autorizada.
+
+Nesta versão, não é mantido um índice global de todos os produtores que
+avaliaram um insumo.
+
+## 6.3 Correção documental
+
+O fornecedor original pode adicionar registros de correção com novos
+`metadataURI`. As correções são append-only e o `metadataURI` original não é
+sobrescrito.
+
+Correção documental não equivale à invalidação do lote.
+
+## 6.4 Invalidação
+
+Somente o fornecedor original pode invalidar seu lote de insumo. Ser
+administrador não concede permissão para invalidar lotes, e produtores podem
+rejeitar um insumo para si, mas não invalidá-lo globalmente.
+
+A invalidação:
+
+- é definitiva e não permite reativação;
+- exige `metadataURI`;
+- registra timestamp;
+- preserva para consulta os dados, correções e avaliações anteriores.
+
+Um lote invalidado nunca é considerado aprovado para novos usos, mesmo que a
+avaliação vigente de determinado produtor seja `Aprovado`.
+
+Um lote substituto é cadastrado como novo insumo, com novo ID. Nesta versão,
+não existe relação on-chain obrigatória entre o lote anterior e o substituto.
+
+## 6.5 Relacionamento futuro com a produção
+
 Um insumo possui três níveis:
 
-## 1. Registrado
+1. registrado pelo fornecedor;
+2. vinculado a um lote de produção pelo produtor;
+3. registrado como utilizado em uma etapa de produção.
 
-Fornecedor declarou a existência do insumo.
+A vinculação e o registro de utilização pertencem ao futuro
+`ContratoProducao`, não ao `ContratoInsumos`.
 
-## 2. Vinculado ao lote
+O futuro `ContratoProducao` deve verificar se o insumo está válido e aprovado
+por aquele produtor:
 
-Produtor declarou que aquele insumo faz parte da produção.
+- ao vinculá-lo ao lote de produção;
+- ao registrá-lo como utilizado em uma etapa;
+- novamente ao concluir a produção.
 
-## 3. Utilizado em uma etapa
-
-Produtor declarou exatamente onde aquele insumo foi utilizado.
+Uma invalidação ou reavaliação posterior não altera retroativamente uma
+produção já concluída.
 
 Exemplo:
 
@@ -225,6 +332,11 @@ Lote VOD-001 utiliza INS-001
 ↓
 
 AjusteFinal referencia INS-001
+
+## 6.6 Consultas
+
+Consultas de coleções devem preferir funções de total e acesso por índice,
+evitando retornar arrays completos sem limite.
 
 ---
 
@@ -410,7 +522,8 @@ Um lote só pode ser concluído quando:
 
 - todas as etapas obrigatórias existirem;
 - todas as etapas condicionais aplicáveis existirem;
-- todos os insumos utilizados estiverem aprovados;
+- todos os insumos utilizados estiverem válidos e aprovados pelo produtor
+  responsável no momento da conclusão;
 - o produtor responsável registrar a conclusão.
 
 Após concluído:
