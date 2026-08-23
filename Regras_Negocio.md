@@ -359,27 +359,123 @@ evitando retornar arrays completos sem limite.
 
 # 7. Regras gerais de produção
 
-## Etapas permitidas
+## 7.1 Tipos de bebida
+
+`TipoBebida` possui os valores:
+
+- `NaoDefinido`;
+- `Cachaca`;
+- `Whisky`;
+- `Vodca`;
+- `Gin`.
+
+## 7.2 Estados da produção
+
+`EstadoProducao` possui os valores:
+
+- `Criado`;
+- `EmProducao`;
+- `Concluido`.
+
+O fluxo de estado é:
+
+Criado → EmProducao → Concluido
+
+A primeira etapa registrada muda o lote de `Criado` para `EmProducao`. A
+conclusão é explícita e nunca automática.
+
+## 7.3 Cadastro do lote de produção
+
+Somente contas com `PRODUTOR_ROLE` podem cadastrar lotes de produção.
+
+Cada lote é cadastrado com:
+
+- identificador on-chain `uint256`, sequencial e iniciado em 1;
+- produtor responsável igual a `msg.sender`;
+- `TipoBebida` diferente de `NaoDefinido`;
+- `metadataURI` obrigatória;
+- `criadoEm` igual a `block.timestamp`;
+- `concluidoEm` inicialmente igual a 0;
+- estado inicial `Criado`.
+
+## 7.4 Vínculo de insumos
+
+O produtor responsável pode vincular insumos ao lote enquanto seu estado for
+`Criado` ou `EmProducao`.
+
+Para vincular um insumo:
+
+- a conta deve possuir `PRODUTOR_ROLE` no momento da operação;
+- a conta deve ser o produtor responsável pelo lote;
+- o insumo deve existir;
+- o insumo deve estar válido;
+- o insumo deve estar aprovado por aquele produtor no `ContratoInsumos`;
+- não pode existir vínculo duplicado.
+
+Os vínculos são append-only. Não existe desvinculação nesta versão.
+
+## 7.5 Etapas permitidas
 
 O sistema utiliza etapas genéricas:
 
-- PreparacaoBase
-- Fermentacao
-- Destilacao
-- Retificacao
-- Maturacao
-- Filtragem
-- Blendagem
-- Aromatizacao
-- AjusteFinal
+- `PreparacaoBase`;
+- `Fermentacao`;
+- `Destilacao`;
+- `Retificacao`;
+- `Maturacao`;
+- `Filtragem`;
+- `Blendagem`;
+- `Aromatizacao`;
+- `AjusteFinal`.
 
-Não criar etapas específicas por bebida.
+Cada etapa pode ser registrada no máximo uma vez por lote nesta versão.
 
-Exemplo:
+Não criar etapas específicas por bebida. Detalhes repetitivos, medições,
+equipamentos, cortes e demais informações ficam no `metadataURI` da etapa.
 
-"Corte cabeça/coração/cauda" não é uma etapa.
+Exemplo: "corte cabeça/coração/cauda" não é uma etapa; é uma informação
+dentro da etapa `Destilacao`.
 
-É uma informação dentro da etapa Destilacao.
+## 7.6 Registro de etapa
+
+O registro de uma etapa contém conceitualmente:
+
+- `loteId`;
+- etapa;
+- `executadoPor`;
+- `inicioInformado`;
+- `fimInformado`;
+- `registradoEm`;
+- `metadataURI`;
+- relação com os insumos utilizados.
+
+Para registrar uma etapa:
+
+- a conta deve possuir `PRODUTOR_ROLE` no momento da operação;
+- a conta deve ser o produtor responsável pelo lote;
+- o lote não pode estar concluído;
+- a etapa deve ser aplicável ao `TipoBebida`;
+- a etapa ainda não pode ter sido registrada no lote;
+- a precedência deve ser válida;
+- `metadataURI` deve ser obrigatória;
+- `inicioInformado` deve ser menor ou igual a `fimInformado`;
+- `registradoEm` deve ser igual a `block.timestamp`.
+
+`inicioInformado` e `fimInformado` são declarados pelo produtor.
+`registradoEm` representa quando a informação entrou na blockchain.
+
+Ao registrar uma etapa, o produtor pode informar zero ou vários insumos
+utilizados. Cada insumo utilizado:
+
+- deve estar previamente vinculado ao lote;
+- deve continuar válido;
+- deve continuar aprovado pelo produtor responsável;
+- não pode aparecer mais de uma vez dentro da mesma etapa.
+
+A relação entre etapa e insumos utilizados fica registrada on-chain e deve ser
+consultável por total e índice. Uma etapa pode validamente não introduzir
+nenhum novo insumo. O mesmo insumo pode ser utilizado em etapas diferentes do
+mesmo lote.
 
 ---
 
@@ -403,13 +499,37 @@ Pode existir ou não.
 
 Condicional.
 
-Depende da configuração escolhida.
+Passa a ser obrigatória quando o produtor a declara aplicável ao lote.
 
 ## N/A
 
 Não aplicável.
 
 A etapa não deve ser registrada.
+
+## 8.1 Configuração das etapas condicionais
+
+As etapas condicionais configuráveis por bebida são:
+
+- cachaça: `Maturacao` e `AjusteFinal`;
+- whisky: `Blendagem` e `AjusteFinal`;
+- vodca: `Retificacao` e `AjusteFinal`;
+- gin: `AjusteFinal`.
+
+A configuração condicional:
+
+- é registrada on-chain;
+- deve ser compatível com o `TipoBebida`;
+- pode ser alterada somente enquanto o lote estiver em `Criado`;
+- fica congelada após o registro da primeira etapa;
+- não pode ser alterada em `EmProducao` ou `Concluido`.
+
+Etapas OBR são sempre exigidas. Etapas OPC podem existir ou não e não precisam
+de configuração. Etapas N/A não podem ser registradas.
+
+Uma etapa COND somente pode ser registrada quando estiver declarada como
+aplicável na configuração do lote. Se estiver configurada como não aplicável,
+seu registro deve ser rejeitado.
 
 ---
 
@@ -453,6 +573,9 @@ Maturacao (quando aplicável)
 
 AjusteFinal (quando aplicável)
 
+Para atender ao requisito mínimo de insumos, pelo menos um insumo do tipo
+`MateriaPrimaAgricola` deve ter sido efetivamente utilizado em alguma etapa.
+
 ---
 
 ## Whisky
@@ -481,26 +604,27 @@ Blendagem (quando aplicável)
 
 AjusteFinal (quando aplicável)
 
+Para atender ao requisito mínimo de insumos, pelo menos um insumo do tipo
+`MateriaPrimaAgricola` deve ter sido efetivamente utilizado em alguma etapa.
+
 ---
 
 ## Vodca
 
-Fluxo principal:
-
-Base alcoólica aprovada
-
-↓
-
-Processos opcionais:
+Pode registrar, conforme aplicabilidade:
 
 - Retificacao;
 - Filtragem;
 - Blendagem;
 - Aromatizacao.
 
-↓
+Não existe uma ordem universal artificial entre essas operações.
 
-AjusteFinal
+Se `AjusteFinal` for aplicável e registrado, ele deve ser a última etapa
+produtiva e nenhuma outra etapa pode ser registrada depois dele.
+
+Para atender ao requisito mínimo de insumos, pelo menos uma `BaseAlcoolica`
+deve ter sido efetivamente utilizada em alguma etapa.
 
 Observação:
 
@@ -526,27 +650,70 @@ Aromatizacao
 
 AjusteFinal
 
+Para atender ao requisito mínimo de insumos, pelo menos uma `BaseAlcoolica` e
+um `Zimbro` devem ter sido efetivamente utilizados em alguma etapa.
+
 A aromatização pode ocorrer por:
 
 - redestilação com zimbro;
 - adição de extrato de zimbro.
 
+`Agua`, `Levedura`, `Botanico` e `Outro` não são insumos universalmente
+obrigatórios para a conclusão.
+
 ---
 
 # 11. Regras de conclusão
 
-Um lote só pode ser concluído quando:
+A conclusão usa uma operação explícita equivalente a:
 
+`concluirProducao(loteId, metadataURI)`
+
+Somente o produtor responsável pode concluir a produção e ele deve possuir
+`PRODUTOR_ROLE` no momento da operação. O lote deve estar em `EmProducao`.
+
+Para concluir:
+
+- pelo menos uma etapa deve ter sido registrada no lote;
 - todas as etapas obrigatórias existirem;
 - todas as etapas condicionais aplicáveis existirem;
-- todos os insumos utilizados estiverem válidos e aprovados pelo produtor
-  responsável no momento da conclusão;
-- o produtor responsável registrar a conclusão.
+- os tipos mínimos de insumo da bebida devem ter sido efetivamente utilizados;
+- todos os insumos efetivamente utilizados devem continuar válidos;
+- todos os insumos efetivamente utilizados devem continuar aprovados pelo
+  produtor responsável;
+- a `metadataURI` da conclusão deve ser obrigatória e válida.
 
-Após concluído:
+Ao concluir:
 
-- novas etapas não podem ser adicionadas;
-- o lote pode seguir para envasamento.
+- o estado passa a `Concluido`;
+- `concluidoEm` recebe `block.timestamp`;
+- a `metadataURI` da conclusão é registrada.
+
+Depois de `Concluido`, o lote:
+
+- não aceita novas etapas;
+- não aceita novos vínculos de insumo;
+- não aceita alteração da configuração;
+- não aceita nova conclusão;
+- permanece totalmente consultável;
+- pode seguir para o `ContratoEnvasamento`.
+
+Se um insumo efetivamente utilizado for invalidado ou rejeitado antes da
+conclusão, a conclusão deve falhar. Se a produção já estiver concluída, uma
+invalidação ou reavaliação posterior não altera retroativamente seu estado.
+
+Para vodca, a exigência de pelo menos uma etapa significa que ao menos uma das
+etapas produtivas permitidas deve ter sido efetivamente registrada.
+
+Para rastreabilidade, deve ser possível distinguir um insumo apenas vinculado
+de um insumo efetivamente utilizado. A utilização efetiva é o relacionamento
+relevante para rastrear impacto e identificar as produções que utilizaram o
+insumo.
+
+Para rastreabilidade reversa, deve ser possível consultar, por total e índice,
+quais lotes de produção efetivamente utilizaram determinado insumo. Se o mesmo
+insumo for utilizado em várias etapas do mesmo lote, esse lote deve aparecer
+apenas uma vez na relação reversa daquele insumo.
 
 ---
 
