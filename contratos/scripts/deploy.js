@@ -4,7 +4,7 @@ const path = require("path");
 const { exportarABIs, exportarEnderecos } = require("./exportar-frontend");
 
 /**
- * Implantação dos três contratos, na ordem de dependência.
+ * Implantação dos quatro contratos, na ordem de dependência.
  *
  * ATENÇÃO. Este script AINDA NÃO FOI EXECUTADO em rede pública. A implantação
  * definitiva na Sepolia depende da aprovação integral da suíte local de testes
@@ -53,9 +53,16 @@ async function main() {
   }
 
   // A ordem é obrigatória: cada contrato só conhece os implantados antes dele.
-  const lote = await implantar("ContratoLote");
-  const tokenizacao = await implantar("ContratoTokenizacao", [await lote.getAddress()]);
-  await implantar("ContratoRastreamento", [await tokenizacao.getAddress()]);
+  const acesso = await implantar("ContratoAcesso", [implantador.address]);
+  const enderecoAcesso = await acesso.getAddress();
+
+  const insumos = await implantar("ContratoInsumos", [enderecoAcesso]);
+  const enderecoInsumos = await insumos.getAddress();
+
+  const producao = await implantar("ContratoProducao", [enderecoAcesso, enderecoInsumos]);
+  const enderecoProducao = await producao.getAddress();
+
+  await implantar("ContratoEnvasamento", [enderecoAcesso, enderecoProducao]);
 
   const destino = path.join(__dirname, "..", `implantacao-${network.name}.json`);
   fs.writeFileSync(destino, JSON.stringify(registro, null, 2));
@@ -68,9 +75,8 @@ async function main() {
   for (const arquivo of arquivosABI) console.log(`  ${arquivo}`);
   console.log(`  ${arquivoEnderecos}`);
 
-  console.log("\nProximo passo: conceder os papeis as contas de teste.");
-  console.log("O numero do bloco do ContratoLote serve de ancora para as");
-  console.log("consultas por eventos feitas pela interface.");
+  console.log("\nNenhum papel operacional foi concedido automaticamente.");
+  console.log("O administrador inicial do ContratoAcesso e a conta implantadora.");
 }
 
 main().catch((erro) => {

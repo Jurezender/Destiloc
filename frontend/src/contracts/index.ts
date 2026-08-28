@@ -3,9 +3,18 @@ import type { ContractRunner, InterfaceAbi } from "ethers";
 import { REDES, obterConfiguracaoRede } from "./redes";
 import type { ConfiguracaoRede } from "./redes";
 
-export type NomeContrato = "ContratoLote" | "ContratoTokenizacao" | "ContratoRastreamento";
+export type NomeContrato =
+  | "ContratoAcesso"
+  | "ContratoInsumos"
+  | "ContratoProducao"
+  | "ContratoEnvasamento";
 
-const NOMES_CONTRATOS: NomeContrato[] = ["ContratoLote", "ContratoTokenizacao", "ContratoRastreamento"];
+const NOMES_CONTRATOS: NomeContrato[] = [
+  "ContratoAcesso",
+  "ContratoInsumos",
+  "ContratoProducao",
+  "ContratoEnvasamento",
+];
 
 interface RegistroEnderecos {
   rede: string;

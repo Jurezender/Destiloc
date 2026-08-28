@@ -4,11 +4,15 @@ const path = require("path");
 /**
  * Ponte entre os artefatos do Hardhat e a aplicação React em `frontend/`.
  *
- * Os três contratos implantáveis. `TiposCadeia` e `AcessoProtegido` não geram
- * contrato próprio (o segundo é abstrato, herdado pelos três), então não têm
- * ABI a exportar.
+ * Os quatro contratos da arquitetura atual. Bibliotecas, interfaces, tipos e
+ * contratos auxiliares não fazem parte do catálogo consumido pelo frontend.
  */
-const CONTRATOS_IMPLANTAVEIS = ["ContratoLote", "ContratoTokenizacao", "ContratoRastreamento"];
+const CONTRATOS_IMPLANTAVEIS = [
+  "ContratoAcesso",
+  "ContratoInsumos",
+  "ContratoProducao",
+  "ContratoEnvasamento",
+];
 
 const RAIZ_CONTRATOS = path.join(__dirname, "..");
 const DESTINO_FRONTEND = path.join(RAIZ_CONTRATOS, "..", "frontend", "src", "contracts");
@@ -44,7 +48,7 @@ function exportarABIs() {
 
 /**
  * Grava `frontend/src/contracts/enderecos.<rede>.json` com os endereços dos
- * três contratos implantados. `registro` é o mesmo objeto que `deploy.js` já
+ * quatro contratos implantados. `registro` é o mesmo objeto que `deploy.js` já
  * monta e salva em `implantacao-<rede>.json`; esta função só espelha os
  * endereços num formato mais simples de consumir pela interface.
  */
