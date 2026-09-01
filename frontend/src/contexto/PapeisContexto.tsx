@@ -1,31 +1,24 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { obterContrato } from "../contracts";
-import { PAPEL_ADMIN, PAPEL_DISTRIBUIDOR, PAPEL_FABRICANTE, PAPEL_VAREJISTA } from "../lib/papeis";
 import { useCarteira } from "./CarteiraContexto";
-
-interface PapeisPorContrato {
-  admin: boolean;
-  fabricante: boolean;
-}
 
 interface EstadoPapeis {
   carregando: boolean;
   erro: string | null;
-  lote: PapeisPorContrato;
-  tokenizacao: PapeisPorContrato;
-  rastreamento: PapeisPorContrato & { distribuidor: boolean; varejista: boolean };
-  /** Tem FABRICANTE_ROLE nos três contratos — só assim opera o fluxo completo. */
-  fabricanteCompleto: boolean;
+  admin: boolean;
+  fornecedor: boolean;
+  produtor: boolean;
+  envasador: boolean;
   recarregar: () => void;
 }
 
 const PADRAO: Omit<EstadoPapeis, "recarregar"> = {
   carregando: false,
   erro: null,
-  lote: { admin: false, fabricante: false },
-  tokenizacao: { admin: false, fabricante: false },
-  rastreamento: { admin: false, fabricante: false, distribuidor: false, varejista: false },
-  fabricanteCompleto: false,
+  admin: false,
+  fornecedor: false,
+  produtor: false,
+  envasador: false,
 };
 
 const PapeisContexto = createContext<EstadoPapeis | null>(null);
@@ -47,43 +40,23 @@ export function PapeisProvedor({ children }: { children: ReactNode }) {
 
     async function carregar() {
       try {
-        const lote = obterContrato("ContratoLote", chainId!, signer!);
-        const tokenizacao = obterContrato("ContratoTokenizacao", chainId!, signer!);
-        const rastreamento = obterContrato("ContratoRastreamento", chainId!, signer!);
+        const acesso = obterContrato("ContratoAcesso", chainId!, signer!);
 
-        const [
-          adminLote,
-          fabricanteLote,
-          adminTokenizacao,
-          fabricanteTokenizacao,
-          adminRastreamento,
-          fabricanteRastreamento,
-          distribuidor,
-          varejista,
-        ] = await Promise.all([
-          lote.hasRole(PAPEL_ADMIN, conta) as Promise<boolean>,
-          lote.hasRole(PAPEL_FABRICANTE, conta) as Promise<boolean>,
-          tokenizacao.hasRole(PAPEL_ADMIN, conta) as Promise<boolean>,
-          tokenizacao.hasRole(PAPEL_FABRICANTE, conta) as Promise<boolean>,
-          rastreamento.hasRole(PAPEL_ADMIN, conta) as Promise<boolean>,
-          rastreamento.hasRole(PAPEL_FABRICANTE, conta) as Promise<boolean>,
-          rastreamento.hasRole(PAPEL_DISTRIBUIDOR, conta) as Promise<boolean>,
-          rastreamento.hasRole(PAPEL_VAREJISTA, conta) as Promise<boolean>,
+        const [admin, fornecedor, produtor, envasador] = await Promise.all([
+          acesso.ehAdministrador(conta) as Promise<boolean>,
+          acesso.ehFornecedor(conta) as Promise<boolean>,
+          acesso.ehProdutor(conta) as Promise<boolean>,
+          acesso.ehEnvasador(conta) as Promise<boolean>,
         ]);
 
         if (cancelado) return;
         setEstado({
           carregando: false,
           erro: null,
-          lote: { admin: adminLote, fabricante: fabricanteLote },
-          tokenizacao: { admin: adminTokenizacao, fabricante: fabricanteTokenizacao },
-          rastreamento: {
-            admin: adminRastreamento,
-            fabricante: fabricanteRastreamento,
-            distribuidor,
-            varejista,
-          },
-          fabricanteCompleto: fabricanteLote && fabricanteTokenizacao && fabricanteRastreamento,
+          admin,
+          fornecedor,
+          produtor,
+          envasador,
         });
       } catch (erro) {
         if (cancelado) return;
