@@ -6,7 +6,9 @@ import { REDES } from "../contracts/redes";
 import { mapearErroContrato } from "../lib/erros";
 
 interface Contadores {
-  totalLotes: bigint;
+  totalInsumos: bigint;
+  totalLotesProducao: bigint;
+  totalEnvasamentos: bigint;
   totalGarrafas: bigint;
 }
 
@@ -21,13 +23,18 @@ export function Inicio() {
     let cancelado = false;
     (async () => {
       try {
-        const lote = obterContrato("ContratoLote", chainId, signer);
-        const tokenizacao = obterContrato("ContratoTokenizacao", chainId, signer);
-        const [totalLotes, totalGarrafas] = await Promise.all([
-          lote.totalLotes() as Promise<bigint>,
-          tokenizacao.totalEmitidas() as Promise<bigint>,
+        const insumos = obterContrato("ContratoInsumos", chainId, signer);
+        const producao = obterContrato("ContratoProducao", chainId, signer);
+        const envasamento = obterContrato("ContratoEnvasamento", chainId, signer);
+        const [totalInsumos, totalLotesProducao, totalEnvasamentos, totalGarrafas] = await Promise.all([
+          insumos.totalLotesInsumo() as Promise<bigint>,
+          producao.totalLotesProducao() as Promise<bigint>,
+          envasamento.totalEnvasamentos() as Promise<bigint>,
+          envasamento.totalGarrafas() as Promise<bigint>,
         ]);
-        if (!cancelado) setContadores({ totalLotes, totalGarrafas });
+        if (!cancelado) {
+          setContadores({ totalInsumos, totalLotesProducao, totalEnvasamentos, totalGarrafas });
+        }
       } catch (erroLeitura) {
         if (!cancelado) setErro(mapearErroContrato(erroLeitura));
       }
@@ -49,34 +56,24 @@ export function Inicio() {
       </p>
 
       <h2>Seus papéis</h2>
-      <ul>
-        <li>ContratoLote: {papeis.lote.admin && "administrador"} {papeis.lote.fabricante && "fabricante"} {!papeis.lote.admin && !papeis.lote.fabricante && "nenhum"}</li>
-        <li>ContratoTokenizacao: {papeis.tokenizacao.admin && "administrador"} {papeis.tokenizacao.fabricante && "fabricante"} {!papeis.tokenizacao.admin && !papeis.tokenizacao.fabricante && "nenhum"}</li>
-        <li>
-          ContratoRastreamento: {papeis.rastreamento.admin && "administrador "}
-          {papeis.rastreamento.fabricante && "fabricante "}
-          {papeis.rastreamento.distribuidor && "distribuidor "}
-          {papeis.rastreamento.varejista && "varejista "}
-          {!papeis.rastreamento.admin &&
-            !papeis.rastreamento.fabricante &&
-            !papeis.rastreamento.distribuidor &&
-            !papeis.rastreamento.varejista &&
-            "nenhum"}
-        </li>
-      </ul>
-      {!papeis.fabricanteCompleto && (papeis.lote.fabricante || papeis.tokenizacao.fabricante || papeis.rastreamento.fabricante) && (
-        <p className="aviso">
-          Esta conta tem o papel de fabricante em apenas parte dos contratos. Para operar o fluxo completo
-          (lote, emissão e expedição), ela precisa de FABRICANTE_ROLE nos três — peça a um administrador para
-          completar em "Participantes".
-        </p>
+      {papeis.carregando && <p>Carregando papéis…</p>}
+      {papeis.erro && <p className="erro">{papeis.erro}</p>}
+      {!papeis.carregando && !papeis.erro && (
+        <ul>
+          <li>Administrador: {papeis.admin ? "sim" : "não"}</li>
+          <li>Fornecedor: {papeis.fornecedor ? "sim" : "não"}</li>
+          <li>Produtor: {papeis.produtor ? "sim" : "não"}</li>
+          <li>Envasador: {papeis.envasador ? "sim" : "não"}</li>
+        </ul>
       )}
 
       <h2>Contadores gerais</h2>
       {erro && <p className="erro">{erro}</p>}
       {contadores ? (
         <ul>
-          <li>Lotes cadastrados: {contadores.totalLotes.toString()}</li>
+          <li>Lotes de insumo: {contadores.totalInsumos.toString()}</li>
+          <li>Lotes de produção: {contadores.totalLotesProducao.toString()}</li>
+          <li>Envasamentos: {contadores.totalEnvasamentos.toString()}</li>
           <li>Garrafas emitidas: {contadores.totalGarrafas.toString()}</li>
         </ul>
       ) : (
