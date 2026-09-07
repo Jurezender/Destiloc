@@ -30,7 +30,7 @@ export function App() {
           path="participantes"
           element={
             <RotaProtegida
-              exigirPapel={(p) => p.lote.admin || p.tokenizacao.admin || p.rastreamento.admin}
+              exigirPapel={(p) => p.admin}
               mensagemPapel="Só administradores (em algum dos três contratos) podem gerenciar participantes."
             >
               <Participantes />
