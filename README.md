@@ -8,22 +8,24 @@ Orientação: Prof. Dr. João Paulo de Brito Gonçalves
 
 ## Sobre o projeto
 
-Protótipo de rastreabilidade de bebidas destiladas apoiado em blockchain, cobrindo o ciclo completo desde o registro do lote de produção até a verificação de uma garrafa individual pelo consumidor final.
+Protótipo de rastreabilidade de bebidas destiladas apoiado em blockchain, cobrindo o ciclo completo desde o cadastro dos insumos até a consulta pública de uma garrafa individual pelo consumidor final.
 
-A identidade de cada garrafa é representada por um token ERC-721 não transferível. Os eventos de produção pertencem ao lote e seguem uma gramática estrutural que impõe uma sequência válida de etapas. A transferência de custódia acontece em duas fases, expedição e confirmação, com reverificação do papel do destinatário no momento da confirmação. O controle de acesso é baseado em papéis, com exclusividade mútua entre os papéis operacionais, de modo que o varejista é um estado terminal.
+O fluxo segue: o fornecedor cadastra o insumo; o produtor avalia e aprova (ou rejeita) o insumo; um insumo aprovado passa a poder ser vinculado a um lote de produção; o produtor cria e configura esse lote, vincula os insumos aprovados, registra as etapas de produção previstas para o tipo de bebida e conclui a produção; o envasador registra um envasamento referente a um lote de produção concluído e emite as garrafas correspondentes. Cada garrafa emitida recebe uma identidade individual não transferível, representada por um token ERC-721 vinculado ao envasamento — e, por meio dele, ao lote de produção, às etapas e aos insumos utilizados. A consulta pública percorre essa cadeia (garrafa → envasamento → produção → etapas → insumos → fornecedores) sem exigir carteira conectada.
+
+O controle de acesso é baseado em papéis — administrador, fornecedor, produtor e envasador —, geridos pelo `ContratoAcesso`; uma mesma conta pode acumular mais de um papel.
 
 ## Estrutura do repositório
 
 | Diretório | Conteúdo |
 |---|---|
 | `contratos/` | Contratos inteligentes em Solidity, suíte de testes automatizados e scripts de implantação |
-| `frontend/` | Interface web em React, integrada à MetaMask para autenticação e envio de transações |
+| `frontend/` | Interface web em React, integrada à MetaMask para conexão da carteira e envio de transações |
 
 ## Estado de validação
 
-Os contratos estão refatorados e a suíte de 92 testes passa integralmente na rede local. Os scripts de implantação foram executados com sucesso contra `localhost`.
+Os contratos seguem a arquitetura atual (`ContratoAcesso`, `ContratoInsumos`, `ContratoProducao` e `ContratoEnvasamento`) e a suíte de 134 testes passa integralmente na rede Hardhat local, distribuída nos grupos J a N. Os scripts de implantação foram executados com sucesso contra `localhost`.
 
-O fluxo completo, do cadastro do lote até a consulta pública, foi validado de ponta a ponta pelo script `contratos/scripts/fluxo-local.js`.
+O fluxo completo, do cadastro do insumo até a consulta pública da garrafa, é validado de ponta a ponta pelo grupo de testes `N. Fluxo completo da arquitetura nova` (`contratos/test/12-fluxo-completo.js`).
 
 A interface web está implementada e foi exercitada contra a rede local. A integração com o IPFS via nó Kubo local também está implementada. Ambas dependem de recursos externos ao processo de teste, a extensão MetaMask e o daemon Kubo em execução, e por isso a verificação delas é manual. O roteiro está na seção [Interface web](#interface-web).
 
@@ -103,7 +105,6 @@ npm run node:local        # em um terminal à parte, deixa rodando
 
 ```bash
 npm run deploy:local      # em outro terminal — implanta e exporta para o frontend
-npm run fluxo:local       # opcional: roda o fluxo completo por script, sem interface
 ```
 
 ### Nó IPFS
@@ -136,11 +137,12 @@ Verificação manual da interface, na ordem:
 1. Suba o nó Hardhat local e implante os contratos, anotando os endereços resultantes.
 2. Confirme que os endereços implantados estão configurados no frontend.
 3. Adicione a rede local à MetaMask, apontando para `http://127.0.0.1:8545` com o `chainId` correspondente.
-4. Importe para a MetaMask uma das contas de teste geradas pelo nó Hardhat.
-5. Conecte a carteira pela interface e confirme que o papel atribuído à conta é reconhecido corretamente.
-6. Cadastre um lote, registre os eventos de produção na sequência válida e faça a tokenização das garrafas.
-7. Execute a expedição e a confirmação de custódia entre duas contas com papéis distintos.
-8. Leia o QR Code de uma garrafa em um navegador sem carteira conectada e confirme que a consulta pública retorna o histórico esperado.
+4. Importe para a MetaMask contas de teste geradas pelo nó Hardhat e conceda a elas os papéis necessários (fornecedor, produtor, envasador) na tela Participantes.
+5. Conecte a carteira pela interface e confirme que o(s) papel(is) atribuído(s) à conta são reconhecidos corretamente.
+6. Como fornecedor, cadastre um lote de insumo; como produtor, avalie e aprove esse insumo.
+7. Como produtor, crie e configure um lote de produção, vincule o insumo aprovado, registre as etapas previstas para o tipo de bebida e conclua a produção.
+8. Como envasador, registre um envasamento referente ao lote concluído e emita as garrafas.
+9. Leia o QR Code de uma garrafa em um navegador sem carteira conectada e confirme que a consulta pública retorna o histórico esperado.
 
 Tentativas de executar operações fora da sequência válida ou a partir de uma conta sem o papel exigido devem ser rejeitadas pelo contrato. Essas rejeições são o comportamento correto e evidenciam que as regras estão sendo aplicadas na cadeia.
 
@@ -150,9 +152,10 @@ Tentativas de executar operações fora da sequência válida ou a partir de uma
 
 | Contrato | Endereço |
 |---|---|
-| `ContratoLote` | |
-| `ContratoTokenizacao` | |
-| `ContratoRastreamento` | |
+| `ContratoAcesso` | |
+| `ContratoInsumos` | |
+| `ContratoProducao` | |
+| `ContratoEnvasamento` | |
 
 ## Licença
 
