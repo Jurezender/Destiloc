@@ -1,49 +1,61 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { AcoesCustodia } from "../componentes/AcoesCustodia";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
+import { formatarTimestamp } from "../lib/formatadores";
 
 interface LinhaGarrafa {
   tokenId: bigint;
-  loteId: bigint;
-  custodianteAtual: string;
-  pendente: boolean;
-  destinatarioPendente: string;
+  envasamentoId: bigint;
+  loteProducaoId: bigint;
+  emitidaEm: bigint;
 }
 
 export function Garrafas() {
-  const { conta, chainId, signer } = useCarteira();
+  const { chainId, signer } = useCarteira();
   const [linhas, setLinhas] = useState<LinhaGarrafa[]>([]);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
-  const [apenasMinhas, setApenasMinhas] = useState(true);
 
   const carregar = useCallback(async () => {
     if (!chainId || !signer) return;
     setCarregando(true);
     setErro(null);
     try {
-      const tokenizacao = obterContrato("ContratoTokenizacao", chainId, signer);
-      const rastreamento = obterContrato("ContratoRastreamento", chainId, signer);
-      const total = Number((await tokenizacao.totalEmitidas()) as bigint);
-      const ids = Array.from({ length: total }, (_, i) => BigInt(i + 1));
+      const envasamento = obterContrato("ContratoEnvasamento", chainId, signer);
+      const total = Number(await envasamento.totalGarrafas());
+      const tokenIds = Array.from({ length: total }, (_, i) => BigInt(i + 1));
 
-      const dados = await Promise.all(
-        ids.map(async (tokenId) => {
-          const [dadosGarrafa, situacao] = await Promise.all([
-            tokenizacao.dadosDaGarrafa(tokenId),
-            rastreamento.situacaoCustodia(tokenId),
-          ]);
+      const garrafas = await Promise.all(
+        tokenIds.map(async (tokenId) => {
+          const dado = await envasamento.obterGarrafa(tokenId);
           return {
             tokenId,
-            loteId: dadosGarrafa.loteId as bigint,
-            custodianteAtual: situacao.custodiante as string,
-            pendente: situacao.pendente as boolean,
-            destinatarioPendente: situacao.destinatario as string,
-          } satisfies LinhaGarrafa;
+            envasamentoId: dado.envasamentoId as bigint,
+            emitidaEm: dado.emitidaEm as bigint,
+          };
         })
+      );
+
+      const idsEnvasamentosUnicos = Array.from(new Set(garrafas.map((g) => g.envasamentoId.toString())));
+      const paresEnvasamento = await Promise.all(
+        idsEnvasamentosUnicos.map(async (chave) => {
+          const envasamentoId = BigInt(chave);
+          const dadoEnvasamento = await envasamento.obterEnvasamento(envasamentoId);
+          return [chave, dadoEnvasamento.loteProducaoId as bigint] as const;
+        })
+      );
+      const loteProducaoIdPorEnvasamento = new Map(paresEnvasamento);
+
+      const dados = garrafas.map(
+        (g) =>
+          ({
+            tokenId: g.tokenId,
+            envasamentoId: g.envasamentoId,
+            loteProducaoId: loteProducaoIdPorEnvasamento.get(g.envasamentoId.toString())!,
+            emitidaEm: g.emitidaEm,
+          }) satisfies LinhaGarrafa
       );
       setLinhas(dados.reverse());
     } catch (erroLeitura) {
@@ -57,48 +69,26 @@ export function Garrafas() {
     void carregar();
   }, [carregar]);
 
-  const visiveis = linhas.filter((linha) => {
-    if (!apenasMinhas || !conta) return true;
-    const c = conta.toLowerCase();
-    return linha.custodianteAtual.toLowerCase() === c || (linha.pendente && linha.destinatarioPendente.toLowerCase() === c);
-  });
-
   return (
     <section>
       <h1>Garrafas</h1>
-      <label>
-        <input type="checkbox" checked={apenasMinhas} onChange={(e) => setApenasMinhas(e.target.checked)} />
-        Mostrar só as garrafas que exigem alguma ação minha
-      </label>
 
       {carregando && <p>Carregando…</p>}
       {erro && <p className="erro">{erro}</p>}
 
       <ul className="lista-garrafas">
-        {visiveis.map((linha) => (
+        {linhas.map((linha) => (
           <li key={linha.tokenId.toString()}>
             <p>
-              <Link to={`/garrafas/${linha.tokenId}`}>Garrafa #{linha.tokenId.toString()}</Link> — lote #
-              {linha.loteId.toString()}
+              <Link to={`/garrafas/${linha.tokenId}`}>Garrafa #{linha.tokenId.toString()}</Link> — envasamento #
+              {linha.envasamentoId.toString()} — lote{" "}
+              <Link to={`/lotes/${linha.loteProducaoId}`}>#{linha.loteProducaoId.toString()}</Link>
               <br />
-              Custodiante atual: {linha.custodianteAtual}
-              {linha.pendente && <> — expedição pendente para {linha.destinatarioPendente}</>}
+              Emitida em: {formatarTimestamp(linha.emitidaEm)}
             </p>
-            {conta && chainId && signer && (
-              <AcoesCustodia
-                tokenId={linha.tokenId}
-                chainId={chainId}
-                signer={signer}
-                conta={conta}
-                custodianteAtual={linha.custodianteAtual}
-                pendente={linha.pendente}
-                destinatarioPendente={linha.destinatarioPendente}
-                aoAtualizar={carregar}
-              />
-            )}
           </li>
         ))}
-        {!carregando && visiveis.length === 0 && <li>Nenhuma garrafa nesta visão.</li>}
+        {!carregando && linhas.length === 0 && <li>Nenhuma garrafa emitida ainda.</li>}
       </ul>
     </section>
   );
