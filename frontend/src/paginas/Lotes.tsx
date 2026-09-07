@@ -3,81 +3,97 @@ import { Link } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
-import { RETULO_ETAPA } from "../lib/formatadores";
 import { mapearErroContrato } from "../lib/erros";
-import { EtapaProdutiva } from "../lib/tipos";
-import { validarSequencia } from "../lib/validacaoSequencia";
+import { encurtarEndereco, formatarTimestamp, RETULO_ESTADO_PRODUCAO, RETULO_TIPO_BEBIDA } from "../lib/formatadores";
+import { EstadoProducao, TipoBebida } from "../lib/tipos";
+import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
+import { adicionarJSON } from "../ipfs/kubo";
+import { montarMetadadosLoteProducao, type ConfiguracaoProducaoMetadados } from "../ipfs/metadados";
 
 interface LinhaLote {
   id: bigint;
-  tipoBebida: string;
-  fabricante: string;
-  indiceAtual: bigint;
+  tipoBebida: TipoBebida;
+  produtor: string;
+  estado: EstadoProducao;
+  criadoEm: bigint;
   totalEtapas: bigint;
-  concluido: boolean;
 }
 
-function ConstrutorSequencia({ sequencia, setSequencia }: { sequencia: EtapaProdutiva[]; setSequencia: (s: EtapaProdutiva[]) => void }) {
-  const completa = [EtapaProdutiva.RecebimentoMateriaPrima, ...sequencia, EtapaProdutiva.Engarrafamento];
-  const erroSequencia = validarSequencia(completa);
+const OPCOES_TIPO_BEBIDA = [TipoBebida.Cachaca, TipoBebida.Whisky, TipoBebida.Vodca, TipoBebida.Gin];
 
-  return (
-    <div className="construtor-sequencia">
-      <ol>
-        <li>{RETULO_ETAPA[EtapaProdutiva.RecebimentoMateriaPrima]} (fixa, primeira)</li>
-        {sequencia.map((etapa, indice) => (
-          <li key={indice}>{RETULO_ETAPA[etapa]}</li>
-        ))}
-        <li>{RETULO_ETAPA[EtapaProdutiva.Engarrafamento]} (fixa, última)</li>
-      </ol>
-      <div className="acoes">
-        <button type="button" onClick={() => setSequencia([...sequencia, EtapaProdutiva.TransformacaoDestilacao])}>
-          + Transformação/destilação
-        </button>
-        <button type="button" onClick={() => setSequencia([...sequencia, EtapaProdutiva.Envelhecimento])}>
-          + Envelhecimento
-        </button>
-        <button type="button" onClick={() => setSequencia([...sequencia, EtapaProdutiva.Finalizacao])}>
-          + Finalização
-        </button>
-        <button type="button" disabled={sequencia.length === 0} onClick={() => setSequencia(sequencia.slice(0, -1))}>
-          Remover última
-        </button>
-      </div>
-      {erroSequencia ? <p className="erro">{erroSequencia}</p> : <p className="ok">Sequência válida.</p>}
-    </div>
-  );
-}
+const CONFIGURACAO_PADRAO: ConfiguracaoProducaoMetadados = {
+  maturacaoAplicavel: false,
+  retificacaoAplicavel: false,
+  blendagemAplicavel: false,
+  ajusteFinalAplicavel: false,
+};
 
-function NovoLote({ onCriado }: { onCriado: () => void }) {
+function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
   const { chainId, signer } = useCarteira();
   const [tipoBebida, setTipoBebida] = useState("");
-  const [insumos, setInsumos] = useState("");
-  const [sequencia, setSequencia] = useState<EtapaProdutiva[]>([EtapaProdutiva.TransformacaoDestilacao]);
+  const [configuracao, setConfiguracao] = useState<ConfiguracaoProducaoMetadados>(CONFIGURACAO_PADRAO);
+  const [descricao, setDescricao] = useState("");
+  const [documentos, setDocumentos] = useState("");
+  const [metadataURI, setMetadataURI] = useState("");
+  const [enviandoIpfs, setEnviandoIpfs] = useState(false);
+  const [erroIpfs, setErroIpfs] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
-  async function enviar() {
-    if (!chainId || !signer) return;
-    const completa = [EtapaProdutiva.RecebimentoMateriaPrima, ...sequencia, EtapaProdutiva.Engarrafamento];
-    const erroSequencia = validarSequencia(completa);
-    if (erroSequencia) {
-      setErro(erroSequencia);
+  function alternarConfiguracao(campo: keyof ConfiguracaoProducaoMetadados) {
+    setConfiguracao((atual) => ({ ...atual, [campo]: !atual[campo] }));
+  }
+
+  async function gerarViaIpfs() {
+    if (tipoBebida === "") {
+      setErroIpfs("Selecione o tipo de bebida antes de gerar os metadados.");
       return;
     }
-    if (!tipoBebida.trim() || !insumos.trim()) {
-      setErro("Preencha o tipo de bebida e os insumos.");
+    setErroIpfs(null);
+    setEnviandoIpfs(true);
+    try {
+      const metadados = montarMetadadosLoteProducao({
+        tipoBebida: Number(tipoBebida) as TipoBebida,
+        configuracao,
+        descricao: descricao.trim() || undefined,
+        documentos: documentos
+          .split("\n")
+          .map((linha) => linha.trim())
+          .filter(Boolean),
+      });
+      const referencia = await adicionarJSON(metadados);
+      setMetadataURI(referencia);
+    } catch (erroUpload) {
+      setErroIpfs(erroUpload instanceof Error ? erroUpload.message : "Não foi possível enviar ao IPFS.");
+    } finally {
+      setEnviandoIpfs(false);
+    }
+  }
+
+  const erroReferencia =
+    motivoReferenciaInvalida(metadataURI) ?? (metadataURI.trim() === "" ? "Informe a referência ipfs://." : null);
+
+  async function enviar() {
+    if (!chainId || !signer) return;
+    if (tipoBebida === "") {
+      setErro("Selecione o tipo de bebida.");
+      return;
+    }
+    if (erroReferencia) {
+      setErro(erroReferencia);
       return;
     }
     setErro(null);
     setEnviando(true);
     try {
-      const lote = obterContrato("ContratoLote", chainId, signer);
-      const tx = await lote.registrarLote(tipoBebida.trim(), insumos.trim(), completa);
+      const producao = obterContrato("ContratoProducao", chainId, signer);
+      const tx = await producao.criarLoteProducao(Number(tipoBebida) as TipoBebida, configuracao, metadataURI.trim());
       await tx.wait();
       setTipoBebida("");
-      setInsumos("");
-      setSequencia([EtapaProdutiva.TransformacaoDestilacao]);
+      setConfiguracao(CONFIGURACAO_PADRAO);
+      setDescricao("");
+      setDocumentos("");
+      setMetadataURI("");
       onCriado();
     } catch (erroEnvio) {
       setErro(mapearErroContrato(erroEnvio));
@@ -88,16 +104,72 @@ function NovoLote({ onCriado }: { onCriado: () => void }) {
 
   return (
     <fieldset disabled={enviando}>
-      <legend>Novo lote</legend>
+      <legend>Novo lote de produção</legend>
       <label>
         Tipo de bebida
-        <input value={tipoBebida} onChange={(e) => setTipoBebida(e.target.value)} />
+        <select value={tipoBebida} onChange={(e) => setTipoBebida(e.target.value)}>
+          <option value="">Selecione…</option>
+          {OPCOES_TIPO_BEBIDA.map((opcao) => (
+            <option key={opcao} value={opcao}>
+              {RETULO_TIPO_BEBIDA[opcao]}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <fieldset>
+        <legend>Configuração de produção</legend>
+        <label>
+          <input
+            type="checkbox"
+            checked={configuracao.maturacaoAplicavel}
+            onChange={() => alternarConfiguracao("maturacaoAplicavel")}
+          />
+          Maturação aplicável
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={configuracao.retificacaoAplicavel}
+            onChange={() => alternarConfiguracao("retificacaoAplicavel")}
+          />
+          Retificação aplicável
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={configuracao.blendagemAplicavel}
+            onChange={() => alternarConfiguracao("blendagemAplicavel")}
+          />
+          Blendagem aplicável
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={configuracao.ajusteFinalAplicavel}
+            onChange={() => alternarConfiguracao("ajusteFinalAplicavel")}
+          />
+          Ajuste final aplicável
+        </label>
+      </fieldset>
+
+      <label>
+        Descrição (opcional — vai para os metadados enviados ao IPFS)
+        <input value={descricao} onChange={(e) => setDescricao(e.target.value)} />
       </label>
       <label>
-        Insumos
-        <input value={insumos} onChange={(e) => setInsumos(e.target.value)} />
+        Documentos (um por linha, opcional — vira um JSON enviado ao IPFS)
+        <textarea rows={3} value={documentos} onChange={(e) => setDocumentos(e.target.value)} />
       </label>
-      <ConstrutorSequencia sequencia={sequencia} setSequencia={setSequencia} />
+      <button type="button" onClick={() => void gerarViaIpfs()} disabled={enviandoIpfs}>
+        {enviandoIpfs ? "Enviando ao IPFS…" : "Gerar referência no IPFS"}
+      </button>
+      {erroIpfs && <p className="erro">{erroIpfs}</p>}
+      <label>
+        Metadados (ipfs://…, preenchido automaticamente pelo botão acima, ou cole uma referência já existente)
+        <input value={metadataURI} onChange={(e) => setMetadataURI(e.target.value.trim())} />
+      </label>
+
       <button type="button" onClick={() => void enviar()}>
         {enviando ? "Registrando…" : "Registrar lote"}
       </button>
@@ -118,19 +190,22 @@ export function Lotes() {
     setCarregando(true);
     setErro(null);
     try {
-      const lote = obterContrato("ContratoLote", chainId, signer);
-      const total = (await lote.totalLotes()) as bigint;
+      const producao = obterContrato("ContratoProducao", chainId, signer);
+      const total = (await producao.totalLotesProducao()) as bigint;
       const ids = Array.from({ length: Number(total) }, (_, i) => BigInt(i + 1));
       const dados = await Promise.all(
         ids.map(async (id) => {
-          const dado = await lote.obterLote(id);
+          const [dado, totalEtapas] = await Promise.all([
+            producao.obterLoteProducao(id),
+            producao.totalEtapas(id) as Promise<bigint>,
+          ]);
           return {
             id,
-            tipoBebida: dado.tipoBebida as string,
-            fabricante: dado.fabricante as string,
-            indiceAtual: dado.indiceAtual as bigint,
-            totalEtapas: (await lote.totalEtapas(id)) as bigint,
-            concluido: ((dado.dataConclusao as bigint) ?? 0n) > 0n,
+            tipoBebida: Number(dado.tipoBebida) as TipoBebida,
+            produtor: dado.produtor as string,
+            estado: Number(dado.estado) as EstadoProducao,
+            criadoEm: dado.criadoEm as bigint,
+            totalEtapas,
           } satisfies LinhaLote;
         })
       );
@@ -148,10 +223,10 @@ export function Lotes() {
 
   return (
     <section>
-      <h1>Lotes</h1>
-      {papeis.lote.fabricante && <NovoLote onCriado={carregar} />}
-      {!papeis.lote.fabricante && (
-        <p className="dica">Sua conta não tem FABRICANTE_ROLE em ContratoLote; só pode consultar.</p>
+      <h1>Lotes de produção</h1>
+      {papeis.produtor && <NovoLoteProducao onCriado={carregar} />}
+      {!papeis.produtor && (
+        <p className="dica">Sua conta não tem PRODUTOR_ROLE (concedido no ContratoAcesso); só pode consultar.</p>
       )}
 
       <h2>Lotes cadastrados</h2>
@@ -161,8 +236,9 @@ export function Lotes() {
         {linhas.map((linha) => (
           <li key={linha.id.toString()}>
             <Link to={`/lotes/${linha.id}`}>
-              #{linha.id.toString()} — {linha.tipoBebida} ({linha.indiceAtual.toString()}/{linha.totalEtapas.toString()}
-              {linha.concluido ? ", concluído" : ""})
+              #{linha.id.toString()} — {RETULO_TIPO_BEBIDA[linha.tipoBebida]} — produtor{" "}
+              {encurtarEndereco(linha.produtor)} — {RETULO_ESTADO_PRODUCAO[linha.estado]} — criado em{" "}
+              {formatarTimestamp(linha.criadoEm)} — {linha.totalEtapas.toString()} etapa(s)
             </Link>
           </li>
         ))}
