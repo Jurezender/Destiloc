@@ -4,6 +4,7 @@ import { StatusCarteira } from "./StatusCarteira";
 const LINKS = [
   { para: "/", rotulo: "Início" },
   { para: "/participantes", rotulo: "Participantes" },
+  { para: "/insumos", rotulo: "Insumos" },
   { para: "/lotes", rotulo: "Lotes" },
   { para: "/garrafas", rotulo: "Garrafas" },
 ];

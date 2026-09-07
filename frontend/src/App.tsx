@@ -6,6 +6,8 @@ import { Emitir } from "./paginas/Emitir";
 import { Garrafas } from "./paginas/Garrafas";
 import { GarrafaDetalhe } from "./paginas/GarrafaDetalhe";
 import { Inicio } from "./paginas/Inicio";
+import { InsumoDetalhe } from "./paginas/InsumoDetalhe";
+import { Insumos } from "./paginas/Insumos";
 import { LoteDetalhe } from "./paginas/LoteDetalhe";
 import { Lotes } from "./paginas/Lotes";
 import { Participantes } from "./paginas/Participantes";
@@ -34,6 +36,22 @@ export function App() {
               mensagemPapel="Só administradores (em algum dos três contratos) podem gerenciar participantes."
             >
               <Participantes />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="insumos"
+          element={
+            <RotaProtegida>
+              <Insumos />
+            </RotaProtegida>
+          }
+        />
+        <Route
+          path="insumos/:id"
+          element={
+            <RotaProtegida>
+              <InsumoDetalhe />
             </RotaProtegida>
           }
         />
