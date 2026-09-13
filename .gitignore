@@ -18,8 +18,6 @@ coverage.json
 # como evidência da implantação.
 /contratos/implantacao-localhost.json
 
-# ABIs e endereços exportados para a interface: gerados por
-# `npm run compile` / `npm run deploy:local` / `npm run deploy:sepolia`
-# dentro de contratos/. Regenerar em vez de versionar.
-/frontend/src/contracts/abi/
-/frontend/src/contracts/enderecos.*.json
+# ABIs versionadas junto com o código: geradas por `npm run compile` +
+# `npm run frontend:abi`. Endereço local é efêmero; Sepolia é permanente.
+/frontend/src/contracts/enderecos.localhost.json

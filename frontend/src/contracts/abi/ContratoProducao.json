@@ -1,0 +1,969 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "enderecoContratoAcesso",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "enderecoContratoInsumos",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "ConfiguracaoCongelada",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ConfiguracaoInvalida",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ContratoAcessoInvalido",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ContratoInsumosInvalido",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "EstadoProducaoInvalido",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "EtapaJaRegistrada",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "EtapaNaoAplicavel",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "IndiceForaDosLimites",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsumoDuplicadoNaEtapa",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsumoInexistente",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsumoInvalido",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsumoJaVinculado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsumoNaoAprovado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsumoNaoVinculado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LoteProducaoInexistente",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NaoEhProdutorResponsavel",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PeriodoInformadoInvalido",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PrecedenciaInvalida",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReferenciaIPFSInvalida",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "RequisitoDeEtapaNaoAtendido",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "RequisitoDeInsumoNaoAtendido",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SemPermissao",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TipoBebidaInvalido",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      }
+    ],
+    "name": "ConfiguracaoProducaoAtualizada",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "enum ContratoProducao.EtapaProducao",
+        "name": "etapa",
+        "type": "uint8"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "executadoPor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "indice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "registradoEm",
+        "type": "uint64"
+      }
+    ],
+    "name": "EtapaProducaoRegistrada",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      }
+    ],
+    "name": "InsumoVinculadoAoLote",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "enum ContratoProducao.TipoBebida",
+        "name": "tipoBebida",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "criadoEm",
+        "type": "uint64"
+      }
+    ],
+    "name": "LoteProducaoCriado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "concluidoEm",
+        "type": "uint64"
+      }
+    ],
+    "name": "ProducaoConcluida",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "maturacaoAplicavel",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "retificacaoAplicavel",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "blendagemAplicavel",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "ajusteFinalAplicavel",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct ContratoProducao.ConfiguracaoProducao",
+        "name": "configuracao",
+        "type": "tuple"
+      }
+    ],
+    "name": "atualizarConfiguracao",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      }
+    ],
+    "name": "concluirProducao",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "contratoAcesso",
+    "outputs": [
+      {
+        "internalType": "contract IContratoAcesso",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "contratoInsumos",
+    "outputs": [
+      {
+        "internalType": "contract IContratoInsumos",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum ContratoProducao.TipoBebida",
+        "name": "tipoBebida",
+        "type": "uint8"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "maturacaoAplicavel",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "retificacaoAplicavel",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "blendagemAplicavel",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "ajusteFinalAplicavel",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct ContratoProducao.ConfiguracaoProducao",
+        "name": "configuracao",
+        "type": "tuple"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      }
+    ],
+    "name": "criarLoteProducao",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum ContratoProducao.EtapaProducao",
+        "name": "etapa",
+        "type": "uint8"
+      }
+    ],
+    "name": "etapaFoiRegistrada",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indice",
+        "type": "uint256"
+      }
+    ],
+    "name": "etapaPorIndice",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum ContratoProducao.EtapaProducao",
+            "name": "etapa",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "executadoPor",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "inicioInformado",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fimInformado",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint64",
+            "name": "registradoEm",
+            "type": "uint64"
+          },
+          {
+            "internalType": "string",
+            "name": "metadataURI",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ContratoProducao.RegistroEtapa",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indiceEtapa",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indiceInsumo",
+        "type": "uint256"
+      }
+    ],
+    "name": "insumoDaEtapaPorIndice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      }
+    ],
+    "name": "insumoEstaVinculado",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indice",
+        "type": "uint256"
+      }
+    ],
+    "name": "insumoUtilizadoPorIndice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indice",
+        "type": "uint256"
+      }
+    ],
+    "name": "insumoVinculadoPorIndice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indice",
+        "type": "uint256"
+      }
+    ],
+    "name": "loteDoProdutorPorIndice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
+    "name": "loteProducaoConcluido",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
+    "name": "loteProducaoExiste",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indice",
+        "type": "uint256"
+      }
+    ],
+    "name": "loteQueUtilizouInsumoPorIndice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
+    "name": "obterConfiguracao",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "maturacaoAplicavel",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "retificacaoAplicavel",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "blendagemAplicavel",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "ajusteFinalAplicavel",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct ContratoProducao.ConfiguracaoProducao",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
+    "name": "obterLoteProducao",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "produtor",
+            "type": "address"
+          },
+          {
+            "internalType": "enum ContratoProducao.TipoBebida",
+            "name": "tipoBebida",
+            "type": "uint8"
+          },
+          {
+            "internalType": "enum ContratoProducao.EstadoProducao",
+            "name": "estado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint64",
+            "name": "criadoEm",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "concluidoEm",
+            "type": "uint64"
+          },
+          {
+            "internalType": "string",
+            "name": "metadataURI",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "metadataURIConclusao",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ContratoProducao.LoteProducao",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum ContratoProducao.EtapaProducao",
+        "name": "etapa",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "insumosUtilizados",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "inicioInformado",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fimInformado",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      }
+    ],
+    "name": "registrarEtapa",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalEtapas",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indiceEtapa",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalInsumosDaEtapa",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalInsumosUtilizados",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalInsumosVinculados",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      }
+    ],
+    "name": "totalLotesDoProdutor",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalLotesProducao",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalLotesQueUtilizaramInsumo",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      }
+    ],
+    "name": "vincularInsumoAoLote",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

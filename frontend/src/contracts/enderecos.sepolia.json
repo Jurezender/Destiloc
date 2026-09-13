@@ -1,0 +1,10 @@
+{
+  "rede": "sepolia",
+  "momento": "2026-09-13T23:03:32.438Z",
+  "enderecos": {
+    "ContratoAcesso": "0x3f1c9F542AF7D5a7Bfd386F4b645d396bea69766",
+    "ContratoInsumos": "0x95173eDFc3606826242fb9cd9e30a3D8C4005390",
+    "ContratoProducao": "0xb73b6a9A06E3EE3c81D1F3A383f8586017137Da3",
+    "ContratoEnvasamento": "0xE8C40B72A80E960405AbDCb555046A9ec1EE45CC"
+  }
+}
