@@ -60,6 +60,16 @@ function SecaoPapel({
 
     setExecutando(true);
     try {
+      const acesso = obterContrato("ContratoAcesso", chainId, signer);
+      const possuiPapel = (await acesso.hasRole(papel, endereco)) as boolean;
+      if (acao === "conceder" && possuiPapel) {
+        setErro("Esta conta já possui este papel.");
+        return;
+      }
+      if (acao === "revogar" && !possuiPapel) {
+        setErro("Esta conta não possui este papel.");
+        return;
+      }
       setStatus(`${acao === "conceder" ? "Concedendo" : "Revogando"} papel no ContratoAcesso…`);
       await aplicarPapel(papel, endereco, acao, signer, chainId);
       setStatus("Concluído.");

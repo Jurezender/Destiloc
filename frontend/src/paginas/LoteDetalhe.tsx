@@ -299,7 +299,8 @@ export function LoteDetalhe() {
           <br />
           Metadados de conclusão: {lote.metadataURIConclusao}
           <br />
-          Produção concluída — apta para envasamento.
+          Produção concluída — apta para envasamento.{" "}
+          <Link to={`/lotes/${lote.id.toString()}/emitir`}>Ir para envasamento e emissão</Link>
         </p>
       ) : lote.estado === EstadoProducao.EmProducao ? (
         podeOperar ? (
