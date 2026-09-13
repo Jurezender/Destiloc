@@ -45,6 +45,8 @@ const MENSAGENS: Array<[string, string]> = [
   ["TokenNaoTransferivel", "Esta garrafa não pode ser transferida."],
   ["AprovacaoNaoPermitida", "Não é permitido aprovar transferências desta garrafa."],
   ["IndiceForaDosLimites", "O item solicitado não existe nesta lista."],
+  ["ERC721NonexistentToken", "Esta garrafa não existe."],
+  ["AccessControlBadConfirmation", "A confirmação para renunciar ao papel está incorreta."],
 ];
 
 interface ErroComRevert {
@@ -76,6 +78,9 @@ export function mapearErroContrato(erro: unknown): string {
   }
   if (texto.includes("insufficient funds")) {
     return "Saldo insuficiente para pagar o gas desta transação.";
+  }
+  if (texto.includes("unknown custom error")) {
+    return "A transação foi rejeitada pelo contrato. Verifique os dados informados e tente novamente.";
   }
 
   return "Não foi possível concluir a operação. Detalhe técnico: " + (texto || "erro desconhecido");

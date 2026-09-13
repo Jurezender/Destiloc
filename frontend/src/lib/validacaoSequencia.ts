@@ -1,4 +1,4 @@
-import { EtapaProducao, TipoBebida } from "./tipos";
+import { EtapaProducao, TipoBebida, TipoInsumo } from "./tipos";
 
 /**
  * Espelha ConfiguracaoProducao de ContratoProducao. Estes helpers antecipam
@@ -203,4 +203,62 @@ export function validarRegistroEtapa(dados: DadosRegistroEtapa): string | null {
 
 export function podeRegistrarEtapa(dados: DadosRegistroEtapa): boolean {
   return validarRegistroEtapa(dados) === null;
+}
+
+export interface InsumoVinculadoInfo {
+  id: bigint;
+  tipo: TipoInsumo;
+}
+
+/**
+ * Espelha _validarInsumosParaConclusao de ContratoProducao.
+ * Verifica se os insumos marcados como utilizados nas etapas atendem ao
+ * requisito de tipo exigido pelo tipo de bebida, antecipando o revert
+ * RequisitoDeInsumoNaoAtendido antes de enviar a transação.
+ *
+ * @param idsUtilizados  IDs coletados de etapas[*].insumosUtilizados (pode repetir).
+ * @param insumosVinculados  Insumos vinculados ao lote, para mapear ID → tipo.
+ */
+export function validarInsumosParaConclusao(
+  tipoBebida: TipoBebida,
+  idsUtilizados: readonly bigint[],
+  insumosVinculados: readonly InsumoVinculadoInfo[]
+): string | null {
+  const tiposPorId = new Map<bigint, TipoInsumo>();
+  for (const insumo of insumosVinculados) {
+    tiposPorId.set(insumo.id, insumo.tipo);
+  }
+
+  let temAgricola = false;
+  let temBase = false;
+  let temZimbro = false;
+
+  for (const id of idsUtilizados) {
+    const tipo = tiposPorId.get(id);
+    if (tipo === TipoInsumo.MateriaPrimaAgricola) temAgricola = true;
+    else if (tipo === TipoInsumo.BaseAlcoolica) temBase = true;
+    else if (tipo === TipoInsumo.Zimbro) temZimbro = true;
+  }
+
+  if (tipoBebida === TipoBebida.Cachaca || tipoBebida === TipoBebida.Whisky) {
+    if (!temAgricola) {
+      return "Nenhuma etapa registrada utilizou um insumo do tipo Matéria-Prima Agrícola, que é exigido para esta bebida.";
+    }
+  } else if (tipoBebida === TipoBebida.Vodca) {
+    if (!temBase) {
+      return "Nenhuma etapa registrada utilizou um insumo do tipo Base Alcoólica, que é exigido para vodca.";
+    }
+  } else if (tipoBebida === TipoBebida.Gin) {
+    if (!temBase && !temZimbro) {
+      return "Nenhuma etapa registrada utilizou insumos dos tipos Base Alcoólica e Zimbro, ambos exigidos para gin.";
+    }
+    if (!temBase) {
+      return "Nenhuma etapa registrada utilizou um insumo do tipo Base Alcoólica, que é exigido para gin.";
+    }
+    if (!temZimbro) {
+      return "Nenhuma etapa registrada utilizou um insumo do tipo Zimbro, que é exigido para gin.";
+    }
+  }
+
+  return null;
 }

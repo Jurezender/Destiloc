@@ -28,6 +28,15 @@ const CONFIGURACAO_PADRAO: ConfiguracaoProducaoMetadados = {
   ajusteFinalAplicavel: false,
 };
 
+// Flags que o contrato proíbe para cada tipo de bebida (_validarConfiguracao em ContratoProducao.sol).
+// Checkboxes proibidos ficam desabilitados e são forçados a false antes do envio.
+const FLAGS_INVALIDAS: Partial<Record<TipoBebida, (keyof ConfiguracaoProducaoMetadados)[]>> = {
+  [TipoBebida.Cachaca]: ["retificacaoAplicavel", "blendagemAplicavel"],
+  [TipoBebida.Whisky]:  ["maturacaoAplicavel", "retificacaoAplicavel"],
+  [TipoBebida.Vodca]:   ["maturacaoAplicavel", "blendagemAplicavel"],
+  [TipoBebida.Gin]:     ["maturacaoAplicavel", "retificacaoAplicavel", "blendagemAplicavel"],
+};
+
 function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
   const { chainId, signer } = useCarteira();
   const [tipoBebida, setTipoBebida] = useState("");
@@ -39,6 +48,11 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+
+  function flagBloqueada(campo: keyof ConfiguracaoProducaoMetadados): boolean {
+    if (tipoBebida === "") return false;
+    return (FLAGS_INVALIDAS[Number(tipoBebida) as TipoBebida] ?? []).includes(campo);
+  }
 
   function alternarConfiguracao(campo: keyof ConfiguracaoProducaoMetadados) {
     setConfiguracao((atual) => ({ ...atual, [campo]: !atual[campo] }));
@@ -107,7 +121,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
       <legend>Novo lote de produção</legend>
       <label>
         Tipo de bebida
-        <select value={tipoBebida} onChange={(e) => setTipoBebida(e.target.value)}>
+        <select value={tipoBebida} onChange={(e) => { setTipoBebida(e.target.value); setConfiguracao(CONFIGURACAO_PADRAO); }}>
           <option value="">Selecione…</option>
           {OPCOES_TIPO_BEBIDA.map((opcao) => (
             <option key={opcao} value={opcao}>
@@ -124,6 +138,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
             type="checkbox"
             checked={configuracao.maturacaoAplicavel}
             onChange={() => alternarConfiguracao("maturacaoAplicavel")}
+            disabled={flagBloqueada("maturacaoAplicavel")}
           />
           Maturação aplicável
         </label>
@@ -132,6 +147,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
             type="checkbox"
             checked={configuracao.retificacaoAplicavel}
             onChange={() => alternarConfiguracao("retificacaoAplicavel")}
+            disabled={flagBloqueada("retificacaoAplicavel")}
           />
           Retificação aplicável
         </label>
@@ -140,6 +156,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
             type="checkbox"
             checked={configuracao.blendagemAplicavel}
             onChange={() => alternarConfiguracao("blendagemAplicavel")}
+            disabled={flagBloqueada("blendagemAplicavel")}
           />
           Blendagem aplicável
         </label>
@@ -148,6 +165,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
             type="checkbox"
             checked={configuracao.ajusteFinalAplicavel}
             onChange={() => alternarConfiguracao("ajusteFinalAplicavel")}
+            disabled={flagBloqueada("ajusteFinalAplicavel")}
           />
           Ajuste final aplicável
         </label>

@@ -17,6 +17,7 @@ import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
 import {
   obterEtapasAplicaveis,
   validarConfiguracaoProducao,
+  validarInsumosParaConclusao,
   validarRegistroEtapa,
   type ConfiguracaoProducao,
 } from "../lib/validacaoSequencia";
@@ -174,6 +175,13 @@ export function LoteDetalhe() {
     (etapa) => !etapasRegistradas.includes(etapa)
   );
 
+  const idsUtilizados = etapas.flatMap((e) => e.insumosUtilizados);
+  const erroInsumosConclusao = validarInsumosParaConclusao(
+    lote.tipoBebida,
+    idsUtilizados,
+    insumosVinculados
+  );
+
   return (
     <section>
       <p>
@@ -304,7 +312,11 @@ export function LoteDetalhe() {
         </p>
       ) : lote.estado === EstadoProducao.EmProducao ? (
         podeOperar ? (
-          <ConcluirProducao loteId={lote.id} chainId={chainId!} signer={signer!} aoConcluir={carregar} />
+          erroInsumosConclusao ? (
+            <p className="dica">{erroInsumosConclusao}</p>
+          ) : (
+            <ConcluirProducao loteId={lote.id} chainId={chainId!} signer={signer!} aoConcluir={carregar} />
+          )
         ) : (
           <p className="dica">Só o produtor responsável, com PRODUTOR_ROLE, pode concluir a produção.</p>
         )

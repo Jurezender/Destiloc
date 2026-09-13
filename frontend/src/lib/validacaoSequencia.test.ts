@@ -1,15 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { EtapaProducao, TipoBebida } from "./tipos";
+import { EtapaProducao, TipoBebida, TipoInsumo } from "./tipos";
 import {
   configuracaoProducaoValida,
   etapaAplicavel,
   obterEtapasAplicaveis,
   podeRegistrarEtapa,
   validarConfiguracaoProducao,
+  validarInsumosParaConclusao,
   validarPrecedenciaEtapa,
   validarRegistroEtapa,
   type ConfiguracaoProducao,
   type DadosRegistroEtapa,
+  type InsumoVinculadoInfo,
 } from "./validacaoSequencia";
 
 // Mesmas regras de ContratoProducao.sol (_validarConfiguracao, _validarAplicabilidade,
@@ -346,5 +348,125 @@ describe("podeRegistrarEtapa", () => {
     expect(podeRegistrarEtapa(dados(TipoBebida.Gin, Aromatizacao, []))).toBe(true);
     expect(podeRegistrarEtapa(dados(TipoBebida.Gin, AjusteFinal, []))).toBe(false);
     expect(podeRegistrarEtapa(dados(TipoBebida.Cachaca, PreparacaoBase, [PreparacaoBase]))).toBe(false);
+  });
+});
+
+// Espelha _validarInsumosParaConclusao de ContratoProducao.sol para garantir que
+// frontend e contrato concordam sobre os requisitos de insumo por tipo de bebida.
+describe("validarInsumosParaConclusao", () => {
+  const ins = (id: number, tipo: TipoInsumo): InsumoVinculadoInfo => ({
+    id: BigInt(id),
+    tipo,
+  });
+
+  const agricola = ins(1, TipoInsumo.MateriaPrimaAgricola);
+  const base     = ins(2, TipoInsumo.BaseAlcoolica);
+  const zimbro   = ins(3, TipoInsumo.Zimbro);
+  const levedura = ins(4, TipoInsumo.Levedura);
+
+  // ── Cachaça ──────────────────────────────────────────────────────────────
+
+  it("cachaça: aceita quando MateriaPrimaAgricola foi utilizada em uma etapa", () => {
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Cachaca, [1n], [agricola, levedura])
+    ).toBeNull();
+  });
+
+  it("cachaça: rejeita quando nenhum insumo foi utilizado", () => {
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Cachaca, [], [agricola])
+    ).not.toBeNull();
+  });
+
+  it("cachaça: rejeita quando só foram utilizados insumos de outros tipos", () => {
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Cachaca, [4n], [agricola, levedura])
+    ).not.toBeNull();
+  });
+
+  it("cachaça: insumo vinculado mas não utilizado não conta", () => {
+    // agricola está vinculado (id=1) mas o ID utilizado é o da levedura (id=4)
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Cachaca, [4n], [agricola, levedura])
+    ).not.toBeNull();
+  });
+
+  it("cachaça: tolera IDs repetidos (mesmo insumo em múltiplas etapas)", () => {
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Cachaca, [1n, 1n, 4n], [agricola, levedura])
+    ).toBeNull();
+  });
+
+  // ── Whisky ───────────────────────────────────────────────────────────────
+
+  it("whisky: aceita quando MateriaPrimaAgricola foi utilizada", () => {
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Whisky, [1n, 4n], [agricola, levedura])
+    ).toBeNull();
+  });
+
+  it("whisky: rejeita quando nenhum insumo foi utilizado", () => {
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Whisky, [], [agricola])
+    ).not.toBeNull();
+  });
+
+  it("whisky: rejeita quando só foram utilizados insumos sem MateriaPrimaAgricola", () => {
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Whisky, [4n], [agricola, levedura])
+    ).not.toBeNull();
+  });
+
+  // ── Vodca ────────────────────────────────────────────────────────────────
+
+  it("vodca: aceita quando BaseAlcoolica foi utilizada", () => {
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Vodca, [2n], [base])
+    ).toBeNull();
+  });
+
+  it("vodca: rejeita quando nenhum insumo foi utilizado", () => {
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Vodca, [], [base])
+    ).not.toBeNull();
+  });
+
+  it("vodca: rejeita quando o insumo utilizado não é BaseAlcoolica", () => {
+    // base está vinculado (id=2) mas o utilizado é a levedura (id=4)
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Vodca, [4n], [base, levedura])
+    ).not.toBeNull();
+  });
+
+  // ── Gin ──────────────────────────────────────────────────────────────────
+
+  it("gin: aceita quando BaseAlcoolica e Zimbro foram utilizados", () => {
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Gin, [2n, 3n], [base, zimbro])
+    ).toBeNull();
+  });
+
+  it("gin: rejeita e menciona BaseAlcoolica quando só Zimbro foi utilizado", () => {
+    const erro = validarInsumosParaConclusao(TipoBebida.Gin, [3n], [base, zimbro]);
+    expect(erro).not.toBeNull();
+    expect(erro).toContain("Base Alcoólica");
+  });
+
+  it("gin: rejeita e menciona Zimbro quando só BaseAlcoolica foi utilizada", () => {
+    const erro = validarInsumosParaConclusao(TipoBebida.Gin, [2n], [base, zimbro]);
+    expect(erro).not.toBeNull();
+    expect(erro).toContain("Zimbro");
+  });
+
+  it("gin: rejeita quando nenhum insumo foi utilizado", () => {
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Gin, [], [base, zimbro])
+    ).not.toBeNull();
+  });
+
+  it("gin: rejeita quando só foram utilizados insumos de outros tipos", () => {
+    expect(
+      validarInsumosParaConclusao(TipoBebida.Gin, [4n], [base, zimbro, levedura])
+    ).not.toBeNull();
   });
 });

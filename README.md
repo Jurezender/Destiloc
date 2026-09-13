@@ -27,7 +27,7 @@ Os contratos seguem a arquitetura atual (`ContratoAcesso`, `ContratoInsumos`, `C
 
 O fluxo completo, do cadastro do insumo até a consulta pública da garrafa, é validado de ponta a ponta pelo grupo de testes `N. Fluxo completo da arquitetura nova` (`contratos/test/12-fluxo-completo.js`).
 
-A interface web está implementada e foi exercitada contra a rede local. A integração com o IPFS via nó Kubo local também está implementada. Ambas dependem de recursos externos ao processo de teste, a extensão MetaMask e o daemon Kubo em execução, e por isso a verificação delas é manual. O roteiro está na seção [Interface web](#interface-web).
+A interface web está implementada e foi exercitada contra a rede local. A integração com o IPFS via Pinata também está implementada. Ambas dependem de recursos externos ao processo de teste, a extensão MetaMask e as credenciais do Pinata, e por isso a verificação delas é manual. O roteiro está na seção [Interface web](#interface-web).
 
 A implantação na Sepolia Testnet ainda não foi realizada.
 
@@ -37,8 +37,8 @@ A implantação na Sepolia Testnet ainda não foi realizada.
 |---|---|
 | Node.js | 22.22.2 |
 | npm | 10.9.7 |
-| Kubo (IPFS) | Não há versão fixada pelo projeto; qualquer build recente serve |
 | MetaMask | Extensão de navegador, versão atual |
+| Conta no Pinata | Plano gratuito é suficiente — gere um JWT em https://app.pinata.cloud/developers/api-keys |
 
 ## Versões fixadas
 
@@ -79,8 +79,7 @@ Copie `.env.example` para `.env` em cada módulo que exigir configuração e pre
 | `PRIVATE_KEY` | `contratos` | Chave privada da conta de implantação |
 | `VITE_RPC_URL_LOCALHOST` | `frontend` | RPC usada pela consulta pública (sem MetaMask) na rede local |
 | `VITE_RPC_URL_SEPOLIA` | `frontend` | RPC usada pela consulta pública (sem MetaMask) na Sepolia |
-| `VITE_KUBO_API_URL` | `frontend` | API HTTP do nó Kubo local, para enviar metadados |
-| `VITE_KUBO_GATEWAY_URL` | `frontend` | Gateway do nó Kubo local, para recuperar metadados |
+| `VITE_PINATA_JWT` | `frontend` | JWT do Pinata, para enviar metadados ao IPFS |
 
 A chave privada nunca deve ser versionada. Confirme que `.env` está listado no `.gitignore`.
 
@@ -107,22 +106,17 @@ npm run node:local        # em um terminal à parte, deixa rodando
 npm run deploy:local      # em outro terminal — implanta e exporta para o frontend
 ```
 
-### Nó IPFS
+### IPFS / Pinata
 
-O armazenamento fora da cadeia depende de um nó Kubo em execução na máquina local. A RPC administrativa fica restrita a `localhost`.
+Os metadados fora da cadeia são enviados ao Pinata (https://pinata.cloud). Não é necessário instalar nenhum daemon local.
 
-Por padrão, o Kubo recusa requisições `POST` vindas de outra origem — a página da interface, em `localhost:5173`, conta como outra origem. Rode uma vez, com o daemon **parado**:
+Antes de usar a interface, gere um JWT em https://app.pinata.cloud/developers/api-keys e configure-o em `frontend/.env`:
 
-```bash
-ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["http://localhost:5173"]'
-ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["PUT","POST","GET"]'
+```
+VITE_PINATA_JWT=seu_jwt_aqui
 ```
 
-Depois inicie o daemon normalmente, e repita a configuração sempre que a porta ou a origem mudarem.
-
-```bash
-ipfs daemon
-```
+O valor real nunca deve ser versionado. O arquivo `frontend/.env` já está listado no `.gitignore`.
 
 ### Interface web
 
