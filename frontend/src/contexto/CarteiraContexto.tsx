@@ -64,6 +64,41 @@ export function CarteiraProvedor({ children }: { children: ReactNode }) {
       const contas = (await window.ethereum.request({ method: "eth_requestAccounts" })) as string[];
       const contaEscolhida = contas[0] ?? null;
       setConta(contaEscolhida);
+
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: "0xaa36a7" }],
+        });
+      } catch (erroTroca) {
+        // 4902 = rede não está na lista do MetaMask; adiciona e repete o switch.
+        if (
+          erroTroca &&
+          typeof erroTroca === "object" &&
+          "code" in erroTroca &&
+          (erroTroca as { code: unknown }).code === 4902
+        ) {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: "0xaa36a7",
+                chainName: "Sepolia",
+                nativeCurrency: { name: "SepoliaETH", symbol: "ETH", decimals: 18 },
+                rpcUrls: ["https://rpc.sepolia.org"],
+                blockExplorerUrls: ["https://sepolia.etherscan.io"],
+              },
+            ],
+          });
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0xaa36a7" }],
+          });
+        } else {
+          throw erroTroca;
+        }
+      }
+
       await atualizarSigner(contaEscolhida);
     } catch (erroConexao) {
       const mensagem =
