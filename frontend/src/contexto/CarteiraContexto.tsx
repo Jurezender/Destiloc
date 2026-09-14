@@ -122,11 +122,7 @@ export function CarteiraProvedor({ children }: { children: ReactNode }) {
       void atualizarSigner(contaEscolhida);
     };
     const aoTrocarRede = () => {
-      // A forma mais segura de refletir uma troca de rede é recarregar o
-      // estado derivado dela; a MetaMask recomenda inclusive recarregar a
-      // página nesse evento para evitar estado inconsistente entre partes
-      // da aplicação que já leram o chainId anterior.
-      window.location.reload();
+      void atualizarSigner(conta);
     };
 
     eth.on("accountsChanged", aoTrocarContas);
@@ -135,7 +131,7 @@ export function CarteiraProvedor({ children }: { children: ReactNode }) {
       eth.removeListener("accountsChanged", aoTrocarContas);
       eth.removeListener("chainChanged", aoTrocarRede);
     };
-  }, [atualizarSigner]);
+  }, [atualizarSigner, conta]);
 
   // Reconecta silenciosamente se a MetaMask já tiver uma conta autorizada
   // para este site (evita pedir "Conectar" de novo a cada recarregamento).
