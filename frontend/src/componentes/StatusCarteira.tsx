@@ -1,4 +1,8 @@
-import { useCarteira } from "../contexto/CarteiraContexto";
+import {
+  eDispositivoMobile,
+  urlDeepLinkMetaMask,
+  useCarteira,
+} from "../contexto/CarteiraContexto";
 import { REDES } from "../contracts/redes";
 import { encurtarEndereco } from "../lib/formatadores";
 
@@ -6,6 +10,13 @@ export function StatusCarteira() {
   const { disponivel, conta, chainId, conectando, erro, conectar } = useCarteira();
 
   if (!disponivel) {
+    if (eDispositivoMobile()) {
+      return (
+        <span className="status-carteira status-carteira--aviso">
+          <a href={urlDeepLinkMetaMask()} rel="noreferrer">Abrir no MetaMask</a>
+        </span>
+      );
+    }
     return <span className="status-carteira status-carteira--aviso">MetaMask não detectada</span>;
   }
 

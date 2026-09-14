@@ -131,3 +131,13 @@ export function useCarteira(): EstadoCarteira {
   if (!contexto) throw new Error("useCarteira precisa estar dentro de <CarteiraProvedor>.");
   return contexto;
 }
+
+export function eDispositivoMobile(): boolean {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+/** Deep link que abre o site atual dentro do browser embutido do MetaMask Mobile. */
+export function urlDeepLinkMetaMask(): string {
+  const { host, pathname, search } = window.location;
+  return `https://metamask.app.link/dapp/${host}${pathname}${search}`;
+}

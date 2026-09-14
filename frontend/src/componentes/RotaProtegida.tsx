@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
-import { useCarteira } from "../contexto/CarteiraContexto";
+import {
+  eDispositivoMobile,
+  urlDeepLinkMetaMask,
+  useCarteira,
+} from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 
 interface Props {
@@ -19,6 +23,20 @@ export function RotaProtegida({ children, exigirPapel, mensagemPapel }: Props) {
   const papeis = usePapeis();
 
   if (!disponivel) {
+    if (eDispositivoMobile()) {
+      return (
+        <div className="aviso-acesso">
+          <h2>Acesso pelo celular</h2>
+          <p>
+            No celular, o Destiloc precisa ser aberto dentro do aplicativo MetaMask.
+            Toque no botão abaixo para continuar.
+          </p>
+          <a href={urlDeepLinkMetaMask()} rel="noreferrer">
+            <button>Abrir no MetaMask</button>
+          </a>
+        </div>
+      );
+    }
     return (
       <div className="aviso-acesso">
         <h2>MetaMask não encontrada</h2>
