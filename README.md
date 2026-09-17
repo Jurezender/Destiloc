@@ -79,7 +79,10 @@ Copie `.env.example` para `.env` em cada módulo que exigir configuração e pre
 | `PRIVATE_KEY` | `contratos` | Chave privada da conta de implantação |
 | `VITE_RPC_URL_LOCALHOST` | `frontend` | RPC usada pela consulta pública (sem MetaMask) na rede local |
 | `VITE_RPC_URL_SEPOLIA` | `frontend` | RPC usada pela consulta pública (sem MetaMask) na Sepolia |
-| `VITE_PINATA_JWT` | `frontend` | JWT do Pinata, para enviar metadados ao IPFS |
+| `VITE_API_URL` | `frontend` | URL do backend Destiloc (padrão: `http://localhost:3001`) |
+| `PINATA_JWT` | `backend` | JWT do Pinata, para enviar metadados ao IPFS |
+| `DATABASE_URL` | `backend` | String de conexão PostgreSQL |
+| `CORS_ORIGIN` | `backend` | Origem permitida pelo CORS (URL do frontend em produção) |
 
 A chave privada nunca deve ser versionada. Confirme que `.env` está listado no `.gitignore`.
 
@@ -108,15 +111,15 @@ npm run deploy:local      # em outro terminal — implanta e exporta para o fron
 
 ### IPFS / Pinata
 
-Os metadados fora da cadeia são enviados ao Pinata (https://pinata.cloud). Não é necessário instalar nenhum daemon local.
+Os metadados fora da cadeia são enviados ao Pinata (https://pinata.cloud) pelo backend. Não é necessário instalar nenhum daemon local.
 
-Antes de usar a interface, gere um JWT em https://app.pinata.cloud/developers/api-keys e configure-o em `frontend/.env`:
+Gere um JWT em https://app.pinata.cloud/developers/api-keys e configure-o em `backend/.env`:
 
 ```
-VITE_PINATA_JWT=seu_jwt_aqui
+PINATA_JWT=seu_jwt_aqui
 ```
 
-O valor real nunca deve ser versionado. O arquivo `frontend/.env` já está listado no `.gitignore`.
+O JWT fica exclusivamente no backend — nunca é exposto no bundle do frontend. O valor real nunca deve ser versionado. O arquivo `backend/.env` está listado no `backend/.gitignore`.
 
 ### Interface web
 

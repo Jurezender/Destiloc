@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import carteiras from './rotas/carteiras.js';
+import ipfs from './rotas/ipfs.js';
 
 export async function construirApp() {
   const app = Fastify({
@@ -16,6 +17,7 @@ export async function construirApp() {
   });
 
   await app.register(carteiras);
+  await app.register(ipfs);
 
   return app;
 }
