@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
+import carteiras from './rotas/carteiras.js';
 
 export async function construirApp() {
   const app = Fastify({
@@ -13,6 +14,8 @@ export async function construirApp() {
   app.get('/health', async () => {
     return { status: 'ok' };
   });
+
+  await app.register(carteiras);
 
   return app;
 }
