@@ -20,6 +20,7 @@ O controle de acesso é baseado em papéis — administrador, fornecedor, produt
 |---|---|
 | `contratos/` | Contratos inteligentes em Solidity, suíte de testes automatizados e scripts de implantação |
 | `frontend/` | Interface web em React, integrada à MetaMask para conexão da carteira e envio de transações |
+| `backend/` | API em Node.js com Fastify, integrada ao PostgreSQL (Neon) e ao Pinata IPFS |
 
 ## Estado de validação
 
@@ -29,7 +30,7 @@ O fluxo completo, do cadastro do insumo até a consulta pública da garrafa, é 
 
 A interface web está implementada e foi exercitada contra a rede local. A integração com o IPFS via Pinata também está implementada. Ambas dependem de recursos externos ao processo de teste, a extensão MetaMask e as credenciais do Pinata, e por isso a verificação delas é manual. O roteiro está na seção [Interface web](#interface-web).
 
-A implantação na Sepolia Testnet ainda não foi realizada.
+Os contratos foram implantados na Sepolia Testnet em 2026-09-13. Os endereços estão registrados em `contratos/implantacao-sepolia.json` e listados na seção [Implantação na Sepolia](#implantação-na-sepolia).
 
 ## Pré-requisitos
 
@@ -80,9 +81,11 @@ Copie `.env.example` para `.env` em cada módulo que exigir configuração e pre
 | `VITE_RPC_URL_LOCALHOST` | `frontend` | RPC usada pela consulta pública (sem MetaMask) na rede local |
 | `VITE_RPC_URL_SEPOLIA` | `frontend` | RPC usada pela consulta pública (sem MetaMask) na Sepolia |
 | `VITE_API_URL` | `frontend` | URL do backend Destiloc (padrão: `http://localhost:3001`) |
+| `VITE_PUBLIC_APP_URL` | `frontend` | URL base da aplicação; usada na geração dos QR Codes em produção (opcional em desenvolvimento) |
 | `PINATA_JWT` | `backend` | JWT do Pinata, para enviar metadados ao IPFS |
 | `DATABASE_URL` | `backend` | String de conexão PostgreSQL |
 | `CORS_ORIGIN` | `backend` | Origem permitida pelo CORS (URL do frontend em produção) |
+| `NODE_ENV` | `backend` | Ambiente de execução (`development` ou `production`) |
 
 A chave privada nunca deve ser versionada. Confirme que `.env` está listado no `.gitignore`.
 
@@ -143,16 +146,27 @@ Verificação manual da interface, na ordem:
 
 Tentativas de executar operações fora da sequência válida ou a partir de uma conta sem o papel exigido devem ser rejeitadas pelo contrato. Essas rejeições são o comportamento correto e evidenciam que as regras estão sendo aplicadas na cadeia.
 
+### Backend
+
+```bash
+cd backend
+npm ci
+cp .env.example .env   # preencha DATABASE_URL, PINATA_JWT e CORS_ORIGIN
+npm run dev
+```
+
+O backend sobe na porta configurada em `PORT` (padrão: 3001). O endpoint de saúde `GET /health` retorna `{"status":"ok"}` quando o servidor está pronto.
+
 ## Implantação na Sepolia
 
-> [Preencher após a implantação com os endereços dos contratos e os links correspondentes no Etherscan.]
+Implantação realizada em 2026-09-13. Registro completo em `contratos/implantacao-sepolia.json`.
 
 | Contrato | Endereço |
 |---|---|
-| `ContratoAcesso` | |
-| `ContratoInsumos` | |
-| `ContratoProducao` | |
-| `ContratoEnvasamento` | |
+| `ContratoAcesso` | `0x3f1c9F542AF7D5a7Bfd386F4b645d396bea69766` |
+| `ContratoInsumos` | `0x95173eDFc3606826242fb9cd9e30a3D8C4005390` |
+| `ContratoProducao` | `0xb73b6a9A06E3EE3c81D1F3A383f8586017137Da3` |
+| `ContratoEnvasamento` | `0xE8C40B72A80E960405AbDCb555046A9ec1EE45CC` |
 
 ## Licença
 
