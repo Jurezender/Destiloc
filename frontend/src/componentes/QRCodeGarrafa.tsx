@@ -7,7 +7,8 @@ interface Props {
 
 /** QR code apontando para a página pública de consulta desta garrafa. */
 export function QRCodeGarrafa({ chainId, tokenId }: Props) {
-  const url = `${window.location.origin}/consulta/${chainId}/${tokenId}`;
+  const base = import.meta.env.VITE_PUBLIC_APP_URL || window.location.origin;
+  const url = `${base}/consulta/${chainId}/${tokenId}`;
 
   return (
     <div className="qr-garrafa">
