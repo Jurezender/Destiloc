@@ -8,5 +8,8 @@ let appPromise: ReturnType<typeof construirApp> | undefined;
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   if (!appPromise) appPromise = construirApp();
   const app = await appPromise;
+
+  await app.ready();
+
   app.server.emit('request', req, res);
 }
