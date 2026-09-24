@@ -4,6 +4,7 @@ import { obterContrato, obterProviderPublico } from "../contracts";
 import { REDES } from "../contracts/redes";
 import { mapearErroContrato } from "../lib/erros";
 import {
+  encurtarEndereco,
   formatarTimestamp,
   RETULO_ESTADO_PRODUCAO,
   RETULO_ETAPA_PRODUCAO,
@@ -72,6 +73,34 @@ interface DadosConsulta {
   etapas: EtapaInfo[];
 }
 
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+
+async function buscarApelido(endereco: string): Promise<string | null> {
+  try {
+    const resposta = await fetch(`${API_URL}/carteiras/${endereco}`);
+    if (!resposta.ok) return null;
+    const dados = (await resposta.json()) as { apelido: string };
+    return dados.apelido || null;
+  } catch {
+    return null;
+  }
+}
+
+function ipfsParaUrl(uri: string): string {
+  if (uri.startsWith("ipfs://")) return `https://ipfs.io/ipfs/${uri.slice(7)}`;
+  return uri;
+}
+
+function mensagemAmigavel(erro: string): string {
+  if (erro.includes("não existe") || erro.includes("não encontrad")) {
+    return "Não foi possível verificar esta garrafa. O QR Code pode estar incompleto ou a garrafa não está cadastrada no sistema.";
+  }
+  if (erro.includes("inválido") || erro.includes("inválida")) {
+    return "O link de consulta parece estar incorreto. Verifique se o QR Code foi lido corretamente.";
+  }
+  return "Ocorreu um erro ao buscar as informações. Tente novamente em instantes.";
+}
+
 /**
  * Página do consumidor final. Deliberadamente NÃO usa CarteiraContexto nem
  * `window.ethereum` — só um `JsonRpcProvider` somente leitura, para que a
@@ -80,6 +109,7 @@ interface DadosConsulta {
 export function ConsultaPublica() {
   const { chainId: chainIdParam, tokenId } = useParams<{ chainId: string; tokenId: string }>();
   const [dados, setDados] = useState<DadosConsulta | null>(null);
+  const [nomesCarteiras, setNomesCarteiras] = useState<Record<string, string>>({});
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
 
@@ -163,7 +193,23 @@ export function ConsultaPublica() {
           })
         );
 
+        const enderecoUnicos = [
+          ...new Set([
+            dadoLote.produtor as string,
+            dadoEnvasamento.envasador as string,
+            ...etapas.map((e) => e.executadoPor),
+          ]),
+        ];
+        const resultadosNomes = await Promise.all(
+          enderecoUnicos.map(async (end) => [end, await buscarApelido(end)] as [string, string | null])
+        );
+        const nomes: Record<string, string> = {};
+        for (const [end, apelido] of resultadosNomes) {
+          if (apelido) nomes[end] = apelido;
+        }
+
         if (cancelado) return;
+        setNomesCarteiras(nomes);
         setDados({
           garrafa: {
             tokenId: BigInt(tokenId),
@@ -208,32 +254,40 @@ export function ConsultaPublica() {
     };
   }, [chainId, tokenId]);
 
+  const processosAplicados = dados
+    ? ([
+        dados.configuracao.maturacaoAplicavel && "Maturação",
+        dados.configuracao.retificacaoAplicavel && "Retificação",
+        dados.configuracao.blendagemAplicavel && "Blendagem",
+        dados.configuracao.ajusteFinalAplicavel && "Ajuste final",
+      ].filter(Boolean) as string[])
+    : [];
+
+  const tiposInsumos = dados
+    ? [...new Set(dados.insumosVinculados.map((i) => i.tipo))]
+    : [];
+
   return (
     <div className="consulta-publica">
 
-      {/* ── Hero ── */}
       <header className="cp-hero">
         <p className="cp-hero__sistema">Destiloc</p>
-        <h1 className="cp-hero__titulo">Rastreabilidade de bebidas destiladas</h1>
-        <p className="cp-hero__descricao">Consulta pública · sem necessidade de MetaMask</p>
+        <h1 className="cp-hero__titulo">Conheça a origem desta garrafa</h1>
       </header>
 
-      {/* ── Carregando ── */}
       {carregando && (
         <div className="cp-carregando">
           <span className="cp-carregando__indicador" aria-hidden="true" />
-          <span>Consultando a blockchain…</span>
+          <span>Buscando a história desta garrafa…</span>
         </div>
       )}
 
-      {/* ── Erro ── */}
       {erro && (
         <div className="cp-estado-erro">
-          <p>{erro}</p>
+          <p>{mensagemAmigavel(erro)}</p>
         </div>
       )}
 
-      {/* ── Dados ── */}
       {dados && (
         <div className="cp-conteudo">
 
@@ -242,199 +296,169 @@ export function ConsultaPublica() {
             <div className="cp-identidade__cabecalho">
               <span className="cp-identidade__rotulo">Garrafa certificada</span>
               <span className="cp-identidade__numero">#{dados.garrafa.tokenId.toString()}</span>
+              <span className="cp-identidade__bebida">{RETULO_TIPO_BEBIDA[dados.lote.tipoBebida]}</span>
             </div>
             <div className="cp-identidade__meta">
-              <span>Rede: {rede?.rotulo ?? `chainId ${chainId}`}</span>
+              <span>Lote #{dados.lote.id.toString()}</span>
               <span className="cp-sep">·</span>
               <span>Envasamento #{dados.garrafa.envasamentoId.toString()}</span>
               <span className="cp-sep">·</span>
               <span>Emitida em {formatarTimestamp(dados.garrafa.emitidaEm)}</span>
             </div>
+            <div className="cp-autenticidade">
+              <span className="cp-autenticidade__icone" aria-hidden="true">✓</span>
+              <span>Produto registrado na blockchain</span>
+            </div>
           </div>
 
-          {/* Envasamento */}
+          {/* Origem */}
           <section className="cp-secao">
             <header className="cp-secao__header">
-              <h2 className="cp-secao__titulo">Envasamento</h2>
+              <h2 className="cp-secao__titulo">Origem</h2>
             </header>
             <div className="cp-secao__corpo">
               <dl className="cp-campos">
-                <div className="cp-campo">
-                  <dt className="cp-campo__rotulo">Envasador</dt>
-                  <dd className="cp-campo__valor cp-mono">{dados.envasamento.envasador}</dd>
-                </div>
-                <div className="cp-campo">
-                  <dt className="cp-campo__rotulo">Garrafas emitidas / declaradas</dt>
-                  <dd className="cp-campo__valor">
-                    {dados.envasamento.quantidadeEmitida.toString()} / {dados.envasamento.quantidadeDeclarada.toString()}
-                  </dd>
-                </div>
-                <div className="cp-campo">
-                  <dt className="cp-campo__rotulo">Registrado em</dt>
-                  <dd className="cp-campo__valor">{formatarTimestamp(dados.envasamento.registradoEm)}</dd>
-                </div>
-                <div className="cp-campo">
-                  <dt className="cp-campo__rotulo">Situação</dt>
-                  <dd className="cp-campo__valor">
-                    {dados.envasamento.concluidoEm !== 0n
-                      ? `Concluído em ${formatarTimestamp(dados.envasamento.concluidoEm)}`
-                      : "Em andamento"}
-                  </dd>
-                </div>
-                <div className="cp-campo cp-campo--largo">
-                  <dt className="cp-campo__rotulo">Metadados</dt>
-                  <dd className="cp-campo__valor cp-mono">{dados.envasamento.metadataURI}</dd>
-                </div>
-              </dl>
-            </div>
-          </section>
-
-          {/* Lote de produção */}
-          <section className="cp-secao">
-            <header className="cp-secao__header">
-              <h2 className="cp-secao__titulo">Lote de produção</h2>
-              <span className={`cp-badge ${dados.lote.estado === EstadoProducao.Concluido ? "cp-badge--ok" : "cp-badge--neutro"}`}>
-                {RETULO_ESTADO_PRODUCAO[dados.lote.estado]}
-              </span>
-            </header>
-            <div className="cp-secao__corpo">
-              <dl className="cp-campos">
-                <div className="cp-campo">
-                  <dt className="cp-campo__rotulo">Identificação</dt>
-                  <dd className="cp-campo__valor">
-                    Lote #{dados.lote.id.toString()} — {RETULO_TIPO_BEBIDA[dados.lote.tipoBebida]}
-                  </dd>
-                </div>
-                <div className="cp-campo">
-                  <dt className="cp-campo__rotulo">Criado em</dt>
-                  <dd className="cp-campo__valor">{formatarTimestamp(dados.lote.criadoEm)}</dd>
-                </div>
                 <div className="cp-campo cp-campo--largo">
                   <dt className="cp-campo__rotulo">Produtor</dt>
-                  <dd className="cp-campo__valor cp-mono">{dados.lote.produtor}</dd>
+                  <dd className="cp-campo__valor">
+                    {nomesCarteiras[dados.lote.produtor] ?? encurtarEndereco(dados.lote.produtor)}
+                  </dd>
                 </div>
-                {dados.lote.estado === EstadoProducao.Concluido && (
-                  <>
-                    <div className="cp-campo">
-                      <dt className="cp-campo__rotulo">Produção concluída em</dt>
-                      <dd className="cp-campo__valor">{formatarTimestamp(dados.lote.concluidoEm)}</dd>
-                    </div>
-                    <div className="cp-campo cp-campo--largo">
-                      <dt className="cp-campo__rotulo">Metadados de conclusão</dt>
-                      <dd className="cp-campo__valor cp-mono">{dados.lote.metadataURIConclusao}</dd>
-                    </div>
-                  </>
+                {processosAplicados.length > 0 && (
+                  <div className="cp-campo cp-campo--largo">
+                    <dt className="cp-campo__rotulo">Processo aplicado</dt>
+                    <dd className="cp-campo__valor cp-tags">
+                      {processosAplicados.map((p) => (
+                        <span key={p} className="cp-tag">{p}</span>
+                      ))}
+                    </dd>
+                  </div>
                 )}
-                <div className="cp-campo cp-campo--largo">
-                  <dt className="cp-campo__rotulo">Metadados do lote</dt>
-                  <dd className="cp-campo__valor cp-mono">{dados.lote.metadataURI}</dd>
-                </div>
+                {tiposInsumos.length > 0 && (
+                  <div className="cp-campo cp-campo--largo">
+                    <dt className="cp-campo__rotulo">Ingredientes</dt>
+                    <dd className="cp-campo__valor cp-tags">
+                      {tiposInsumos.map((tipo) => (
+                        <span key={tipo} className="cp-tag">{RETULO_TIPO_INSUMO[tipo]}</span>
+                      ))}
+                    </dd>
+                  </div>
+                )}
               </dl>
             </div>
           </section>
 
-          {/* Configuração da produção */}
-          <section className="cp-secao">
-            <header className="cp-secao__header">
-              <h2 className="cp-secao__titulo">Configuração da produção</h2>
-            </header>
-            <div className="cp-secao__corpo">
-              <ul className="cp-config-grade">
-                <li className={`cp-config-item ${dados.configuracao.maturacaoAplicavel ? "cp-config-item--sim" : "cp-config-item--nao"}`}>
-                  <span className="cp-config-item__icone" aria-hidden="true">
-                    {dados.configuracao.maturacaoAplicavel ? "✓" : "—"}
-                  </span>
-                  <span className="cp-config-item__rotulo">Maturação</span>
-                </li>
-                <li className={`cp-config-item ${dados.configuracao.retificacaoAplicavel ? "cp-config-item--sim" : "cp-config-item--nao"}`}>
-                  <span className="cp-config-item__icone" aria-hidden="true">
-                    {dados.configuracao.retificacaoAplicavel ? "✓" : "—"}
-                  </span>
-                  <span className="cp-config-item__rotulo">Retificação</span>
-                </li>
-                <li className={`cp-config-item ${dados.configuracao.blendagemAplicavel ? "cp-config-item--sim" : "cp-config-item--nao"}`}>
-                  <span className="cp-config-item__icone" aria-hidden="true">
-                    {dados.configuracao.blendagemAplicavel ? "✓" : "—"}
-                  </span>
-                  <span className="cp-config-item__rotulo">Blendagem</span>
-                </li>
-                <li className={`cp-config-item ${dados.configuracao.ajusteFinalAplicavel ? "cp-config-item--sim" : "cp-config-item--nao"}`}>
-                  <span className="cp-config-item__icone" aria-hidden="true">
-                    {dados.configuracao.ajusteFinalAplicavel ? "✓" : "—"}
-                  </span>
-                  <span className="cp-config-item__rotulo">Ajuste final</span>
-                </li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Insumos vinculados */}
-          <section className="cp-secao">
-            <header className="cp-secao__header">
-              <h2 className="cp-secao__titulo">Insumos vinculados ao lote</h2>
-            </header>
-            <div className="cp-secao__corpo--sem-padding">
-              {dados.insumosVinculados.length === 0 ? (
-                <p className="cp-vazio">Nenhum insumo vinculado.</p>
-              ) : (
-                <ul className="cp-insumos">
-                  {dados.insumosVinculados.map((insumo) => (
-                    <li key={insumo.id.toString()} className="cp-insumo">
-                      <div className="cp-insumo__id">#{insumo.id.toString()}</div>
-                      <div className="cp-insumo__info">
-                        <span className="cp-insumo__tipo">{RETULO_TIPO_INSUMO[insumo.tipo]}</span>
-                        <span className="cp-insumo__fornecedor cp-mono">{insumo.fornecedor}</span>
-                        <span className="cp-insumo__metadados cp-mono">{insumo.metadataURI}</span>
+          {/* Jornada de produção */}
+          {dados.etapas.length > 0 && (
+            <section className="cp-secao">
+              <header className="cp-secao__header">
+                <h2 className="cp-secao__titulo">Jornada de produção</h2>
+              </header>
+              <div className="cp-secao__corpo">
+                <ol className="cp-timeline">
+                  {dados.etapas.map((evento) => (
+                    <li key={evento.indice} className="cp-timeline__item">
+                      <div className="cp-timeline__ponto" aria-hidden="true" />
+                      <div className="cp-timeline__conteudo">
+                        <span className="cp-timeline__etapa">{RETULO_ETAPA_PRODUCAO[evento.etapa]}</span>
+                        {(evento.inicioInformado !== 0n || evento.fimInformado !== 0n) && (
+                          <span className="cp-timeline__periodo">
+                            {evento.inicioInformado !== 0n && formatarTimestamp(evento.inicioInformado)}
+                            {evento.inicioInformado !== 0n && evento.fimInformado !== 0n && " — "}
+                            {evento.fimInformado !== 0n && formatarTimestamp(evento.fimInformado)}
+                          </span>
+                        )}
+                        {evento.metadataURI && (
+                          <a
+                            href={ipfsParaUrl(evento.metadataURI)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="cp-link-ipfs"
+                          >
+                            Ver detalhes →
+                          </a>
+                        )}
                       </div>
                     </li>
                   ))}
-                </ul>
-              )}
-            </div>
-          </section>
-
-          {/* Etapas registradas */}
-          <section className="cp-secao">
-            <header className="cp-secao__header">
-              <h2 className="cp-secao__titulo">Etapas registradas</h2>
-            </header>
-            {dados.etapas.length === 0 ? (
-              <p className="cp-vazio">Nenhuma etapa registrada ainda.</p>
-            ) : (
-              <div className="cp-tabela-scroll">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Etapa</th>
-                      <th>Executado por</th>
-                      <th>Início informado</th>
-                      <th>Fim informado</th>
-                      <th>Registrado em</th>
-                      <th>Metadados</th>
-                      <th>Insumos utilizados</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dados.etapas.map((evento) => (
-                      <tr key={evento.indice}>
-                        <td>{RETULO_ETAPA_PRODUCAO[evento.etapa]}</td>
-                        <td className="cp-mono">{evento.executadoPor}</td>
-                        <td>{formatarTimestamp(evento.inicioInformado)}</td>
-                        <td>{formatarTimestamp(evento.fimInformado)}</td>
-                        <td>{formatarTimestamp(evento.registradoEm)}</td>
-                        <td className="cp-mono">{evento.metadataURI}</td>
-                        <td>
-                          {evento.insumosUtilizados.length === 0
-                            ? "—"
-                            : evento.insumosUtilizados.map((insumoId) => `#${insumoId.toString()}`).join(", ")}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                </ol>
               </div>
-            )}
-          </section>
+            </section>
+          )}
+
+          {/* Verificação técnica */}
+          <details className="cp-tecnico">
+            <summary className="cp-tecnico__gatilho">
+              <span>Verificação técnica</span>
+              <span className="cp-tecnico__chevron" aria-hidden="true">▾</span>
+            </summary>
+            <div className="cp-tecnico__corpo">
+              <dl className="cp-campos">
+                {rede && (
+                  <div className="cp-campo">
+                    <dt className="cp-campo__rotulo">Rede blockchain</dt>
+                    <dd className="cp-campo__valor">{rede.rotulo}</dd>
+                  </div>
+                )}
+                <div className="cp-campo">
+                  <dt className="cp-campo__rotulo">Estado do lote</dt>
+                  <dd className="cp-campo__valor">
+                    <span className={`cp-badge ${dados.lote.estado === EstadoProducao.Concluido ? "cp-badge--ok" : "cp-badge--neutro"}`}>
+                      {RETULO_ESTADO_PRODUCAO[dados.lote.estado]}
+                    </span>
+                  </dd>
+                </div>
+                <div className="cp-campo">
+                  <dt className="cp-campo__rotulo">Garrafas deste envasamento</dt>
+                  <dd className="cp-campo__valor">
+                    {dados.envasamento.quantidadeEmitida.toString()} emitidas de {dados.envasamento.quantidadeDeclarada.toString()} declaradas
+                  </dd>
+                </div>
+                <div className="cp-campo">
+                  <dt className="cp-campo__rotulo">Data de registro do lote</dt>
+                  <dd className="cp-campo__valor">{formatarTimestamp(dados.lote.criadoEm)}</dd>
+                </div>
+                <div className="cp-campo cp-campo--largo">
+                  <dt className="cp-campo__rotulo">Endereço do produtor</dt>
+                  <dd className="cp-campo__valor cp-mono">{dados.lote.produtor}</dd>
+                </div>
+                <div className="cp-campo cp-campo--largo">
+                  <dt className="cp-campo__rotulo">Endereço do envasador</dt>
+                  <dd className="cp-campo__valor cp-mono">{dados.envasamento.envasador}</dd>
+                </div>
+                {dados.lote.metadataURI && (
+                  <div className="cp-campo">
+                    <dt className="cp-campo__rotulo">Metadados do lote (IPFS)</dt>
+                    <dd className="cp-campo__valor">
+                      <a href={ipfsParaUrl(dados.lote.metadataURI)} target="_blank" rel="noopener noreferrer" className="cp-link-ipfs">
+                        Abrir no IPFS →
+                      </a>
+                    </dd>
+                  </div>
+                )}
+                {dados.lote.estado === EstadoProducao.Concluido && dados.lote.metadataURIConclusao && (
+                  <div className="cp-campo">
+                    <dt className="cp-campo__rotulo">Metadados de conclusão (IPFS)</dt>
+                    <dd className="cp-campo__valor">
+                      <a href={ipfsParaUrl(dados.lote.metadataURIConclusao)} target="_blank" rel="noopener noreferrer" className="cp-link-ipfs">
+                        Abrir no IPFS →
+                      </a>
+                    </dd>
+                  </div>
+                )}
+                {dados.envasamento.metadataURI && (
+                  <div className="cp-campo">
+                    <dt className="cp-campo__rotulo">Metadados do envasamento (IPFS)</dt>
+                    <dd className="cp-campo__valor">
+                      <a href={ipfsParaUrl(dados.envasamento.metadataURI)} target="_blank" rel="noopener noreferrer" className="cp-link-ipfs">
+                        Abrir no IPFS →
+                      </a>
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+          </details>
 
         </div>
       )}

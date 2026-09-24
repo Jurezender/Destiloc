@@ -898,6 +898,184 @@ tbody tr:hover {
   padding: var(--s-lg) var(--s-xl);
 }
 
+/* Tipo da bebida — destaque principal no card de identidade ─────────────────── */
+.cp-identidade__bebida {
+  display: block;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--avela);
+  line-height: 1;
+  margin-top: var(--s-sm);
+}
+
+/* Selo de autenticidade ──────────────────────────────────────────────────────── */
+.cp-autenticidade {
+  display: flex;
+  align-items: center;
+  gap: var(--s-sm);
+  padding: var(--s-sm) var(--s-xl);
+  background-color: var(--cor-fundo-ok);
+  border-top: 1px solid rgba(136, 144, 99, 0.2);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--moss-green);
+}
+
+.cp-autenticidade__icone {
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+/* Tags de processo e ingredientes ───────────────────────────────────────────── */
+.cp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-xs) var(--s-sm);
+  margin-top: 0.125rem;
+}
+
+.cp-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6875rem;
+  background-color: rgba(136, 144, 99, 0.09);
+  border: 1px solid rgba(136, 144, 99, 0.25);
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--carvao);
+  white-space: nowrap;
+}
+
+/* Timeline de etapas ─────────────────────────────────────────────────────────── */
+.cp-timeline {
+  list-style: none;
+  padding: 0;
+}
+
+.cp-timeline__item {
+  display: flex;
+  gap: var(--s-md);
+  padding-bottom: var(--s-lg);
+  position: relative;
+}
+
+.cp-timeline__item:last-child {
+  padding-bottom: 0;
+}
+
+/* Linha vertical conectando os pontos */
+.cp-timeline__item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: calc(0.6875rem / 2);   /* centro do ponto */
+  top: calc(0.25rem + 0.6875rem);
+  bottom: 0;
+  width: 1px;
+  background-color: var(--cor-borda);
+}
+
+.cp-timeline__ponto {
+  flex-shrink: 0;
+  width: 0.6875rem;
+  height: 0.6875rem;
+  border-radius: 50%;
+  background-color: var(--cafe-noir);
+  margin-top: 0.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cp-timeline__conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1875rem;
+  padding-bottom: 0.125rem;
+}
+
+.cp-timeline__etapa {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--cor-texto-primario);
+  line-height: 1.3;
+}
+
+.cp-timeline__periodo {
+  font-size: 0.8125rem;
+  color: var(--cor-texto-secundario);
+}
+
+/* Link IPFS amigável ─────────────────────────────────────────────────────────── */
+.cp-link-ipfs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--cafe-noir);
+  text-decoration: none;
+  margin-top: 0.125rem;
+}
+
+.cp-link-ipfs:hover {
+  text-decoration: underline;
+}
+
+/* Acordeão de verificação técnica ───────────────────────────────────────────── */
+.cp-tecnico {
+  background: var(--branco);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  overflow: hidden;
+  box-shadow: var(--sombra-card);
+}
+
+.cp-tecnico__gatilho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6875rem var(--s-xl);
+  background-color: var(--cor-fundo-header-linha);
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cor-texto-secundario);
+  user-select: none;
+  transition: background-color 0.15s;
+}
+
+.cp-tecnico__gatilho::-webkit-details-marker {
+  display: none;
+}
+
+.cp-tecnico__gatilho:hover {
+  background-color: var(--cor-borda-suave);
+}
+
+details[open] .cp-tecnico__gatilho {
+  border-bottom-color: var(--cor-borda-suave);
+}
+
+.cp-tecnico__chevron {
+  font-size: 0.875rem;
+  transition: transform 0.2s ease;
+  color: var(--cor-texto-secundario);
+}
+
+details[open] .cp-tecnico__chevron {
+  transform: rotate(180deg);
+}
+
+.cp-tecnico__corpo {
+  padding: var(--s-xl);
+}
+
 /* Estado vazio nas listas operacionais */
 .lista-vazia {
   text-align: center;
@@ -1198,6 +1376,15 @@ tbody tr:hover {
 
   .cp-identidade__numero {
     font-size: 2rem;
+  }
+
+  .cp-autenticidade {
+    padding: var(--s-sm) var(--s-md);
+  }
+
+  .cp-tecnico__gatilho,
+  .cp-tecnico__corpo {
+    padding-inline: var(--s-md);
   }
 }
 
