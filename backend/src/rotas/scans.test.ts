@@ -10,9 +10,6 @@ vi.mock("../servicos/scans.js", () => ({
   listarScans: vi.fn(),
 }));
 
-const registrarScanMock = vi.mocked(scansServico.registrarScan);
-const listarScansMock = vi.mocked(scansServico.listarScans);
-
 const CORPO_VALIDO = {
   chainId: 11155111,
   tokenId: "1",
@@ -50,7 +47,7 @@ describe("POST /scans", () => {
 
   beforeEach(async () => {
     app = await montarApp();
-    registrarScanMock.mockReset();
+    vi.mocked(scansServico.registrarScan).mockReset();
   });
 
   afterEach(async () => {
@@ -58,7 +55,7 @@ describe("POST /scans", () => {
   });
 
   it("retorna 201 quando scan é registrado com sucesso", async () => {
-    registrarScanMock.mockResolvedValue(undefined);
+    vi.mocked(scansServico.registrarScan).mockResolvedValue(undefined);
 
     const res = await app.inject({
       method: "POST",
@@ -69,11 +66,11 @@ describe("POST /scans", () => {
 
     expect(res.statusCode).toBe(201);
     expect(res.json<{ registrado: boolean }>().registrado).toBe(true);
-    expect(registrarScanMock).toHaveBeenCalledOnce();
+    expect(vi.mocked(scansServico.registrarScan)).toHaveBeenCalledOnce();
   });
 
   it("retorna 422 quando GarrafaNaoEncontradaError é lançado", async () => {
-    registrarScanMock.mockRejectedValue(
+    vi.mocked(scansServico.registrarScan).mockRejectedValue(
       new GarrafaNaoEncontradaError("Esta garrafa não existe.")
     );
 
@@ -89,7 +86,7 @@ describe("POST /scans", () => {
   });
 
   it("retorna 503 para erros inesperados", async () => {
-    registrarScanMock.mockRejectedValue(new Error("DB connection failed"));
+    vi.mocked(scansServico.registrarScan).mockRejectedValue(new Error("DB connection failed"));
 
     const res = await app.inject({
       method: "POST",
@@ -99,7 +96,7 @@ describe("POST /scans", () => {
     });
 
     expect(res.statusCode).toBe(503);
-    expect(registrarScanMock).toHaveBeenCalledOnce();
+    expect(vi.mocked(scansServico.registrarScan)).toHaveBeenCalledOnce();
   });
 
   it("retorna 400 quando chainId não é inteiro positivo", async () => {
@@ -111,7 +108,7 @@ describe("POST /scans", () => {
     });
 
     expect(res.statusCode).toBe(400);
-    expect(registrarScanMock).not.toHaveBeenCalled();
+    expect(vi.mocked(scansServico.registrarScan)).not.toHaveBeenCalled();
   });
 
   it("retorna 400 quando tokenId não é numérico", async () => {
@@ -123,7 +120,7 @@ describe("POST /scans", () => {
     });
 
     expect(res.statusCode).toBe(400);
-    expect(registrarScanMock).not.toHaveBeenCalled();
+    expect(vi.mocked(scansServico.registrarScan)).not.toHaveBeenCalled();
   });
 
   it("retorna 400 quando latitude está fora do intervalo -90/90", async () => {
@@ -156,7 +153,7 @@ describe("GET /garrafa/:chainId/:tokenId/scans", () => {
 
   beforeEach(async () => {
     app = await montarApp();
-    listarScansMock.mockReset();
+    vi.mocked(scansServico.listarScans).mockReset();
   });
 
   afterEach(async () => {
@@ -164,7 +161,7 @@ describe("GET /garrafa/:chainId/:tokenId/scans", () => {
   });
 
   it("retorna 200 com o histórico de scans", async () => {
-    listarScansMock.mockResolvedValue(HISTORICO_EXEMPLO);
+    vi.mocked(scansServico.listarScans).mockResolvedValue(HISTORICO_EXEMPLO);
 
     const res = await app.inject({
       method: "GET",
@@ -175,11 +172,11 @@ describe("GET /garrafa/:chainId/:tokenId/scans", () => {
     const corpo = res.json<scansServico.HistoricoScans>();
     expect(corpo.total).toBe(1);
     expect(corpo.scans[0].cidade).toBe("São Paulo");
-    expect(listarScansMock).toHaveBeenCalledWith(11155111, "1");
+    expect(vi.mocked(scansServico.listarScans)).toHaveBeenCalledWith(11155111, "1");
   });
 
   it("retorna 200 com lista vazia quando não há scans", async () => {
-    listarScansMock.mockResolvedValue({ total: 0, scans: [] });
+    vi.mocked(scansServico.listarScans).mockResolvedValue({ total: 0, scans: [] });
 
     const res = await app.inject({
       method: "GET",
@@ -197,7 +194,7 @@ describe("GET /garrafa/:chainId/:tokenId/scans", () => {
     });
 
     expect(res.statusCode).toBe(400);
-    expect(listarScansMock).not.toHaveBeenCalled();
+    expect(vi.mocked(scansServico.listarScans)).not.toHaveBeenCalled();
   });
 
   it("retorna 400 quando tokenId não é numérico", async () => {
@@ -210,7 +207,7 @@ describe("GET /garrafa/:chainId/:tokenId/scans", () => {
   });
 
   it("retorna 503 para erros de banco de dados", async () => {
-    listarScansMock.mockRejectedValue(new Error("DB timeout"));
+    vi.mocked(scansServico.listarScans).mockRejectedValue(new Error("DB timeout"));
 
     const res = await app.inject({
       method: "GET",

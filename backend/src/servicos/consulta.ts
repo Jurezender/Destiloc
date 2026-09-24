@@ -81,7 +81,7 @@ async function salvarCache(
   tokenId: string,
   dados: RespostaGarrafa
 ): Promise<void> {
-  try {
+  const inserir = async () => {
     const pool = obterPool();
     await pool.query(
       `INSERT INTO garrafa_cache (chain_id, token_id, dados)
@@ -89,8 +89,17 @@ async function salvarCache(
        ON CONFLICT (chain_id, token_id) DO NOTHING`,
       [chainId, tokenId, JSON.stringify(dados)]
     );
-  } catch {
-    // Falha no cache não interrompe a resposta.
+  };
+  try {
+    await inserir();
+  } catch (erro) {
+    console.error('[garrafa_cache] tentativa 1 falhou:', erro);
+    await new Promise((r) => setTimeout(r, 200));
+    try {
+      await inserir();
+    } catch (erro2) {
+      console.error('[garrafa_cache] tentativa 2 falhou:', erro2);
+    }
   }
 }
 

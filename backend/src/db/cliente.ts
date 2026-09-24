@@ -13,7 +13,13 @@ export function obterPool(): InstanceType<typeof Pool> {
         'DATABASE_URL não configurado. Copie .env.example para .env e preencha os valores.'
       );
     }
-    _pool = new Pool({ connectionString: url });
+    _pool = new Pool({
+      connectionString: url,
+      max: 3,
+      connectionTimeoutMillis: 5_000,
+      idleTimeoutMillis: 10_000,
+      allowExitOnIdle: true,
+    });
   }
   return _pool;
 }

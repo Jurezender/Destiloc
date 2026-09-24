@@ -159,6 +159,24 @@ describe("registrarScan", () => {
     await expect(registrarScan(ENTRADA_BASE)).rejects.toThrow(GarrafaNaoEncontradaError);
   });
 
+  it("erro no cache check: faz fallback para blockchain e registra scan", async () => {
+    const contratoFake = { garrafaExiste: vi.fn().mockResolvedValue(true) };
+    vi.mocked(obterContrato).mockReturnValue(contratoFake as any);
+
+    mockQuery
+      .mockRejectedValueOnce(new Error("DB connection error")) // cache check falha
+      .mockResolvedValueOnce({ rows: [] })                     // sem scan anterior
+      .mockResolvedValueOnce({ rows: [] });                    // INSERT
+
+    await registrarScan(ENTRADA_BASE);
+
+    expect(contratoFake.garrafaExiste).toHaveBeenCalledWith("1");
+    const inseriu = mockQuery.mock.calls.some(
+      (c) => (c[0] as string).includes("INSERT")
+    );
+    expect(inseriu).toBe(true);
+  });
+
   it("consulta anterior com velocidade > 500 km/h: marca suspeito=true", async () => {
     const trintaMinAtras = new Date(Date.now() - 30 * 60 * 1000);
     mockQuery

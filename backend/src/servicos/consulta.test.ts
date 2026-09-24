@@ -137,7 +137,8 @@ describe("consultarGarrafa — cache", () => {
     mockQuery.mockRejectedValueOnce(new Error("connection refused"));
     // SELECT carteiras_conhecidas
     mockQuery.mockResolvedValueOnce({ rows: [] });
-    // INSERT garrafa_cache (também pode falhar — deve ser silencioso)
+    // INSERT garrafa_cache — falha nas duas tentativas (retry incluído)
+    mockQuery.mockRejectedValueOnce(new Error("connection refused"));
     mockQuery.mockRejectedValueOnce(new Error("connection refused"));
 
     criarContratosFake();
@@ -151,7 +152,8 @@ describe("consultarGarrafa — cache", () => {
   it("cache write error: retorna resposta mesmo quando INSERT falha", async () => {
     mockQuery.mockResolvedValueOnce({ rows: [] });         // SELECT miss
     mockQuery.mockResolvedValueOnce({ rows: [] });         // carteiras
-    mockQuery.mockRejectedValueOnce(new Error("timeout")); // INSERT falha
+    mockQuery.mockRejectedValueOnce(new Error("timeout")); // INSERT falha tentativa 1
+    mockQuery.mockRejectedValueOnce(new Error("timeout")); // INSERT falha tentativa 2
 
     criarContratosFake();
 

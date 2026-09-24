@@ -100,6 +100,9 @@ function mensagemAmigavel(erro: string): string {
   if (erro.includes("inválido") || erro.includes("inválida")) {
     return "O link de consulta parece estar incorreto. Verifique se o QR Code foi lido corretamente.";
   }
+  if (erro.includes("temporariamente") || erro.includes("indisponível")) {
+    return "O serviço está temporariamente indisponível. Tente novamente em instantes.";
+  }
   return "Ocorreu um erro ao buscar as informações. Tente novamente em instantes.";
 }
 
@@ -177,8 +180,16 @@ export function ConsultaPublica() {
       ]);
 
       if (!garrafaResposta.ok) {
-        const corpo = (await garrafaResposta.json()) as { erro: string };
-        setMensagemErro(mensagemAmigavel(corpo.erro ?? "Erro desconhecido."));
+        let erroMsg = garrafaResposta.status >= 500
+          ? "Serviço temporariamente indisponível."
+          : "Erro desconhecido.";
+        try {
+          const corpo = (await garrafaResposta.json()) as { erro?: string };
+          if (corpo.erro) erroMsg = corpo.erro;
+        } catch {
+          // Corpo não é JSON (ex: 504 HTML da Vercel) — usa mensagem pelo status
+        }
+        setMensagemErro(mensagemAmigavel(erroMsg));
         setEstado("erro-consulta");
         return;
       }
@@ -204,9 +215,13 @@ export function ConsultaPublica() {
       setDados(dadosGarrafa);
       setHistorico(dadosHistorico);
       setEstado("carregado");
-    } catch {
+    } catch (erro) {
+      console.error("[ConsultaPublica] carregarDados falhou:", erro);
+      const isNetworkError = erro instanceof TypeError;
       setMensagemErro(
-        "Ocorreu um erro ao buscar as informações. Tente novamente em instantes."
+        isNetworkError
+          ? "Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente."
+          : "Ocorreu um erro ao buscar as informações. Tente novamente em instantes."
       );
       setEstado("erro-consulta");
     }

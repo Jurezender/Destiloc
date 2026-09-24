@@ -144,12 +144,18 @@ function truncarPrefixoIp(ip: string): string | null {
 export async function registrarScan(entrada: EntradaScan): Promise<void> {
   const pool = obterPool();
 
-  const cacheRes = await pool.query(
-    "SELECT 1 FROM garrafa_cache WHERE chain_id = $1 AND token_id = $2",
-    [entrada.chainId, entrada.tokenId]
-  );
+  let garrafaEmCache = false;
+  try {
+    const cacheRes = await pool.query(
+      "SELECT 1 FROM garrafa_cache WHERE chain_id = $1 AND token_id = $2",
+      [entrada.chainId, entrada.tokenId]
+    );
+    garrafaEmCache = cacheRes.rows.length > 0;
+  } catch (erro) {
+    console.warn('[registrarScan] falha ao verificar cache — verificando blockchain:', erro);
+  }
 
-  if (cacheRes.rows.length === 0) {
+  if (!garrafaEmCache) {
     const contrato = obterContrato("ContratoEnvasamento", entrada.chainId);
     const existe = (await contrato.garrafaExiste(entrada.tokenId)) as boolean;
     if (!existe) {
