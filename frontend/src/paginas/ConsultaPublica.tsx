@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { obterContrato, obterProviderPublico } from "../contracts";
 import { REDES } from "../contracts/redes";
-import { mapearErroContrato } from "../lib/erros";
 import {
   encurtarEndereco,
   formatarTimestamp,
@@ -13,78 +11,58 @@ import {
 } from "../lib/formatadores";
 import { EstadoProducao, EtapaProducao, TipoBebida, TipoInsumo } from "../lib/tipos";
 
-interface DadosGarrafa {
-  tokenId: bigint;
-  envasamentoId: bigint;
-  emitidaEm: bigint;
-}
-
-interface DadosEnvasamento {
-  envasador: string;
-  quantidadeDeclarada: bigint;
-  quantidadeEmitida: bigint;
-  registradoEm: bigint;
-  concluidoEm: bigint;
-  metadataURI: string;
-}
-
-interface DadosLote {
-  id: bigint;
-  produtor: string;
-  tipoBebida: TipoBebida;
-  estado: EstadoProducao;
-  criadoEm: bigint;
-  concluidoEm: bigint;
-  metadataURI: string;
-  metadataURIConclusao: string;
-}
-
-interface ConfiguracaoLote {
-  maturacaoAplicavel: boolean;
-  retificacaoAplicavel: boolean;
-  blendagemAplicavel: boolean;
-  ajusteFinalAplicavel: boolean;
-}
-
-interface InsumoInfo {
-  id: bigint;
-  tipo: TipoInsumo;
-  fornecedor: string;
-  metadataURI: string;
-}
-
-interface EtapaInfo {
-  indice: number;
-  etapa: EtapaProducao;
-  executadoPor: string;
-  inicioInformado: bigint;
-  fimInformado: bigint;
-  registradoEm: bigint;
-  metadataURI: string;
-  insumosUtilizados: bigint[];
-}
-
+// Todos os valores uint256/uint64 da blockchain chegam como string
+// para preservar precisão — os enums chegam como number.
 interface DadosConsulta {
-  garrafa: DadosGarrafa;
-  envasamento: DadosEnvasamento;
-  lote: DadosLote;
-  configuracao: ConfiguracaoLote;
-  insumosVinculados: InsumoInfo[];
-  etapas: EtapaInfo[];
+  garrafa: {
+    tokenId: string;
+    envasamentoId: string;
+    emitidaEm: string;
+  };
+  envasamento: {
+    envasador: string;
+    quantidadeDeclarada: string;
+    quantidadeEmitida: string;
+    registradoEm: string;
+    concluidoEm: string;
+    metadataURI: string;
+  };
+  lote: {
+    id: string;
+    produtor: string;
+    tipoBebida: TipoBebida;
+    estado: EstadoProducao;
+    criadoEm: string;
+    concluidoEm: string;
+    metadataURI: string;
+    metadataURIConclusao: string;
+  };
+  configuracao: {
+    maturacaoAplicavel: boolean;
+    retificacaoAplicavel: boolean;
+    blendagemAplicavel: boolean;
+    ajusteFinalAplicavel: boolean;
+  };
+  insumosVinculados: Array<{
+    id: string;
+    tipo: TipoInsumo;
+    fornecedor: string;
+    metadataURI: string;
+  }>;
+  etapas: Array<{
+    indice: number;
+    etapa: EtapaProducao;
+    executadoPor: string;
+    inicioInformado: string;
+    fimInformado: string;
+    registradoEm: string;
+    metadataURI: string;
+    insumosUtilizados: string[];
+  }>;
+  nomesCarteiras: Record<string, string>;
 }
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
-
-async function buscarApelido(endereco: string): Promise<string | null> {
-  try {
-    const resposta = await fetch(`${API_URL}/carteiras/${endereco}`);
-    if (!resposta.ok) return null;
-    const dados = (await resposta.json()) as { apelido: string };
-    return dados.apelido || null;
-  } catch {
-    return null;
-  }
-}
 
 function ipfsParaUrl(uri: string): string {
   if (uri.startsWith("ipfs://")) return `https://ipfs.io/ipfs/${uri.slice(7)}`;
@@ -102,14 +80,12 @@ function mensagemAmigavel(erro: string): string {
 }
 
 /**
- * Página do consumidor final. Deliberadamente NÃO usa CarteiraContexto nem
- * `window.ethereum` — só um `JsonRpcProvider` somente leitura, para que a
- * consulta funcione sem a MetaMask instalada ou conectada.
+ * Página do consumidor final. Não usa CarteiraContexto, window.ethereum
+ * nem chamadas diretas à blockchain — consulta via API backend com cache Neon.
  */
 export function ConsultaPublica() {
   const { chainId: chainIdParam, tokenId } = useParams<{ chainId: string; tokenId: string }>();
   const [dados, setDados] = useState<DadosConsulta | null>(null);
-  const [nomesCarteiras, setNomesCarteiras] = useState<Record<string, string>>({});
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
 
@@ -127,124 +103,16 @@ export function ConsultaPublica() {
       setCarregando(true);
       setErro(null);
       try {
-        const provider = obterProviderPublico(chainId);
-        const envasamentoContrato = obterContrato("ContratoEnvasamento", chainId, provider);
-        const existeGarrafa = (await envasamentoContrato.garrafaExiste(tokenId)) as boolean;
-        if (!existeGarrafa) {
-          if (!cancelado) setErro("Esta garrafa não existe.");
+        const resposta = await fetch(`${API_URL}/garrafa/${chainId}/${tokenId}`);
+        if (!resposta.ok) {
+          const corpo = (await resposta.json()) as { erro: string };
+          if (!cancelado) setErro(corpo.erro ?? "Erro desconhecido.");
           return;
         }
-
-        const dadoGarrafa = await envasamentoContrato.obterGarrafa(tokenId);
-        const envasamentoId = dadoGarrafa.envasamentoId as bigint;
-        const dadoEnvasamento = await envasamentoContrato.obterEnvasamento(envasamentoId);
-        const loteProducaoId = dadoEnvasamento.loteProducaoId as bigint;
-
-        const producaoContrato = obterContrato("ContratoProducao", chainId, provider);
-        const existeLote = (await producaoContrato.loteProducaoExiste(loteProducaoId)) as boolean;
-        if (!existeLote) {
-          if (!cancelado) setErro("O lote de produção desta garrafa não existe.");
-          return;
-        }
-
-        const [dadoLote, dadoConfiguracao] = await Promise.all([
-          producaoContrato.obterLoteProducao(loteProducaoId),
-          producaoContrato.obterConfiguracao(loteProducaoId),
-        ]);
-
-        const insumosContrato = obterContrato("ContratoInsumos", chainId, provider);
-        const totalVinculados = Number(await producaoContrato.totalInsumosVinculados(loteProducaoId));
-        const idsVinculados = await Promise.all(
-          Array.from({ length: totalVinculados }, (_, indice) =>
-            producaoContrato.insumoVinculadoPorIndice(loteProducaoId, indice)
-          )
-        );
-        const insumosVinculados = await Promise.all(
-          (idsVinculados as bigint[]).map(async (insumoId) => {
-            const dadoInsumo = await insumosContrato.obterLoteInsumo(insumoId);
-            return {
-              id: insumoId,
-              tipo: Number(dadoInsumo.tipo) as TipoInsumo,
-              fornecedor: dadoInsumo.fornecedor as string,
-              metadataURI: dadoInsumo.metadataURI as string,
-            } satisfies InsumoInfo;
-          })
-        );
-        const totalEtapasRegistradas = Number(await producaoContrato.totalEtapas(loteProducaoId));
-        const etapas = await Promise.all(
-          Array.from({ length: totalEtapasRegistradas }, async (_, indice) => {
-            const registro = await producaoContrato.etapaPorIndice(loteProducaoId, indice);
-            const totalInsumosEtapa = Number(await producaoContrato.totalInsumosDaEtapa(loteProducaoId, indice));
-            const insumosDaEtapa = await Promise.all(
-              Array.from({ length: totalInsumosEtapa }, (_, indiceInsumo) =>
-                producaoContrato.insumoDaEtapaPorIndice(loteProducaoId, indice, indiceInsumo)
-              )
-            );
-            return {
-              indice,
-              etapa: Number(registro.etapa) as EtapaProducao,
-              executadoPor: registro.executadoPor as string,
-              inicioInformado: registro.inicioInformado as bigint,
-              fimInformado: registro.fimInformado as bigint,
-              registradoEm: registro.registradoEm as bigint,
-              metadataURI: registro.metadataURI as string,
-              insumosUtilizados: insumosDaEtapa as bigint[],
-            } satisfies EtapaInfo;
-          })
-        );
-
-        const enderecoUnicos = [
-          ...new Set([
-            dadoLote.produtor as string,
-            dadoEnvasamento.envasador as string,
-            ...etapas.map((e) => e.executadoPor),
-          ]),
-        ];
-        const resultadosNomes = await Promise.all(
-          enderecoUnicos.map(async (end) => [end, await buscarApelido(end)] as [string, string | null])
-        );
-        const nomes: Record<string, string> = {};
-        for (const [end, apelido] of resultadosNomes) {
-          if (apelido) nomes[end] = apelido;
-        }
-
-        if (cancelado) return;
-        setNomesCarteiras(nomes);
-        setDados({
-          garrafa: {
-            tokenId: BigInt(tokenId),
-            envasamentoId,
-            emitidaEm: dadoGarrafa.emitidaEm as bigint,
-          },
-          envasamento: {
-            envasador: dadoEnvasamento.envasador as string,
-            quantidadeDeclarada: dadoEnvasamento.quantidadeDeclarada as bigint,
-            quantidadeEmitida: dadoEnvasamento.quantidadeEmitida as bigint,
-            registradoEm: dadoEnvasamento.registradoEm as bigint,
-            concluidoEm: dadoEnvasamento.concluidoEm as bigint,
-            metadataURI: dadoEnvasamento.metadataURI as string,
-          },
-          lote: {
-            id: loteProducaoId,
-            produtor: dadoLote.produtor as string,
-            tipoBebida: Number(dadoLote.tipoBebida) as TipoBebida,
-            estado: Number(dadoLote.estado) as EstadoProducao,
-            criadoEm: dadoLote.criadoEm as bigint,
-            concluidoEm: dadoLote.concluidoEm as bigint,
-            metadataURI: dadoLote.metadataURI as string,
-            metadataURIConclusao: dadoLote.metadataURIConclusao as string,
-          },
-          configuracao: {
-            maturacaoAplicavel: dadoConfiguracao.maturacaoAplicavel as boolean,
-            retificacaoAplicavel: dadoConfiguracao.retificacaoAplicavel as boolean,
-            blendagemAplicavel: dadoConfiguracao.blendagemAplicavel as boolean,
-            ajusteFinalAplicavel: dadoConfiguracao.ajusteFinalAplicavel as boolean,
-          },
-          insumosVinculados,
-          etapas,
-        });
-      } catch (erroConsulta) {
-        if (!cancelado) setErro(mapearErroContrato(erroConsulta));
+        const json = (await resposta.json()) as DadosConsulta;
+        if (!cancelado) setDados(json);
+      } catch {
+        if (!cancelado) setErro("Ocorreu um erro ao buscar as informações. Tente novamente em instantes.");
       } finally {
         if (!cancelado) setCarregando(false);
       }
@@ -278,7 +146,7 @@ export function ConsultaPublica() {
       {carregando && (
         <div className="cp-carregando">
           <span className="cp-carregando__indicador" aria-hidden="true" />
-          <span>Buscando a história desta garrafa…</span>
+          <span>Buscando o histórico desta garrafa…</span>
         </div>
       )}
 
@@ -295,15 +163,15 @@ export function ConsultaPublica() {
           <div className="cp-identidade">
             <div className="cp-identidade__cabecalho">
               <span className="cp-identidade__rotulo">Garrafa certificada</span>
-              <span className="cp-identidade__numero">#{dados.garrafa.tokenId.toString()}</span>
+              <span className="cp-identidade__numero">#{dados.garrafa.tokenId}</span>
               <span className="cp-identidade__bebida">{RETULO_TIPO_BEBIDA[dados.lote.tipoBebida]}</span>
             </div>
             <div className="cp-identidade__meta">
-              <span>Lote #{dados.lote.id.toString()}</span>
+              <span>Lote #{dados.lote.id}</span>
               <span className="cp-sep">·</span>
-              <span>Envasamento #{dados.garrafa.envasamentoId.toString()}</span>
+              <span>Envasamento #{dados.garrafa.envasamentoId}</span>
               <span className="cp-sep">·</span>
-              <span>Emitida em {formatarTimestamp(dados.garrafa.emitidaEm)}</span>
+              <span>Emitida em {formatarTimestamp(Number(dados.garrafa.emitidaEm))}</span>
             </div>
             <div className="cp-autenticidade">
               <span className="cp-autenticidade__icone" aria-hidden="true">✓</span>
@@ -321,7 +189,7 @@ export function ConsultaPublica() {
                 <div className="cp-campo cp-campo--largo">
                   <dt className="cp-campo__rotulo">Produtor</dt>
                   <dd className="cp-campo__valor">
-                    {nomesCarteiras[dados.lote.produtor] ?? encurtarEndereco(dados.lote.produtor)}
+                    {dados.nomesCarteiras[dados.lote.produtor] ?? encurtarEndereco(dados.lote.produtor)}
                   </dd>
                 </div>
                 {processosAplicados.length > 0 && (
@@ -361,11 +229,11 @@ export function ConsultaPublica() {
                       <div className="cp-timeline__ponto" aria-hidden="true" />
                       <div className="cp-timeline__conteudo">
                         <span className="cp-timeline__etapa">{RETULO_ETAPA_PRODUCAO[evento.etapa]}</span>
-                        {(evento.inicioInformado !== 0n || evento.fimInformado !== 0n) && (
+                        {(evento.inicioInformado !== "0" || evento.fimInformado !== "0") && (
                           <span className="cp-timeline__periodo">
-                            {evento.inicioInformado !== 0n && formatarTimestamp(evento.inicioInformado)}
-                            {evento.inicioInformado !== 0n && evento.fimInformado !== 0n && " — "}
-                            {evento.fimInformado !== 0n && formatarTimestamp(evento.fimInformado)}
+                            {evento.inicioInformado !== "0" && formatarTimestamp(Number(evento.inicioInformado))}
+                            {evento.inicioInformado !== "0" && evento.fimInformado !== "0" && " — "}
+                            {evento.fimInformado !== "0" && formatarTimestamp(Number(evento.fimInformado))}
                           </span>
                         )}
                         {evento.metadataURI && (
@@ -411,12 +279,12 @@ export function ConsultaPublica() {
                 <div className="cp-campo">
                   <dt className="cp-campo__rotulo">Garrafas deste envasamento</dt>
                   <dd className="cp-campo__valor">
-                    {dados.envasamento.quantidadeEmitida.toString()} emitidas de {dados.envasamento.quantidadeDeclarada.toString()} declaradas
+                    {dados.envasamento.quantidadeEmitida} emitidas de {dados.envasamento.quantidadeDeclarada} declaradas
                   </dd>
                 </div>
                 <div className="cp-campo">
                   <dt className="cp-campo__rotulo">Data de registro do lote</dt>
-                  <dd className="cp-campo__valor">{formatarTimestamp(dados.lote.criadoEm)}</dd>
+                  <dd className="cp-campo__valor">{formatarTimestamp(Number(dados.lote.criadoEm))}</dd>
                 </div>
                 <div className="cp-campo cp-campo--largo">
                   <dt className="cp-campo__rotulo">Endereço do produtor</dt>

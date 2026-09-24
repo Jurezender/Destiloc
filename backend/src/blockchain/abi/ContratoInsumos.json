@@ -1,0 +1,651 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "enderecoContratoAcesso",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "ContratoAcessoInvalido",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "IndiceForaDosLimites",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LoteInsumoEstaInvalidado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LoteInsumoInexistente",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LoteInsumoJaInvalidado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NaoEhFornecedorOriginal",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReferenciaIPFSInvalida",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ResultadoAvaliacaoInvalido",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SemPermissao",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TipoInsumoInvalido",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "fornecedor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "registradoEm",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "indice",
+        "type": "uint256"
+      }
+    ],
+    "name": "CorrecaoDocumentalRegistrada",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum ContratoInsumos.ResultadoAvaliacao",
+        "name": "resultado",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "registradoEm",
+        "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "indice",
+        "type": "uint256"
+      }
+    ],
+    "name": "InsumoAvaliado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "fornecedor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "registradoEm",
+        "type": "uint64"
+      }
+    ],
+    "name": "LoteInsumoInvalidado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "fornecedor",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "enum ContratoInsumos.TipoInsumo",
+        "name": "tipo",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "registradoEm",
+        "type": "uint64"
+      }
+    ],
+    "name": "LoteInsumoRegistrado",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      }
+    ],
+    "name": "aprovadoPor",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indice",
+        "type": "uint256"
+      }
+    ],
+    "name": "avaliacaoPorIndice",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum ContratoInsumos.ResultadoAvaliacao",
+            "name": "resultado",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint64",
+            "name": "registradoEm",
+            "type": "uint64"
+          },
+          {
+            "internalType": "string",
+            "name": "metadataURI",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ContratoInsumos.AvaliacaoInsumo",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "enum ContratoInsumos.ResultadoAvaliacao",
+        "name": "resultado",
+        "type": "uint8"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      }
+    ],
+    "name": "avaliarInsumo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "contratoAcesso",
+    "outputs": [
+      {
+        "internalType": "contract IContratoAcesso",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indice",
+        "type": "uint256"
+      }
+    ],
+    "name": "correcaoPorIndice",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint64",
+            "name": "registradoEm",
+            "type": "uint64"
+          },
+          {
+            "internalType": "string",
+            "name": "metadataURI",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ContratoInsumos.CorrecaoDocumental",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "fornecedor",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "indice",
+        "type": "uint256"
+      }
+    ],
+    "name": "insumoDoFornecedorPorIndice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      }
+    ],
+    "name": "invalidarLoteInsumo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      }
+    ],
+    "name": "loteInsumoExiste",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      }
+    ],
+    "name": "loteInsumoValido",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      }
+    ],
+    "name": "obterInvalidacao",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bool",
+            "name": "invalidado",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint64",
+            "name": "registradoEm",
+            "type": "uint64"
+          },
+          {
+            "internalType": "string",
+            "name": "metadataURI",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ContratoInsumos.InvalidacaoInsumo",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      }
+    ],
+    "name": "obterLoteInsumo",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "fornecedor",
+            "type": "address"
+          },
+          {
+            "internalType": "enum ContratoInsumos.TipoInsumo",
+            "name": "tipo",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint64",
+            "name": "registradoEm",
+            "type": "uint64"
+          },
+          {
+            "internalType": "string",
+            "name": "metadataURI",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct ContratoInsumos.LoteInsumo",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      }
+    ],
+    "name": "registrarCorrecaoDocumental",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum ContratoInsumos.TipoInsumo",
+        "name": "tipo",
+        "type": "uint8"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      }
+    ],
+    "name": "registrarLoteInsumo",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      }
+    ],
+    "name": "resultadoAtual",
+    "outputs": [
+      {
+        "internalType": "enum ContratoInsumos.ResultadoAvaliacao",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      }
+    ],
+    "name": "totalAvaliacoes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalCorrecoes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "fornecedor",
+        "type": "address"
+      }
+    ],
+    "name": "totalInsumosDoFornecedor",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalLotesInsumo",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
