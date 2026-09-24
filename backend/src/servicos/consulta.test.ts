@@ -190,4 +190,25 @@ describe("consultarGarrafa — cache", () => {
     // Apenas 1 query (SELECT cache) — sem nova consulta de carteiras
     expect(mockQuery).toHaveBeenCalledTimes(1);
   });
+
+  it("retry em 429: retenta após rate limit e retorna resposta correta", async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [] }); // cache miss
+    mockQuery.mockResolvedValueOnce({ rows: [] }); // carteiras
+    mockQuery.mockResolvedValueOnce({ rows: [] }); // INSERT
+
+    const erroRateLimit = Object.assign(new Error("Too Many Requests"), {
+      info: { error: { code: -32005 } },
+    });
+
+    const { envasamento } = criarContratosFake();
+    // garrafaExiste falha na 1ª tentativa (429), sucede na 2ª (retry)
+    envasamento.garrafaExiste = vi.fn()
+      .mockRejectedValueOnce(erroRateLimit)
+      .mockResolvedValue(true);
+
+    const resultado = await consultarGarrafa(CHAIN_ID, TOKEN_ID);
+
+    expect(resultado.garrafa.tokenId).toBe(TOKEN_ID);
+    expect(envasamento.garrafaExiste).toHaveBeenCalledTimes(2);
+  }, 10_000); // timeout estendido para cobrir o backoff de 1 s
 });
