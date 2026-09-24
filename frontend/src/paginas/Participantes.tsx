@@ -167,7 +167,7 @@ export function Participantes() {
     <section>
       <h1>Participantes</h1>
       <p className="dica">
-        Os papéis são centralizados no ContratoAcesso. Uma mesma conta pode acumular os papéis de
+        Uma mesma conta pode acumular os papéis de
         administrador, fornecedor, produtor e envasador.
       </p>
 
