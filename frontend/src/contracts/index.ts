@@ -9,13 +9,6 @@ export type NomeContrato =
   | "ContratoProducao"
   | "ContratoEnvasamento";
 
-const NOMES_CONTRATOS: NomeContrato[] = [
-  "ContratoAcesso",
-  "ContratoInsumos",
-  "ContratoProducao",
-  "ContratoEnvasamento",
-];
-
 interface RegistroEnderecos {
   rede: string;
   momento: string;
@@ -69,7 +62,7 @@ function obterAbi(nome: NomeContrato): InterfaceAbi {
   return abi;
 }
 
-export function obterEnderecos(chainId: number): Record<NomeContrato, string> {
+function obterEnderecos(chainId: number): Record<NomeContrato, string> {
   const config = obterConfiguracaoRede(chainId);
   const registro = config ? enderecosPorRede[config.nome] : undefined;
   if (!registro) {
@@ -82,7 +75,6 @@ export function obterEnderecos(chainId: number): Record<NomeContrato, string> {
   return registro.enderecos;
 }
 
-/** Instancia um contrato pronto para uso, com ABI + endereço da rede indicada. */
 export function obterContrato(nome: NomeContrato, chainId: number, executor: ContractRunner): Contract {
   const enderecos = obterEnderecos(chainId);
   return new Contract(enderecos[nome], obterAbi(nome), executor);
@@ -99,5 +91,5 @@ export function obterProviderPublico(chainId: number): JsonRpcProvider {
   return new JsonRpcProvider(config.urlRpcPublica);
 }
 
-export { NOMES_CONTRATOS, REDES, obterConfiguracaoRede };
+export { REDES, obterConfiguracaoRede };
 export type { ConfiguracaoRede };

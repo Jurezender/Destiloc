@@ -12,10 +12,3 @@ export const PAPEL_ADMIN = ZeroHash;
 export const PAPEL_FORNECEDOR = id("FORNECEDOR_ROLE");
 export const PAPEL_PRODUTOR = id("PRODUTOR_ROLE");
 export const PAPEL_ENVASADOR = id("ENVASADOR_ROLE");
-
-export const RETULO_PAPEL: Record<string, string> = {
-  [PAPEL_ADMIN]: "Administrador",
-  [PAPEL_FORNECEDOR]: "Fornecedor",
-  [PAPEL_PRODUTOR]: "Produtor",
-  [PAPEL_ENVASADOR]: "Envasador",
-};
