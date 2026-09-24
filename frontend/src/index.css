@@ -1352,6 +1352,137 @@ details[open] .cp-tecnico__chevron {
   color: var(--cor-texto-secundario);
 }
 
+/* ─── Consentimento de localização ──────────────────────────────────────────── */
+.cp-consentimento {
+  display: flex;
+  justify-content: center;
+  padding: var(--s-2xl) var(--s-md);
+}
+
+.cp-consentimento__corpo {
+  background: var(--branco);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  box-shadow: var(--sombra-elevada);
+  padding: var(--s-2xl);
+  max-width: 30rem;
+  width: 100%;
+}
+
+.cp-consentimento__titulo {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--cor-texto-primario);
+  margin-bottom: var(--s-lg);
+}
+
+.cp-consentimento__texto {
+  font-size: 0.9375rem;
+  color: var(--cor-texto-secundario);
+  line-height: 1.6;
+  margin-bottom: var(--s-md);
+}
+
+.cp-consentimento__texto strong {
+  color: var(--cor-texto-primario);
+}
+
+.cp-consentimento__acoes {
+  display: flex;
+  gap: var(--s-md);
+  margin-top: var(--s-xl);
+  flex-wrap: wrap;
+}
+
+/* Botão ghost — fundo transparente com borda */
+.cp-botao--neutro {
+  background-color: transparent;
+  color: var(--cor-texto-secundario);
+  border: 1px solid var(--cor-borda);
+}
+
+.cp-botao--neutro:hover:not(:disabled) {
+  background-color: var(--cor-fundo-pagina);
+  box-shadow: none;
+  color: var(--cor-texto-primario);
+}
+
+/* Estado informativo — localização recusada ou GPS indisponível */
+.cp-estado-informativo {
+  max-width: 50rem;
+  margin: var(--s-xl) auto;
+  padding: var(--s-lg) var(--s-xl);
+  background-color: #EFF3FB;
+  border: 1px solid rgba(70, 110, 195, 0.18);
+  border-left: 3px solid #466EC3;
+  border-radius: var(--raio-md);
+  color: #2B4A9E;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.cp-estado-informativo__acao {
+  margin-top: var(--s-lg);
+}
+
+/* Badge de contagem na seção ─────────────────────────────────────────────── */
+.cp-secao__badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cor-texto-secundario);
+  background-color: var(--cor-fundo-pagina);
+  border: 1px solid var(--cor-borda);
+  border-radius: 10rem;
+  padding: 0.125rem 0.625rem;
+  white-space: nowrap;
+}
+
+/* Histórico de consultas ─────────────────────────────────────────────────── */
+.cp-historico {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cp-historico__item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--s-lg);
+  row-gap: 0.25rem;
+  padding: var(--s-md) var(--s-xl);
+  border-bottom: 1px solid var(--cor-borda-suave);
+}
+
+.cp-historico__item:last-child {
+  border-bottom: none;
+}
+
+.cp-historico__item--suspeito {
+  border-left: 3px solid #D49A22;
+  background-color: #FDF8EE;
+  padding-left: calc(var(--s-xl) - 3px);
+}
+
+.cp-historico__local {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--cor-texto-primario);
+}
+
+.cp-historico__data {
+  font-size: 0.8125rem;
+  color: var(--cor-texto-secundario);
+  white-space: nowrap;
+  text-align: right;
+}
+
+.cp-historico__alerta {
+  grid-column: 1 / -1;
+  font-size: 0.8125rem;
+  color: #8A6800;
+  font-style: italic;
+}
+
 /* Responsivo — ConsultaPublica ───────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .cp-hero {

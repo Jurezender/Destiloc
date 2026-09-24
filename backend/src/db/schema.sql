@@ -18,6 +18,28 @@ CREATE TABLE IF NOT EXISTS garrafa_cache (
   PRIMARY KEY (chain_id, token_id)
 );
 
+-- Registro de consultas públicas: rastreabilidade pós-consumo.
+-- Coordenadas truncadas a 2 casas (≈1.1 km) — minimização de dados (LGPD).
+CREATE TABLE IF NOT EXISTS scan_garrafa (
+  id               BIGSERIAL    PRIMARY KEY,
+  chain_id         INTEGER      NOT NULL,
+  token_id         TEXT         NOT NULL,
+  latitude         NUMERIC(7,2) NOT NULL,
+  longitude        NUMERIC(7,2) NOT NULL,
+  precisao_m       INTEGER,
+  cidade           TEXT,
+  estado           TEXT,
+  pais             TEXT,
+  tipo_dispositivo TEXT         CHECK (tipo_dispositivo IN ('mobile', 'tablet', 'desktop')),
+  ip_prefixo       TEXT,
+  escaneado_em     TIMESTAMPTZ  NOT NULL DEFAULT now(),
+  suspeito         BOOLEAN      NOT NULL DEFAULT false,
+  motivo_suspeita  TEXT
+);
+
+CREATE INDEX IF NOT EXISTS scan_garrafa_garrafa_idx
+  ON scan_garrafa (chain_id, token_id, escaneado_em DESC);
+
 -- Cache de uploads ao Pinata — evita pinagens duplicadas para o mesmo conteúdo
 CREATE TABLE IF NOT EXISTS ipfs_cache (
   hash_conteudo TEXT        PRIMARY KEY,

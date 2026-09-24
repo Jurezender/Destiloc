@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { REDES } from "../contracts/redes";
 import {
@@ -62,6 +62,30 @@ interface DadosConsulta {
   nomesCarteiras: Record<string, string>;
 }
 
+interface ItemHistorico {
+  id: number;
+  cidade: string | null;
+  estado: string | null;
+  pais: string | null;
+  escaneadoEm: string;
+  suspeito: boolean;
+  motivo: string | null;
+}
+
+interface HistoricoScans {
+  total: number;
+  scans: ItemHistorico[];
+}
+
+type EstadoConsulta =
+  | "consentimento"
+  | "solicitando"
+  | "carregando"
+  | "carregado"
+  | "recusado"
+  | "erro-localizacao"
+  | "erro-consulta";
+
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
 function ipfsParaUrl(uri: string): string {
@@ -79,48 +103,114 @@ function mensagemAmigavel(erro: string): string {
   return "Ocorreu um erro ao buscar as informações. Tente novamente em instantes.";
 }
 
+function mensagemErroGeo(codigo: number): string {
+  if (codigo === GeolocationPositionError.PERMISSION_DENIED)
+    return "Permissão de localização negada. Para acessar esta consulta, autorize o acesso à localização nas configurações do navegador e tente novamente.";
+  if (codigo === GeolocationPositionError.POSITION_UNAVAILABLE)
+    return "Não foi possível determinar sua localização. Verifique se o GPS está ativo.";
+  if (codigo === GeolocationPositionError.TIMEOUT)
+    return "Tempo esgotado ao obter localização. Tente novamente.";
+  return "Não foi possível obter sua localização.";
+}
+
 /**
- * Página do consumidor final. Não usa CarteiraContexto, window.ethereum
- * nem chamadas diretas à blockchain — consulta via API backend com cache Neon.
+ * Página do consumidor final. Fluxo: consentimento → localização → POST /scans
+ * + GET /garrafa em paralelo → exibir consulta e histórico.
+ * Não usa CarteiraContexto, window.ethereum nem chamadas diretas à blockchain.
  */
 export function ConsultaPublica() {
-  const { chainId: chainIdParam, tokenId } = useParams<{ chainId: string; tokenId: string }>();
+  const { chainId: chainIdParam, tokenId } = useParams<{
+    chainId: string;
+    tokenId: string;
+  }>();
+  const [estado, setEstado] = useState<EstadoConsulta>("consentimento");
   const [dados, setDados] = useState<DadosConsulta | null>(null);
-  const [erro, setErro] = useState<string | null>(null);
-  const [carregando, setCarregando] = useState(true);
+  const [historico, setHistorico] = useState<HistoricoScans | null>(null);
+  const [mensagemErro, setMensagemErro] = useState<string | null>(null);
 
   const chainId = chainIdParam ? Number(chainIdParam) : NaN;
   const rede = REDES[chainId];
 
-  useEffect(() => {
+  function solicitarLocalizacao() {
+    setEstado("solicitando");
+    navigator.geolocation.getCurrentPosition(
+      (posicao) => {
+        setEstado("carregando");
+        void carregarDados({
+          latitude: posicao.coords.latitude,
+          longitude: posicao.coords.longitude,
+          precisao: Math.round(posicao.coords.accuracy),
+        });
+      },
+      (erro) => {
+        setEstado("erro-localizacao");
+        setMensagemErro(mensagemErroGeo(erro.code));
+      },
+      { timeout: 10_000, maximumAge: 60_000 }
+    );
+  }
+
+  async function carregarDados(loc: {
+    latitude: number;
+    longitude: number;
+    precisao: number;
+  }) {
     if (!tokenId || Number.isNaN(chainId)) {
-      setErro("Link de consulta inválido.");
-      setCarregando(false);
+      setMensagemErro("Link de consulta inválido.");
+      setEstado("erro-consulta");
       return;
     }
-    let cancelado = false;
-    (async () => {
-      setCarregando(true);
-      setErro(null);
-      try {
-        const resposta = await fetch(`${API_URL}/garrafa/${chainId}/${tokenId}`);
-        if (!resposta.ok) {
-          const corpo = (await resposta.json()) as { erro: string };
-          if (!cancelado) setErro(corpo.erro ?? "Erro desconhecido.");
-          return;
-        }
-        const json = (await resposta.json()) as DadosConsulta;
-        if (!cancelado) setDados(json);
-      } catch {
-        if (!cancelado) setErro("Ocorreu um erro ao buscar as informações. Tente novamente em instantes.");
-      } finally {
-        if (!cancelado) setCarregando(false);
+    try {
+      const [scanResposta, garrafaResposta] = await Promise.all([
+        fetch(`${API_URL}/scans`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chainId,
+            tokenId,
+            latitude: loc.latitude,
+            longitude: loc.longitude,
+            precisao: loc.precisao,
+          }),
+        }),
+        fetch(`${API_URL}/garrafa/${chainId}/${tokenId}`),
+      ]);
+
+      if (!garrafaResposta.ok) {
+        const corpo = (await garrafaResposta.json()) as { erro: string };
+        setMensagemErro(mensagemAmigavel(corpo.erro ?? "Erro desconhecido."));
+        setEstado("erro-consulta");
+        return;
       }
-    })();
-    return () => {
-      cancelado = true;
-    };
-  }, [chainId, tokenId]);
+
+      // 422 = garrafa inexistente; erros 5xx são não-bloqueantes
+      if (!scanResposta.ok && scanResposta.status === 422) {
+        const corpo = (await scanResposta.json()) as { erro: string };
+        setMensagemErro(mensagemAmigavel(corpo.erro ?? "Garrafa não encontrada."));
+        setEstado("erro-consulta");
+        return;
+      }
+
+      const dadosGarrafa = (await garrafaResposta.json()) as DadosConsulta;
+
+      // Histórico é uma consulta rápida (só banco) — feita após registrar o scan
+      const historicoResposta = await fetch(
+        `${API_URL}/garrafa/${chainId}/${tokenId}/scans`
+      );
+      const dadosHistorico = historicoResposta.ok
+        ? ((await historicoResposta.json()) as HistoricoScans)
+        : { total: 0, scans: [] };
+
+      setDados(dadosGarrafa);
+      setHistorico(dadosHistorico);
+      setEstado("carregado");
+    } catch {
+      setMensagemErro(
+        "Ocorreu um erro ao buscar as informações. Tente novamente em instantes."
+      );
+      setEstado("erro-consulta");
+    }
+  }
 
   const processosAplicados = dados
     ? ([
@@ -143,20 +233,82 @@ export function ConsultaPublica() {
         <h1 className="cp-hero__titulo">Conheça a origem desta garrafa</h1>
       </header>
 
-      {carregando && (
+      {estado === "consentimento" && (
+        <div className="cp-consentimento">
+          <div className="cp-consentimento__corpo">
+            <h2 className="cp-consentimento__titulo">Localização necessária</h2>
+            <p className="cp-consentimento__texto">
+              Para garantir a rastreabilidade pós-consumo desta garrafa, esta consulta
+              registra uma localização aproximada de onde ela está sendo verificada.
+            </p>
+            <p className="cp-consentimento__texto">
+              Sua privacidade é protegida por{" "}
+              <strong>minimização de dados</strong>: apenas a cidade e o estado são
+              armazenados — nunca o endereço exato.
+            </p>
+            <div className="cp-consentimento__acoes">
+              <button type="button" onClick={solicitarLocalizacao}>
+                Autorizar e continuar
+              </button>
+              <button
+                type="button"
+                className="cp-botao--neutro"
+                onClick={() => setEstado("recusado")}
+              >
+                Não autorizar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {estado === "solicitando" && (
         <div className="cp-carregando">
           <span className="cp-carregando__indicador" aria-hidden="true" />
-          <span>Buscando o histórico desta garrafa…</span>
+          <span>Obtendo localização…</span>
         </div>
       )}
 
-      {erro && (
+      {estado === "carregando" && (
+        <div className="cp-carregando">
+          <span className="cp-carregando__indicador" aria-hidden="true" />
+          <span>Buscando o histórico dessa garrafa…</span>
+        </div>
+      )}
+
+      {estado === "recusado" && (
+        <div className="cp-estado-informativo">
+          <p>A localização é necessária para acessar o histórico desta garrafa.</p>
+          <button
+            type="button"
+            className="cp-estado-informativo__acao"
+            onClick={() => setEstado("consentimento")}
+          >
+            Tentar novamente
+          </button>
+        </div>
+      )}
+
+      {estado === "erro-localizacao" && (
+        <div className="cp-estado-informativo">
+          <p>{mensagemErro}</p>
+          <button
+            type="button"
+            className="cp-estado-informativo__acao"
+            onClick={() => setEstado("consentimento")}
+          >
+            Tentar novamente
+          </button>
+        </div>
+      )}
+
+      {estado === "erro-consulta" && (
         <div className="cp-estado-erro">
-          <p>{mensagemAmigavel(erro)}</p>
+          <p>{mensagemErro}</p>
         </div>
       )}
 
-      {dados && (
+      {estado === "carregado" && dados && (
         <div className="cp-conteudo">
 
           {/* Identidade da garrafa */}
@@ -253,6 +405,47 @@ export function ConsultaPublica() {
               </div>
             </section>
           )}
+
+          {/* Histórico de consultas */}
+          <section className="cp-secao">
+            <header className="cp-secao__header">
+              <h2 className="cp-secao__titulo">Histórico desta garrafa</h2>
+              {historico && historico.total > 0 && (
+                <span className="cp-secao__badge">
+                  {historico.total} consulta{historico.total !== 1 ? "s" : ""}
+                </span>
+              )}
+            </header>
+            <div className="cp-secao__corpo cp-secao__corpo--sem-padding">
+              {!historico || historico.scans.length === 0 ? (
+                <p className="cp-vazio">Nenhuma consulta registrada.</p>
+              ) : (
+                <ul className="cp-historico">
+                  {historico.scans.map((scan) => (
+                    <li
+                      key={scan.id}
+                      className={`cp-historico__item${scan.suspeito ? " cp-historico__item--suspeito" : ""}`}
+                    >
+                      <span className="cp-historico__local">
+                        {[scan.cidade, scan.estado].filter(Boolean).join(", ") ||
+                          scan.pais ||
+                          "Localização não identificada"}
+                      </span>
+                      <span className="cp-historico__data">
+                        {new Date(scan.escaneadoEm).toLocaleString("pt-BR", {
+                          dateStyle: "short",
+                          timeStyle: "short",
+                        })}
+                      </span>
+                      {scan.suspeito && scan.motivo && (
+                        <span className="cp-historico__alerta">{scan.motivo}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </section>
 
           {/* Verificação técnica */}
           <details className="cp-tecnico">

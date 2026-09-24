@@ -125,7 +125,7 @@ export function GarrafaDetalhe() {
           <dd className="info-campo__valor mono">{dados.enderecoTecnico}</dd>
         </div>
       </dl>
-      <p className="dica">A garrafa não é transferível; o endereço técnico corresponde ao envasador responsável.</p>
+      <p className="dica">A garrafa não é transferível, o endereço técnico corresponde ao envasador responsável.</p>
 
       {chainId && <QRCodeGarrafa chainId={chainId} tokenId={dados.tokenId.toString()} />}
     </section>
