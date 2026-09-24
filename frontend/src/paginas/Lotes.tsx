@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
-import { mapearErroContrato } from "../lib/erros";
+import { feedbackDaTransacao, type FeedbackTx, mapearErroContrato } from "../lib/erros";
 import { encurtarEndereco, formatarTimestamp, RETULO_ESTADO_PRODUCAO, RETULO_TIPO_BEBIDA } from "../lib/formatadores";
 import { EstadoProducao, TipoBebida } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
@@ -48,6 +48,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
   function flagBloqueada(campo: keyof ConfiguracaoProducaoMetadados): boolean {
     if (tipoBebida === "") return false;
@@ -98,6 +99,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
       return;
     }
     setErro(null);
+    setFeedback(null);
     setEnviando(true);
     try {
       const producao = obterContrato("ContratoProducao", chainId, signer);
@@ -108,9 +110,10 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
       setDescricao("");
       setDocumentos("");
       setMetadataURI("");
+      setFeedback({ tipo: "ok", texto: "Lote de produção criado com sucesso." });
       onCriado();
     } catch (erroEnvio) {
-      setErro(mapearErroContrato(erroEnvio));
+      setFeedback(feedbackDaTransacao(erroEnvio));
     } finally {
       setEnviando(false);
     }
@@ -191,6 +194,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
       <button type="button" onClick={() => void enviar()}>
         {enviando ? "Registrando…" : "Registrar lote"}
       </button>
+      {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
       {erro && <p className="erro">{erro}</p>}
     </fieldset>
   );
@@ -248,16 +252,29 @@ export function Lotes() {
       )}
 
       <h2>Lotes cadastrados</h2>
-      {carregando && <p>Carregando…</p>}
+      {carregando && (
+        <div className="carregando">
+          <span className="carregando__indicador" aria-hidden="true" />
+          <span>Carregando lotes…</span>
+        </div>
+      )}
       {erro && <p className="erro">{erro}</p>}
       <ul className="lista-lotes">
         {linhas.map((linha) => (
           <li key={linha.id.toString()}>
-            <Link to={`/lotes/${linha.id}`}>
-              #{linha.id.toString()} — {RETULO_TIPO_BEBIDA[linha.tipoBebida]} — produtor{" "}
-              {encurtarEndereco(linha.produtor)} — {RETULO_ESTADO_PRODUCAO[linha.estado]} — criado em{" "}
-              {formatarTimestamp(linha.criadoEm)} — {linha.totalEtapas.toString()} etapa(s)
-            </Link>
+            <div className="item-lista__cabecalho">
+              <Link className="item-lista__titulo" to={`/lotes/${linha.id}`}>
+                #{linha.id.toString()} — {RETULO_TIPO_BEBIDA[linha.tipoBebida]}
+              </Link>
+              <span className={`badge ${linha.estado === EstadoProducao.Concluido ? "badge--ok" : linha.estado === EstadoProducao.EmProducao ? "badge--neutro" : "badge--aviso"}`}>
+                {RETULO_ESTADO_PRODUCAO[linha.estado]}
+              </span>
+            </div>
+            <p className="item-lista__meta">
+              Produtor: <span className="mono">{encurtarEndereco(linha.produtor)}</span>
+              {" · "}Criado em {formatarTimestamp(linha.criadoEm)}
+              {" · "}{linha.totalEtapas.toString()} etapa(s)
+            </p>
           </li>
         ))}
         {!carregando && linhas.length === 0 && <li>Nenhum lote cadastrado ainda.</li>}

@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
-import { mapearErroContrato } from "../lib/erros";
+import { feedbackDaTransacao, type FeedbackTx, mapearErroContrato } from "../lib/erros";
 import { formatarTimestamp, RETULO_RESULTADO_AVALIACAO, RETULO_TIPO_INSUMO } from "../lib/formatadores";
 import { ResultadoAvaliacao, TipoInsumo } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
@@ -139,7 +139,12 @@ export function InsumoDetalhe() {
     void carregar();
   }, [carregar]);
 
-  if (carregando) return <p>Carregando…</p>;
+  if (carregando) return (
+    <div className="carregando">
+      <span className="carregando__indicador" aria-hidden="true" />
+      <span>Carregando insumo…</span>
+    </div>
+  );
   if (erro && !lote) return <p className="erro">{erro}</p>;
   if (!lote || !invalidacao) return null;
 
@@ -148,21 +153,27 @@ export function InsumoDetalhe() {
 
   return (
     <section>
-      <p>
-        <Link to="/insumos">← Lotes de insumo</Link>
-      </p>
-      <h1>
-        Insumo #{lote.id.toString()} — {RETULO_TIPO_INSUMO[lote.tipo]}
-      </h1>
-      <p>
-        Fornecedor: {lote.fornecedor}
-        <br />
-        Registrado em: {formatarTimestamp(lote.registradoEm)}
-        <br />
-        Metadados: {lote.metadataURI}
-        <br />
-        Situação: {invalidacao.invalidado ? "invalidado" : "válido"}
-      </p>
+      <Link className="link-voltar" to="/insumos">← Lotes de insumo</Link>
+      <div className="secao-titulo-area">
+        <h1>Insumo #{lote.id.toString()} — {RETULO_TIPO_INSUMO[lote.tipo]}</h1>
+        <span className={`badge ${invalidacao.invalidado ? "badge--erro" : "badge--ok"}`}>
+          {invalidacao.invalidado ? "Invalidado" : "Válido"}
+        </span>
+      </div>
+      <dl className="info-grade">
+        <div className="info-campo">
+          <dt className="info-campo__rotulo">Registrado em</dt>
+          <dd className="info-campo__valor">{formatarTimestamp(lote.registradoEm)}</dd>
+        </div>
+        <div className="info-campo info-campo--largo">
+          <dt className="info-campo__rotulo">Fornecedor</dt>
+          <dd className="info-campo__valor mono">{lote.fornecedor}</dd>
+        </div>
+        <div className="info-campo info-campo--largo">
+          <dt className="info-campo__rotulo">Metadados</dt>
+          <dd className="info-campo__valor mono">{lote.metadataURI}</dd>
+        </div>
+      </dl>
       {erro && <p className="erro">{erro}</p>}
 
       <h2>Invalidação</h2>
@@ -170,8 +181,7 @@ export function InsumoDetalhe() {
         <p className="dica">
           Este lote foi invalidado em {formatarTimestamp(invalidacao.registradoEm)} e está definitivamente
           encerrado — não aceita novas avaliações nem correções documentais.
-          <br />
-          Metadados da invalidação: {invalidacao.metadataURI}
+          {" "}Metadados: <span className="mono">{invalidacao.metadataURI}</span>
         </p>
       ) : podeCorrigirOuInvalidar ? (
         <InvalidarLote loteId={lote.id} chainId={chainId!} signer={signer!} aoInvalidar={carregar} />
@@ -180,13 +190,14 @@ export function InsumoDetalhe() {
       )}
 
       <h2>Correções documentais</h2>
-      <ul>
+      <ul className="lista-compacta">
         {correcoes.map((correcao) => (
           <li key={correcao.indice}>
-            {formatarTimestamp(correcao.registradoEm)} — {correcao.metadataURI}
+            {formatarTimestamp(correcao.registradoEm)}
+            {" · "}<span className="mono">{correcao.metadataURI}</span>
           </li>
         ))}
-        {correcoes.length === 0 && <li>Nenhuma correção registrada ainda.</li>}
+        {correcoes.length === 0 && <li className="dica">Nenhuma correção registrada ainda.</li>}
       </ul>
       {invalidacao.invalidado ? (
         <p className="dica">Lote invalidado — não aceita novas correções documentais.</p>
@@ -208,14 +219,15 @@ export function InsumoDetalhe() {
             {resultadoAtual !== null ? RETULO_RESULTADO_AVALIACAO[resultadoAtual] : "carregando…"}
           </p>
           <h3>Histórico das suas avaliações</h3>
-          <ul>
+          <ul className="lista-compacta">
             {avaliacoes.map((avaliacao) => (
               <li key={avaliacao.indice}>
-                {formatarTimestamp(avaliacao.registradoEm)} — {RETULO_RESULTADO_AVALIACAO[avaliacao.resultado]} —{" "}
-                {avaliacao.metadataURI}
+                {formatarTimestamp(avaliacao.registradoEm)}
+                {" · "}{RETULO_RESULTADO_AVALIACAO[avaliacao.resultado]}
+                {" · "}<span className="mono">{avaliacao.metadataURI}</span>
               </li>
             ))}
-            {avaliacoes.length === 0 && <li>Você ainda não avaliou este insumo.</li>}
+            {avaliacoes.length === 0 && <li className="dica">Você ainda não avaliou este insumo.</li>}
           </ul>
           {invalidacao.invalidado ? (
             <p className="dica">Lote invalidado — não aceita novas avaliações.</p>
@@ -247,6 +259,7 @@ function InvalidarLote({
   const [confirmado, setConfirmado] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
   async function gerarViaIpfs() {
     setErroIpfs(null);
@@ -279,14 +292,16 @@ function InvalidarLote({
       return;
     }
     setErro(null);
+    setFeedback(null);
     setEnviando(true);
     try {
       const insumos = obterContrato("ContratoInsumos", chainId, signer);
       const tx = await insumos.invalidarLoteInsumo(loteId, metadataURI.trim());
       await tx.wait();
+      setFeedback({ tipo: "ok", texto: "Lote invalidado com sucesso." });
       aoInvalidar();
     } catch (erroEnvio) {
-      setErro(mapearErroContrato(erroEnvio));
+      setFeedback(feedbackDaTransacao(erroEnvio));
     } finally {
       setEnviando(false);
     }
@@ -319,6 +334,7 @@ function InvalidarLote({
       <button type="button" onClick={() => void enviar()} disabled={!confirmado}>
         {enviando ? "Invalidando…" : "Invalidar lote"}
       </button>
+      {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
       {erro && <p className="erro">{erro}</p>}
     </fieldset>
   );
@@ -341,6 +357,7 @@ function RegistrarCorrecao({
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
   async function gerarViaIpfs() {
     setErroIpfs(null);
@@ -368,6 +385,7 @@ function RegistrarCorrecao({
       return;
     }
     setErro(null);
+    setFeedback(null);
     setEnviando(true);
     try {
       const insumos = obterContrato("ContratoInsumos", chainId, signer);
@@ -375,9 +393,10 @@ function RegistrarCorrecao({
       await tx.wait();
       setDocumentos("");
       setMetadataURI("");
+      setFeedback({ tipo: "ok", texto: "Correção documental registrada com sucesso." });
       aoRegistrar();
     } catch (erroEnvio) {
-      setErro(mapearErroContrato(erroEnvio));
+      setFeedback(feedbackDaTransacao(erroEnvio));
     } finally {
       setEnviando(false);
     }
@@ -401,6 +420,7 @@ function RegistrarCorrecao({
       <button type="button" onClick={() => void enviar()}>
         {enviando ? "Registrando…" : "Registrar correção"}
       </button>
+      {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
       {erro && <p className="erro">{erro}</p>}
     </fieldset>
   );
@@ -425,6 +445,7 @@ function AvaliarInsumo({
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
   async function gerarViaIpfs() {
     if (resultado === "") {
@@ -462,6 +483,7 @@ function AvaliarInsumo({
       return;
     }
     setErro(null);
+    setFeedback(null);
     setEnviando(true);
     try {
       const insumos = obterContrato("ContratoInsumos", chainId, signer);
@@ -471,9 +493,10 @@ function AvaliarInsumo({
       setObservacoes("");
       setDocumentos("");
       setMetadataURI("");
+      setFeedback({ tipo: "ok", texto: "Avaliação registrada com sucesso." });
       aoAvaliar();
     } catch (erroEnvio) {
-      setErro(mapearErroContrato(erroEnvio));
+      setFeedback(feedbackDaTransacao(erroEnvio));
     } finally {
       setEnviando(false);
     }
@@ -512,6 +535,7 @@ function AvaliarInsumo({
       <button type="button" onClick={() => void enviar()}>
         {enviando ? "Avaliando…" : "Registrar avaliação"}
       </button>
+      {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
       {erro && <p className="erro">{erro}</p>}
     </fieldset>
   );

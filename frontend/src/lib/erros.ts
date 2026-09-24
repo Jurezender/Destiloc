@@ -85,3 +85,27 @@ export function mapearErroContrato(erro: unknown): string {
 
   return "Não foi possível concluir a operação. Detalhe técnico: " + (texto || "erro desconhecido");
 }
+
+/** Retorna true se o erro foi cancelamento explícito pelo usuário na carteira. */
+export function ehCancelamentoUsuario(erro: unknown): boolean {
+  const texto = extrairTexto(erro);
+  return texto.includes("user rejected") || texto.includes("ACTION_REJECTED");
+}
+
+export type TipoFeedback = "ok" | "dica" | "erro";
+
+export interface FeedbackTx {
+  tipo: TipoFeedback;
+  texto: string;
+}
+
+/**
+ * Converte um erro de transação blockchain em FeedbackTx para exibição.
+ * Cancelamentos pelo usuário recebem tipo "dica" (neutro), demais falhas recebem "erro".
+ */
+export function feedbackDaTransacao(erro: unknown): FeedbackTx {
+  return {
+    tipo: ehCancelamentoUsuario(erro) ? "dica" : "erro",
+    texto: mapearErroContrato(erro),
+  };
+}

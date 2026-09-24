@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
-import { mapearErroContrato } from "../lib/erros";
+import { feedbackDaTransacao, type FeedbackTx, mapearErroContrato } from "../lib/erros";
 import { encurtarEndereco, formatarTimestamp, RETULO_TIPO_INSUMO } from "../lib/formatadores";
 import { TipoInsumo } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
@@ -46,6 +46,7 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
   async function gerarViaIpfs() {
     if (tipo === "") {
@@ -84,6 +85,7 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
       return;
     }
     setErro(null);
+    setFeedback(null);
     setEnviando(true);
     try {
       const insumos = obterContrato("ContratoInsumos", chainId, signer);
@@ -94,9 +96,10 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
       setOrigem("");
       setDocumentos("");
       setMetadataURI("");
+      setFeedback({ tipo: "ok", texto: "Lote de insumo registrado com sucesso." });
       onCriado();
     } catch (erroEnvio) {
-      setErro(mapearErroContrato(erroEnvio));
+      setFeedback(feedbackDaTransacao(erroEnvio));
     } finally {
       setEnviando(false);
     }
@@ -140,6 +143,7 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
       <button type="button" onClick={() => void enviar()}>
         {enviando ? "Registrando…" : "Registrar lote"}
       </button>
+      {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
       {erro && <p className="erro">{erro}</p>}
     </fieldset>
   );
@@ -196,16 +200,28 @@ export function Insumos() {
       )}
 
       <h2>Insumos cadastrados</h2>
-      {carregando && <p>Carregando…</p>}
+      {carregando && (
+        <div className="carregando">
+          <span className="carregando__indicador" aria-hidden="true" />
+          <span>Carregando insumos…</span>
+        </div>
+      )}
       {erro && <p className="erro">{erro}</p>}
       <ul className="lista-lotes">
         {linhas.map((linha) => (
           <li key={linha.id.toString()}>
-            <Link to={`/insumos/${linha.id}`}>
-              #{linha.id.toString()} — {RETULO_TIPO_INSUMO[linha.tipo]} — fornecedor{" "}
-              {encurtarEndereco(linha.fornecedor)} — {linha.valido ? "válido" : "invalidado"} — registrado em{" "}
-              {formatarTimestamp(linha.registradoEm)}
-            </Link>
+            <div className="item-lista__cabecalho">
+              <Link className="item-lista__titulo" to={`/insumos/${linha.id}`}>
+                #{linha.id.toString()} — {RETULO_TIPO_INSUMO[linha.tipo]}
+              </Link>
+              <span className={`badge ${linha.valido ? "badge--ok" : "badge--erro"}`}>
+                {linha.valido ? "Válido" : "Invalidado"}
+              </span>
+            </div>
+            <p className="item-lista__meta">
+              Fornecedor: <span className="mono">{encurtarEndereco(linha.fornecedor)}</span>
+              {" · "}Registrado em {formatarTimestamp(linha.registradoEm)}
+            </p>
           </li>
         ))}
         {!carregando && linhas.length === 0 && <li>Nenhum insumo cadastrado ainda.</li>}

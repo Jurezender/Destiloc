@@ -56,28 +56,50 @@ export function Inicio() {
       </p>
 
       <h2>Seus papéis</h2>
-      {papeis.carregando && <p>Carregando papéis…</p>}
+      {papeis.carregando && (
+        <div className="carregando">
+          <span className="carregando__indicador" aria-hidden="true" />
+          <span>Carregando papéis…</span>
+        </div>
+      )}
       {papeis.erro && <p className="erro">{papeis.erro}</p>}
       {!papeis.carregando && !papeis.erro && (
-        <ul>
-          <li>Administrador: {papeis.admin ? "sim" : "não"}</li>
-          <li>Fornecedor: {papeis.fornecedor ? "sim" : "não"}</li>
-          <li>Produtor: {papeis.produtor ? "sim" : "não"}</li>
-          <li>Envasador: {papeis.envasador ? "sim" : "não"}</li>
+        <ul className="lista-papeis">
+          <li>Administrador <span className={`badge ${papeis.admin ? "badge--ok" : "badge--neutro"}`}>{papeis.admin ? "Sim" : "Não"}</span></li>
+          <li>Fornecedor <span className={`badge ${papeis.fornecedor ? "badge--ok" : "badge--neutro"}`}>{papeis.fornecedor ? "Sim" : "Não"}</span></li>
+          <li>Produtor <span className={`badge ${papeis.produtor ? "badge--ok" : "badge--neutro"}`}>{papeis.produtor ? "Sim" : "Não"}</span></li>
+          <li>Envasador <span className={`badge ${papeis.envasador ? "badge--ok" : "badge--neutro"}`}>{papeis.envasador ? "Sim" : "Não"}</span></li>
         </ul>
       )}
 
       <h2>Contadores gerais</h2>
       {erro && <p className="erro">{erro}</p>}
       {contadores ? (
-        <ul>
-          <li>Lotes de insumo: {contadores.totalInsumos.toString()}</li>
-          <li>Lotes de produção: {contadores.totalLotesProducao.toString()}</li>
-          <li>Envasamentos: {contadores.totalEnvasamentos.toString()}</li>
-          <li>Garrafas emitidas: {contadores.totalGarrafas.toString()}</li>
-        </ul>
+        <div className="grade-contadores">
+          <div className="contador">
+            <span className="contador__numero">{contadores.totalInsumos.toString()}</span>
+            <span className="contador__rotulo">Lotes de insumo</span>
+          </div>
+          <div className="contador">
+            <span className="contador__numero">{contadores.totalLotesProducao.toString()}</span>
+            <span className="contador__rotulo">Lotes de produção</span>
+          </div>
+          <div className="contador">
+            <span className="contador__numero">{contadores.totalEnvasamentos.toString()}</span>
+            <span className="contador__rotulo">Envasamentos</span>
+          </div>
+          <div className="contador">
+            <span className="contador__numero">{contadores.totalGarrafas.toString()}</span>
+            <span className="contador__rotulo">Garrafas emitidas</span>
+          </div>
+        </div>
       ) : (
-        !erro && <p>Carregando…</p>
+        !erro && (
+          <div className="carregando">
+            <span className="carregando__indicador" aria-hidden="true" />
+            <span>Carregando…</span>
+          </div>
+        )
       )}
     </section>
   );

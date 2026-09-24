@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
-import { mapearErroContrato } from "../lib/erros";
+import { feedbackDaTransacao, type FeedbackTx, mapearErroContrato } from "../lib/erros";
 import { PAPEL_ADMIN, PAPEL_ENVASADOR, PAPEL_FORNECEDOR, PAPEL_PRODUTOR } from "../lib/papeis";
 
 interface Detentores {
@@ -48,11 +48,13 @@ function SecaoPapel({
   const [endereco, setEndereco] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
   const [executando, setExecutando] = useState(false);
 
   async function executar(acao: "conceder" | "revogar") {
     setErro(null);
     setStatus(null);
+    setFeedback(null);
     if (!endereco) {
       setErro("Informe o endereço da conta.");
       return;
@@ -72,10 +74,12 @@ function SecaoPapel({
       }
       setStatus(`${acao === "conceder" ? "Concedendo" : "Revogando"} papel no ContratoAcesso…`);
       await aplicarPapel(papel, endereco, acao, signer, chainId);
-      setStatus("Concluído.");
+      setStatus(null);
+      setFeedback({ tipo: "ok", texto: `Papel ${acao === "conceder" ? "concedido" : "revogado"} com sucesso.` });
       aoConcluir();
     } catch (erroAcao) {
-      setErro(mapearErroContrato(erroAcao));
+      setStatus(null);
+      setFeedback(feedbackDaTransacao(erroAcao));
     } finally {
       setExecutando(false);
     }
@@ -96,7 +100,8 @@ function SecaoPapel({
           Revogar
         </button>
       </div>
-      {status && <p>{status}</p>}
+      {status && <p className="dica">{status}</p>}
+      {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
       {erro && <p className="erro">{erro}</p>}
     </fieldset>
   );
@@ -109,9 +114,9 @@ function ListaEnderecos({ titulo, enderecos }: { titulo: string; enderecos: stri
       {enderecos.length === 0 ? (
         <p className="dica">Nenhuma conta.</p>
       ) : (
-        <ul>
+        <ul className="lista-compacta">
           {enderecos.map((endereco) => (
-            <li key={endereco}>{endereco}</li>
+            <li key={endereco} className="mono">{endereco}</li>
           ))}
         </ul>
       )}
@@ -198,7 +203,12 @@ export function Participantes() {
       </div>
 
       <h2>Contas atuais por papel</h2>
-      {carregando && <p>Carregando participantes…</p>}
+      {carregando && (
+        <div className="carregando">
+          <span className="carregando__indicador" aria-hidden="true" />
+          <span>Carregando participantes…</span>
+        </div>
+      )}
       {erro && <p className="erro">{erro}</p>}
       {detentores && (
         <div className="grade-listas">

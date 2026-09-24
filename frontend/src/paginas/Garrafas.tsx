@@ -73,18 +73,27 @@ export function Garrafas() {
     <section>
       <h1>Garrafas</h1>
 
-      {carregando && <p>Carregando…</p>}
+      {carregando && (
+        <div className="carregando">
+          <span className="carregando__indicador" aria-hidden="true" />
+          <span>Carregando garrafas…</span>
+        </div>
+      )}
       {erro && <p className="erro">{erro}</p>}
 
       <ul className="lista-garrafas">
         {linhas.map((linha) => (
           <li key={linha.tokenId.toString()}>
-            <p>
-              <Link to={`/garrafas/${linha.tokenId}`}>Garrafa #{linha.tokenId.toString()}</Link> — envasamento #
-              {linha.envasamentoId.toString()} — lote{" "}
-              <Link to={`/lotes/${linha.loteProducaoId}`}>#{linha.loteProducaoId.toString()}</Link>
-              <br />
-              Emitida em: {formatarTimestamp(linha.emitidaEm)}
+            <div className="item-lista__cabecalho">
+              <Link className="item-lista__titulo" to={`/garrafas/${linha.tokenId}`}>
+                Garrafa #{linha.tokenId.toString()}
+              </Link>
+            </div>
+            <p className="item-lista__meta">
+              Envasamento #{linha.envasamentoId.toString()}
+              {" · "}
+              <Link to={`/lotes/${linha.loteProducaoId}`}>Lote #{linha.loteProducaoId.toString()}</Link>
+              {" · "}Emitida em {formatarTimestamp(linha.emitidaEm)}
             </p>
           </li>
         ))}

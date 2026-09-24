@@ -69,39 +69,63 @@ export function GarrafaDetalhe() {
     void carregar();
   }, [carregar]);
 
-  if (carregando) return <p>Carregando…</p>;
+  if (carregando) return (
+    <div className="carregando">
+      <span className="carregando__indicador" aria-hidden="true" />
+      <span>Carregando garrafa…</span>
+    </div>
+  );
   if (erro && !dados) return <p className="erro">{erro}</p>;
   if (!dados) return null;
 
   return (
     <section>
-      <p>
-        <Link to="/garrafas">← Garrafas</Link>
-      </p>
+      <Link className="link-voltar" to="/garrafas">← Garrafas</Link>
       <h1>Garrafa #{dados.tokenId.toString()}</h1>
-      <p>
-        Envasamento: #{dados.envasamentoId.toString()} — envasador {dados.envasador}
-        <br />
-        Lote de produção: <Link to={`/lotes/${dados.loteProducaoId}`}>#{dados.loteProducaoId.toString()}</Link>
-        <br />
-        Emitida em: {formatarTimestamp(dados.emitidaEm)}
-        <br />
-        Quantidade do envasamento: {dados.quantidadeEmitida.toString()}/{dados.quantidadeDeclarada.toString()}
-        <br />
-        {dados.concluidoEm !== 0n ? (
-          <>Envasamento concluído em: {formatarTimestamp(dados.concluidoEm)}</>
-        ) : (
-          "Envasamento em andamento"
-        )}
-        <br />
-        Metadados do envasamento: {dados.metadataURI}
-      </p>
 
-      <p className="dica">
-        Endereço técnico do ERC-721: {dados.enderecoTecnico}
-        <br />
-        A garrafa não é transferível; este endereço corresponde ao envasador responsável pelo envasamento.
-      </p>
+      <dl className="info-grade">
+        <div className="info-campo">
+          <dt className="info-campo__rotulo">Envasamento</dt>
+          <dd className="info-campo__valor">#{dados.envasamentoId.toString()}</dd>
+        </div>
+        <div className="info-campo">
+          <dt className="info-campo__rotulo">Lote de produção</dt>
+          <dd className="info-campo__valor">
+            <Link to={`/lotes/${dados.loteProducaoId}`}>#{dados.loteProducaoId.toString()}</Link>
+          </dd>
+        </div>
+        <div className="info-campo">
+          <dt className="info-campo__rotulo">Emitida em</dt>
+          <dd className="info-campo__valor">{formatarTimestamp(dados.emitidaEm)}</dd>
+        </div>
+        <div className="info-campo">
+          <dt className="info-campo__rotulo">Garrafas emitidas / declaradas</dt>
+          <dd className="info-campo__valor">
+            {dados.quantidadeEmitida.toString()} / {dados.quantidadeDeclarada.toString()}
+          </dd>
+        </div>
+        <div className="info-campo">
+          <dt className="info-campo__rotulo">Situação do envasamento</dt>
+          <dd className="info-campo__valor">
+            {dados.concluidoEm !== 0n
+              ? `Concluído em ${formatarTimestamp(dados.concluidoEm)}`
+              : "Em andamento"}
+          </dd>
+        </div>
+        <div className="info-campo info-campo--largo">
+          <dt className="info-campo__rotulo">Envasador</dt>
+          <dd className="info-campo__valor mono">{dados.envasador}</dd>
+        </div>
+        <div className="info-campo info-campo--largo">
+          <dt className="info-campo__rotulo">Metadados do envasamento</dt>
+          <dd className="info-campo__valor mono">{dados.metadataURI}</dd>
+        </div>
+        <div className="info-campo info-campo--largo">
+          <dt className="info-campo__rotulo">Endereço técnico ERC-721</dt>
+          <dd className="info-campo__valor mono">{dados.enderecoTecnico}</dd>
+        </div>
+      </dl>
+      <p className="dica">A garrafa não é transferível; o endereço técnico corresponde ao envasador responsável.</p>
 
       {chainId && <QRCodeGarrafa chainId={chainId} tokenId={dados.tokenId.toString()} />}
     </section>

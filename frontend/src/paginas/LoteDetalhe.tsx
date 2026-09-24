@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
-import { mapearErroContrato } from "../lib/erros";
+import { feedbackDaTransacao, type FeedbackTx, mapearErroContrato } from "../lib/erros";
 import {
   encurtarEndereco,
   formatarTimestamp,
@@ -164,7 +164,12 @@ export function LoteDetalhe() {
     void carregar();
   }, [carregar]);
 
-  if (carregando) return <p>Carregando…</p>;
+  if (carregando) return (
+    <div className="carregando">
+      <span className="carregando__indicador" aria-hidden="true" />
+      <span>Carregando lote…</span>
+    </div>
+  );
   if (erro && !lote) return <p className="erro">{erro}</p>;
   if (!lote || !configuracao) return null;
 
@@ -184,21 +189,27 @@ export function LoteDetalhe() {
 
   return (
     <section>
-      <p>
-        <Link to="/lotes">← Lotes de produção</Link>
-      </p>
-      <h1>
-        Lote #{lote.id.toString()} — {RETULO_TIPO_BEBIDA[lote.tipoBebida]}
-      </h1>
-      <p>
-        Produtor: {lote.produtor}
-        <br />
-        Estado: {RETULO_ESTADO_PRODUCAO[lote.estado]}
-        <br />
-        Criado em: {formatarTimestamp(lote.criadoEm)}
-        <br />
-        Metadados do lote: {lote.metadataURI}
-      </p>
+      <Link className="link-voltar" to="/lotes">← Lotes de produção</Link>
+      <div className="secao-titulo-area">
+        <h1>Lote #{lote.id.toString()} — {RETULO_TIPO_BEBIDA[lote.tipoBebida]}</h1>
+        <span className={`badge ${lote.estado === EstadoProducao.Concluido ? "badge--ok" : lote.estado === EstadoProducao.EmProducao ? "badge--neutro" : "badge--aviso"}`}>
+          {RETULO_ESTADO_PRODUCAO[lote.estado]}
+        </span>
+      </div>
+      <dl className="info-grade">
+        <div className="info-campo">
+          <dt className="info-campo__rotulo">Criado em</dt>
+          <dd className="info-campo__valor">{formatarTimestamp(lote.criadoEm)}</dd>
+        </div>
+        <div className="info-campo info-campo--largo">
+          <dt className="info-campo__rotulo">Produtor</dt>
+          <dd className="info-campo__valor mono">{lote.produtor}</dd>
+        </div>
+        <div className="info-campo info-campo--largo">
+          <dt className="info-campo__rotulo">Metadados</dt>
+          <dd className="info-campo__valor mono">{lote.metadataURI}</dd>
+        </div>
+      </dl>
       {erro && <p className="erro">{erro}</p>}
 
       <h2>Configuração de produção</h2>
@@ -243,41 +254,43 @@ export function LoteDetalhe() {
       )}
 
       <h2>Etapas registradas</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Etapa</th>
-            <th>Executado por</th>
-            <th>Início informado</th>
-            <th>Fim informado</th>
-            <th>Registrado em</th>
-            <th>Metadados</th>
-            <th>Insumos usados</th>
-          </tr>
-        </thead>
-        <tbody>
-          {etapas.map((evento) => (
-            <tr key={evento.indice}>
-              <td>{RETULO_ETAPA_PRODUCAO[evento.etapa]}</td>
-              <td>{encurtarEndereco(evento.executadoPor)}</td>
-              <td>{formatarTimestamp(evento.inicioInformado)}</td>
-              <td>{formatarTimestamp(evento.fimInformado)}</td>
-              <td>{formatarTimestamp(evento.registradoEm)}</td>
-              <td>{evento.metadataURI}</td>
-              <td>
-                {evento.insumosUtilizados.length === 0
-                  ? "—"
-                  : evento.insumosUtilizados.map((insumoId) => `#${insumoId.toString()}`).join(", ")}
-              </td>
-            </tr>
-          ))}
-          {etapas.length === 0 && (
+      <div className="tabela-wrapper">
+        <table>
+          <thead>
             <tr>
-              <td colSpan={7}>Nenhuma etapa registrada ainda.</td>
+              <th>Etapa</th>
+              <th>Executado por</th>
+              <th>Início informado</th>
+              <th>Fim informado</th>
+              <th>Registrado em</th>
+              <th>Metadados</th>
+              <th>Insumos usados</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {etapas.map((evento) => (
+              <tr key={evento.indice}>
+                <td>{RETULO_ETAPA_PRODUCAO[evento.etapa]}</td>
+                <td>{encurtarEndereco(evento.executadoPor)}</td>
+                <td>{formatarTimestamp(evento.inicioInformado)}</td>
+                <td>{formatarTimestamp(evento.fimInformado)}</td>
+                <td>{formatarTimestamp(evento.registradoEm)}</td>
+                <td>{evento.metadataURI}</td>
+                <td>
+                  {evento.insumosUtilizados.length === 0
+                    ? "—"
+                    : evento.insumosUtilizados.map((insumoId) => `#${insumoId.toString()}`).join(", ")}
+                </td>
+              </tr>
+            ))}
+            {etapas.length === 0 && (
+              <tr>
+                <td colSpan={7}>Nenhuma etapa registrada ainda.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {lote.estado !== EstadoProducao.Concluido &&
         (podeOperar ? (
@@ -345,6 +358,7 @@ function AtualizarConfiguracao({
   const [configuracao, setConfiguracao] = useState<ConfiguracaoProducao>(configuracaoAtual);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
   function alternar(campo: keyof ConfiguracaoProducao) {
     setConfiguracao((atual) => ({ ...atual, [campo]: !atual[campo] }));
@@ -358,14 +372,16 @@ function AtualizarConfiguracao({
       return;
     }
     setErro(null);
+    setFeedback(null);
     setEnviando(true);
     try {
       const producao = obterContrato("ContratoProducao", chainId, signer);
       const tx = await producao.atualizarConfiguracao(loteId, configuracao);
       await tx.wait();
+      setFeedback({ tipo: "ok", texto: "Configuração atualizada com sucesso." });
       aoAtualizar();
     } catch (erroEnvio) {
-      setErro(mapearErroContrato(erroEnvio));
+      setFeedback(feedbackDaTransacao(erroEnvio));
     } finally {
       setEnviando(false);
     }
@@ -409,6 +425,7 @@ function AtualizarConfiguracao({
       <button type="button" onClick={() => void enviar()}>
         {enviando ? "Salvando…" : "Salvar configuração"}
       </button>
+      {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
       {erro && <p className="erro">{erro}</p>}
     </fieldset>
   );
@@ -428,6 +445,7 @@ function VincularInsumo({
   const [insumoId, setInsumoId] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
   async function enviar() {
     if (!/^\d+$/.test(insumoId.trim())) {
@@ -435,15 +453,17 @@ function VincularInsumo({
       return;
     }
     setErro(null);
+    setFeedback(null);
     setEnviando(true);
     try {
       const producao = obterContrato("ContratoProducao", chainId, signer);
       const tx = await producao.vincularInsumoAoLote(loteId, insumoId.trim());
       await tx.wait();
       setInsumoId("");
+      setFeedback({ tipo: "ok", texto: "Insumo vinculado com sucesso." });
       aoVincular();
     } catch (erroEnvio) {
-      setErro(mapearErroContrato(erroEnvio));
+      setFeedback(feedbackDaTransacao(erroEnvio));
     } finally {
       setEnviando(false);
     }
@@ -459,6 +479,7 @@ function VincularInsumo({
       <button type="button" onClick={() => void enviar()}>
         {enviando ? "Vinculando…" : "Vincular insumo"}
       </button>
+      {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
       {erro && <p className="erro">{erro}</p>}
     </fieldset>
   );
@@ -495,6 +516,7 @@ function RegistrarEtapa({
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
   function alternarInsumo(id: string) {
     setInsumosSelecionados((atual) => {
@@ -567,6 +589,7 @@ function RegistrarEtapa({
       return;
     }
     setErro(null);
+    setFeedback(null);
     setEnviando(true);
     try {
       const producao = obterContrato("ContratoProducao", chainId, signer);
@@ -585,9 +608,10 @@ function RegistrarEtapa({
       setFim("");
       setDocumentos("");
       setMetadataURI("");
+      setFeedback({ tipo: "ok", texto: "Etapa registrada com sucesso." });
       aoRegistrar();
     } catch (erroEnvio) {
-      setErro(mapearErroContrato(erroEnvio));
+      setFeedback(feedbackDaTransacao(erroEnvio));
     } finally {
       setEnviando(false);
     }
@@ -650,6 +674,7 @@ function RegistrarEtapa({
       <button type="button" onClick={() => void enviar()}>
         {enviando ? "Registrando…" : "Registrar etapa"}
       </button>
+      {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
       {erro && <p className="erro">{erro}</p>}
     </fieldset>
   );
@@ -672,6 +697,7 @@ function ConcluirProducao({
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
   async function gerarViaIpfs() {
     setErroIpfs(null);
@@ -699,6 +725,7 @@ function ConcluirProducao({
       return;
     }
     setErro(null);
+    setFeedback(null);
     setEnviando(true);
     try {
       const producao = obterContrato("ContratoProducao", chainId, signer);
@@ -706,9 +733,10 @@ function ConcluirProducao({
       await tx.wait();
       setDocumentos("");
       setMetadataURI("");
+      setFeedback({ tipo: "ok", texto: "Produção concluída com sucesso." });
       aoConcluir();
     } catch (erroEnvio) {
-      setErro(mapearErroContrato(erroEnvio));
+      setFeedback(feedbackDaTransacao(erroEnvio));
     } finally {
       setEnviando(false);
     }
@@ -732,6 +760,7 @@ function ConcluirProducao({
       <button type="button" onClick={() => void enviar()}>
         {enviando ? "Concluindo…" : "Concluir produção"}
       </button>
+      {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
       {erro && <p className="erro">{erro}</p>}
     </fieldset>
   );

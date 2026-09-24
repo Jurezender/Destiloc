@@ -210,121 +210,233 @@ export function ConsultaPublica() {
 
   return (
     <div className="consulta-publica">
-      <header>
-        <h1>Rastreabilidade de bebidas destiladas</h1>
-        <p className="dica">Consulta pública, somente leitura. Não é necessário ter a MetaMask instalada.</p>
+
+      {/* ── Hero ── */}
+      <header className="cp-hero">
+        <p className="cp-hero__sistema">Destiloc</p>
+        <h1 className="cp-hero__titulo">Rastreabilidade de bebidas destiladas</h1>
+        <p className="cp-hero__descricao">Consulta pública · sem necessidade de MetaMask</p>
       </header>
 
-      {carregando && <p>Carregando…</p>}
-      {erro && <p className="erro">{erro}</p>}
+      {/* ── Carregando ── */}
+      {carregando && (
+        <div className="cp-carregando">
+          <span className="cp-carregando__indicador" aria-hidden="true" />
+          <span>Consultando a blockchain…</span>
+        </div>
+      )}
 
+      {/* ── Erro ── */}
+      {erro && (
+        <div className="cp-estado-erro">
+          <p>{erro}</p>
+        </div>
+      )}
+
+      {/* ── Dados ── */}
       {dados && (
-        <>
-          <h2>Garrafa #{dados.garrafa.tokenId.toString()}</h2>
-          <p>
-            Rede: {rede?.rotulo ?? `chainId ${chainId}`}
-            <br />
-            Envasamento de origem: #{dados.garrafa.envasamentoId.toString()}
-            <br />
-            Emitida em: {formatarTimestamp(dados.garrafa.emitidaEm)}
-          </p>
+        <div className="cp-conteudo">
 
-          <h3>Envasamento</h3>
-          <p>
-            Envasador: {dados.envasamento.envasador}
-            <br />
-            Quantidade: {dados.envasamento.quantidadeEmitida.toString()}/
-            {dados.envasamento.quantidadeDeclarada.toString()}
-            <br />
-            Registrado em: {formatarTimestamp(dados.envasamento.registradoEm)}
-            <br />
-            {dados.envasamento.concluidoEm !== 0n ? (
-              <>Concluído em: {formatarTimestamp(dados.envasamento.concluidoEm)}</>
-            ) : (
-              "Em andamento"
-            )}
-            <br />
-            Metadados do envasamento: {dados.envasamento.metadataURI}
-          </p>
+          {/* Identidade da garrafa */}
+          <div className="cp-identidade">
+            <div className="cp-identidade__cabecalho">
+              <span className="cp-identidade__rotulo">Garrafa certificada</span>
+              <span className="cp-identidade__numero">#{dados.garrafa.tokenId.toString()}</span>
+            </div>
+            <div className="cp-identidade__meta">
+              <span>Rede: {rede?.rotulo ?? `chainId ${chainId}`}</span>
+              <span className="cp-sep">·</span>
+              <span>Envasamento #{dados.garrafa.envasamentoId.toString()}</span>
+              <span className="cp-sep">·</span>
+              <span>Emitida em {formatarTimestamp(dados.garrafa.emitidaEm)}</span>
+            </div>
+          </div>
 
-          <h3>Lote de produção</h3>
-          <p>
-            Lote #{dados.lote.id.toString()} — {RETULO_TIPO_BEBIDA[dados.lote.tipoBebida]}
-            <br />
-            Produtor: {dados.lote.produtor}
-            <br />
-            Estado: {RETULO_ESTADO_PRODUCAO[dados.lote.estado]}
-            <br />
-            Criado em: {formatarTimestamp(dados.lote.criadoEm)}
-            <br />
-            {dados.lote.estado === EstadoProducao.Concluido && (
-              <>
-                Produção concluída em: {formatarTimestamp(dados.lote.concluidoEm)}
-                <br />
-                Metadados de conclusão: {dados.lote.metadataURIConclusao}
-                <br />
-              </>
-            )}
-            Metadados do lote: {dados.lote.metadataURI}
-          </p>
+          {/* Envasamento */}
+          <section className="cp-secao">
+            <header className="cp-secao__header">
+              <h2 className="cp-secao__titulo">Envasamento</h2>
+            </header>
+            <div className="cp-secao__corpo">
+              <dl className="cp-campos">
+                <div className="cp-campo">
+                  <dt className="cp-campo__rotulo">Envasador</dt>
+                  <dd className="cp-campo__valor cp-mono">{dados.envasamento.envasador}</dd>
+                </div>
+                <div className="cp-campo">
+                  <dt className="cp-campo__rotulo">Garrafas emitidas / declaradas</dt>
+                  <dd className="cp-campo__valor">
+                    {dados.envasamento.quantidadeEmitida.toString()} / {dados.envasamento.quantidadeDeclarada.toString()}
+                  </dd>
+                </div>
+                <div className="cp-campo">
+                  <dt className="cp-campo__rotulo">Registrado em</dt>
+                  <dd className="cp-campo__valor">{formatarTimestamp(dados.envasamento.registradoEm)}</dd>
+                </div>
+                <div className="cp-campo">
+                  <dt className="cp-campo__rotulo">Situação</dt>
+                  <dd className="cp-campo__valor">
+                    {dados.envasamento.concluidoEm !== 0n
+                      ? `Concluído em ${formatarTimestamp(dados.envasamento.concluidoEm)}`
+                      : "Em andamento"}
+                  </dd>
+                </div>
+                <div className="cp-campo cp-campo--largo">
+                  <dt className="cp-campo__rotulo">Metadados</dt>
+                  <dd className="cp-campo__valor cp-mono">{dados.envasamento.metadataURI}</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
 
-          <h3>Configuração da produção</h3>
-          <ul>
-            <li>Maturação aplicável: {dados.configuracao.maturacaoAplicavel ? "sim" : "não"}</li>
-            <li>Retificação aplicável: {dados.configuracao.retificacaoAplicavel ? "sim" : "não"}</li>
-            <li>Blendagem aplicável: {dados.configuracao.blendagemAplicavel ? "sim" : "não"}</li>
-            <li>Ajuste final aplicável: {dados.configuracao.ajusteFinalAplicavel ? "sim" : "não"}</li>
-          </ul>
+          {/* Lote de produção */}
+          <section className="cp-secao">
+            <header className="cp-secao__header">
+              <h2 className="cp-secao__titulo">Lote de produção</h2>
+              <span className={`cp-badge ${dados.lote.estado === EstadoProducao.Concluido ? "cp-badge--ok" : "cp-badge--neutro"}`}>
+                {RETULO_ESTADO_PRODUCAO[dados.lote.estado]}
+              </span>
+            </header>
+            <div className="cp-secao__corpo">
+              <dl className="cp-campos">
+                <div className="cp-campo">
+                  <dt className="cp-campo__rotulo">Identificação</dt>
+                  <dd className="cp-campo__valor">
+                    Lote #{dados.lote.id.toString()} — {RETULO_TIPO_BEBIDA[dados.lote.tipoBebida]}
+                  </dd>
+                </div>
+                <div className="cp-campo">
+                  <dt className="cp-campo__rotulo">Criado em</dt>
+                  <dd className="cp-campo__valor">{formatarTimestamp(dados.lote.criadoEm)}</dd>
+                </div>
+                <div className="cp-campo cp-campo--largo">
+                  <dt className="cp-campo__rotulo">Produtor</dt>
+                  <dd className="cp-campo__valor cp-mono">{dados.lote.produtor}</dd>
+                </div>
+                {dados.lote.estado === EstadoProducao.Concluido && (
+                  <>
+                    <div className="cp-campo">
+                      <dt className="cp-campo__rotulo">Produção concluída em</dt>
+                      <dd className="cp-campo__valor">{formatarTimestamp(dados.lote.concluidoEm)}</dd>
+                    </div>
+                    <div className="cp-campo cp-campo--largo">
+                      <dt className="cp-campo__rotulo">Metadados de conclusão</dt>
+                      <dd className="cp-campo__valor cp-mono">{dados.lote.metadataURIConclusao}</dd>
+                    </div>
+                  </>
+                )}
+                <div className="cp-campo cp-campo--largo">
+                  <dt className="cp-campo__rotulo">Metadados do lote</dt>
+                  <dd className="cp-campo__valor cp-mono">{dados.lote.metadataURI}</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
 
-          <h3>Insumos vinculados ao lote</h3>
-          <ul>
-            {dados.insumosVinculados.map((insumo) => (
-              <li key={insumo.id.toString()}>
-                #{insumo.id.toString()} — {RETULO_TIPO_INSUMO[insumo.tipo]} — fornecedor {insumo.fornecedor}
-                <br />
-                Metadados: {insumo.metadataURI}
-              </li>
-            ))}
-            {dados.insumosVinculados.length === 0 && <li>Nenhum insumo vinculado.</li>}
-          </ul>
+          {/* Configuração da produção */}
+          <section className="cp-secao">
+            <header className="cp-secao__header">
+              <h2 className="cp-secao__titulo">Configuração da produção</h2>
+            </header>
+            <div className="cp-secao__corpo">
+              <ul className="cp-config-grade">
+                <li className={`cp-config-item ${dados.configuracao.maturacaoAplicavel ? "cp-config-item--sim" : "cp-config-item--nao"}`}>
+                  <span className="cp-config-item__icone" aria-hidden="true">
+                    {dados.configuracao.maturacaoAplicavel ? "✓" : "—"}
+                  </span>
+                  <span className="cp-config-item__rotulo">Maturação</span>
+                </li>
+                <li className={`cp-config-item ${dados.configuracao.retificacaoAplicavel ? "cp-config-item--sim" : "cp-config-item--nao"}`}>
+                  <span className="cp-config-item__icone" aria-hidden="true">
+                    {dados.configuracao.retificacaoAplicavel ? "✓" : "—"}
+                  </span>
+                  <span className="cp-config-item__rotulo">Retificação</span>
+                </li>
+                <li className={`cp-config-item ${dados.configuracao.blendagemAplicavel ? "cp-config-item--sim" : "cp-config-item--nao"}`}>
+                  <span className="cp-config-item__icone" aria-hidden="true">
+                    {dados.configuracao.blendagemAplicavel ? "✓" : "—"}
+                  </span>
+                  <span className="cp-config-item__rotulo">Blendagem</span>
+                </li>
+                <li className={`cp-config-item ${dados.configuracao.ajusteFinalAplicavel ? "cp-config-item--sim" : "cp-config-item--nao"}`}>
+                  <span className="cp-config-item__icone" aria-hidden="true">
+                    {dados.configuracao.ajusteFinalAplicavel ? "✓" : "—"}
+                  </span>
+                  <span className="cp-config-item__rotulo">Ajuste final</span>
+                </li>
+              </ul>
+            </div>
+          </section>
 
-          <h3>Etapas registradas</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Etapa</th>
-                <th>Executado por</th>
-                <th>Início informado</th>
-                <th>Fim informado</th>
-                <th>Registrado em</th>
-                <th>Metadados</th>
-                <th>Insumos utilizados</th>
-              </tr>
-            </thead>
-            <tbody>
-              {dados.etapas.map((evento) => (
-                <tr key={evento.indice}>
-                  <td>{RETULO_ETAPA_PRODUCAO[evento.etapa]}</td>
-                  <td>{evento.executadoPor}</td>
-                  <td>{formatarTimestamp(evento.inicioInformado)}</td>
-                  <td>{formatarTimestamp(evento.fimInformado)}</td>
-                  <td>{formatarTimestamp(evento.registradoEm)}</td>
-                  <td>{evento.metadataURI}</td>
-                  <td>
-                    {evento.insumosUtilizados.length === 0
-                      ? "—"
-                      : evento.insumosUtilizados.map((insumoId) => `#${insumoId.toString()}`).join(", ")}
-                  </td>
-                </tr>
-              ))}
-              {dados.etapas.length === 0 && (
-                <tr>
-                  <td colSpan={7}>Nenhuma etapa registrada ainda.</td>
-                </tr>
+          {/* Insumos vinculados */}
+          <section className="cp-secao">
+            <header className="cp-secao__header">
+              <h2 className="cp-secao__titulo">Insumos vinculados ao lote</h2>
+            </header>
+            <div className="cp-secao__corpo--sem-padding">
+              {dados.insumosVinculados.length === 0 ? (
+                <p className="cp-vazio">Nenhum insumo vinculado.</p>
+              ) : (
+                <ul className="cp-insumos">
+                  {dados.insumosVinculados.map((insumo) => (
+                    <li key={insumo.id.toString()} className="cp-insumo">
+                      <div className="cp-insumo__id">#{insumo.id.toString()}</div>
+                      <div className="cp-insumo__info">
+                        <span className="cp-insumo__tipo">{RETULO_TIPO_INSUMO[insumo.tipo]}</span>
+                        <span className="cp-insumo__fornecedor cp-mono">{insumo.fornecedor}</span>
+                        <span className="cp-insumo__metadados cp-mono">{insumo.metadataURI}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               )}
-            </tbody>
-          </table>
-        </>
+            </div>
+          </section>
+
+          {/* Etapas registradas */}
+          <section className="cp-secao">
+            <header className="cp-secao__header">
+              <h2 className="cp-secao__titulo">Etapas registradas</h2>
+            </header>
+            {dados.etapas.length === 0 ? (
+              <p className="cp-vazio">Nenhuma etapa registrada ainda.</p>
+            ) : (
+              <div className="cp-tabela-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Etapa</th>
+                      <th>Executado por</th>
+                      <th>Início informado</th>
+                      <th>Fim informado</th>
+                      <th>Registrado em</th>
+                      <th>Metadados</th>
+                      <th>Insumos utilizados</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dados.etapas.map((evento) => (
+                      <tr key={evento.indice}>
+                        <td>{RETULO_ETAPA_PRODUCAO[evento.etapa]}</td>
+                        <td className="cp-mono">{evento.executadoPor}</td>
+                        <td>{formatarTimestamp(evento.inicioInformado)}</td>
+                        <td>{formatarTimestamp(evento.fimInformado)}</td>
+                        <td>{formatarTimestamp(evento.registradoEm)}</td>
+                        <td className="cp-mono">{evento.metadataURI}</td>
+                        <td>
+                          {evento.insumosUtilizados.length === 0
+                            ? "—"
+                            : evento.insumosUtilizados.map((insumoId) => `#${insumoId.toString()}`).join(", ")}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+
+        </div>
       )}
     </div>
   );

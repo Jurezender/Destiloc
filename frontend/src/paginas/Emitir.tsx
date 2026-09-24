@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
-import { mapearErroContrato } from "../lib/erros";
+import { feedbackDaTransacao, type FeedbackTx, mapearErroContrato } from "../lib/erros";
 import { encurtarEndereco, formatarTimestamp, RETULO_TIPO_BEBIDA } from "../lib/formatadores";
 import { TipoBebida } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
@@ -102,7 +102,12 @@ export function Emitir() {
     void carregar();
   }, [carregar]);
 
-  if (statusLote === "carregando") return <p>Carregando…</p>;
+  if (statusLote === "carregando") return (
+    <div className="carregando">
+      <span className="carregando__indicador" aria-hidden="true" />
+      <span>Carregando…</span>
+    </div>
+  );
   if (statusLote === "inexistente") return <p className="erro">Este lote de produção não existe.</p>;
   if (statusLote === "nao-concluido") {
     return (
@@ -115,18 +120,23 @@ export function Emitir() {
 
   return (
     <section>
-      <p>
-        <Link to={`/lotes/${id}`}>← Lote #{id}</Link>
-      </p>
+      <Link className="link-voltar" to={`/lotes/${id}`}>← Lote #{id}</Link>
       <h1>
         Envasamento do lote #{id}
         {loteInfo ? ` — ${RETULO_TIPO_BEBIDA[loteInfo.tipoBebida]}` : ""}
       </h1>
-      {loteInfo && <p>Produtor: {loteInfo.produtor}</p>}
+      {loteInfo && (
+        <p>Produtor: <span className="mono">{loteInfo.produtor}</span></p>
+      )}
       {erro && <p className="erro">{erro}</p>}
 
       <h2>Envasamentos deste lote</h2>
-      {carregando && <p>Carregando…</p>}
+      {carregando && (
+        <div className="carregando">
+          <span className="carregando__indicador" aria-hidden="true" />
+          <span>Carregando envasamentos…</span>
+        </div>
+      )}
       <ul className="lista-envasamentos">
         {envasamentos.map((envasamento) => (
           <LinhaEnvasamento
@@ -174,6 +184,7 @@ function LinhaEnvasamento({
   const [quantidade, setQuantidade] = useState(restante.toString());
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
   const [tokenIdsEmitidos, setTokenIdsEmitidos] = useState<bigint[] | null>(null);
 
   useEffect(() => {
@@ -197,6 +208,7 @@ function LinhaEnvasamento({
       return;
     }
     setErro(null);
+    setFeedback(null);
     setEnviando(true);
     setTokenIdsEmitidos(null);
     try {
@@ -213,7 +225,7 @@ function LinhaEnvasamento({
       setTokenIdsEmitidos(tokenIds);
       aoAtualizar();
     } catch (erroEnvio) {
-      setErro(mapearErroContrato(erroEnvio));
+      setFeedback(feedbackDaTransacao(erroEnvio));
     } finally {
       setEnviando(false);
     }
@@ -221,18 +233,38 @@ function LinhaEnvasamento({
 
   return (
     <li>
-      <p>
-        Envasamento #{envasamento.id.toString()} — envasador {encurtarEndereco(envasamento.envasador)}
-        <br />
-        Declarada: {envasamento.quantidadeDeclarada.toString()} — Emitida:{" "}
-        {envasamento.quantidadeEmitida.toString()} — Restante: {restante.toString()}
-        <br />
-        Registrado em: {formatarTimestamp(envasamento.registradoEm)}
-        <br />
-        {concluido ? <>Concluído em: {formatarTimestamp(envasamento.concluidoEm)}</> : "Em andamento"}
-        <br />
-        Metadados: {envasamento.metadataURI}
-      </p>
+      <div className="item-lista__cabecalho">
+        <span className="item-lista__titulo">Envasamento #{envasamento.id.toString()}</span>
+        <span className={`badge ${concluido ? "badge--ok" : "badge--neutro"}`}>
+          {concluido ? "Concluído" : "Em andamento"}
+        </span>
+      </div>
+      <dl className="info-grade">
+        <div className="info-campo">
+          <dt className="info-campo__rotulo">Envasador</dt>
+          <dd className="info-campo__valor mono">{encurtarEndereco(envasamento.envasador)}</dd>
+        </div>
+        <div className="info-campo">
+          <dt className="info-campo__rotulo">Declarada / emitida / restante</dt>
+          <dd className="info-campo__valor">
+            {envasamento.quantidadeDeclarada.toString()} / {envasamento.quantidadeEmitida.toString()} / {restante.toString()}
+          </dd>
+        </div>
+        <div className="info-campo">
+          <dt className="info-campo__rotulo">Registrado em</dt>
+          <dd className="info-campo__valor">{formatarTimestamp(envasamento.registradoEm)}</dd>
+        </div>
+        {concluido && (
+          <div className="info-campo">
+            <dt className="info-campo__rotulo">Concluído em</dt>
+            <dd className="info-campo__valor">{formatarTimestamp(envasamento.concluidoEm)}</dd>
+          </div>
+        )}
+        <div className="info-campo info-campo--largo">
+          <dt className="info-campo__rotulo">Metadados</dt>
+          <dd className="info-campo__valor mono">{envasamento.metadataURI}</dd>
+        </div>
+      </dl>
 
       {!concluido &&
         (temPapelEnvasador ? (
@@ -246,6 +278,7 @@ function LinhaEnvasamento({
               <button type="button" onClick={() => void enviar()}>
                 {enviando ? "Emitindo…" : "Emitir garrafas"}
               </button>
+              {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
               {erro && <p className="erro">{erro}</p>}
             </fieldset>
           ) : (
@@ -293,6 +326,7 @@ function RegistrarEnvasamento({
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
   const quantidadeValida = /^\d+$/.test(quantidadeDeclarada.trim()) && quantidadeDeclarada.trim() !== "0";
 
@@ -332,6 +366,7 @@ function RegistrarEnvasamento({
       return;
     }
     setErro(null);
+    setFeedback(null);
     setEnviando(true);
     try {
       const contrato = obterContrato("ContratoEnvasamento", chainId, signer);
@@ -341,9 +376,10 @@ function RegistrarEnvasamento({
       setDescricao("");
       setDocumentos("");
       setMetadataURI("");
+      setFeedback({ tipo: "ok", texto: "Envasamento registrado com sucesso." });
       aoRegistrar();
     } catch (erroEnvio) {
-      setErro(mapearErroContrato(erroEnvio));
+      setFeedback(feedbackDaTransacao(erroEnvio));
     } finally {
       setEnviando(false);
     }
@@ -379,6 +415,7 @@ function RegistrarEnvasamento({
       <button type="button" onClick={() => void enviar()}>
         {enviando ? "Registrando…" : "Registrar envasamento"}
       </button>
+      {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
       {erro && <p className="erro">{erro}</p>}
     </fieldset>
   );
