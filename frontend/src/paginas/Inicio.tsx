@@ -1,3 +1,4 @@
+import { BottleWine, FlaskConical, Leaf, Package } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
@@ -77,18 +78,22 @@ export function Inicio() {
       {contadores ? (
         <div className="grade-contadores">
           <div className="contador">
+            <Leaf size={18} className="contador__icone" aria-hidden="true" strokeWidth={1.75} />
             <span className="contador__numero">{contadores.totalInsumos.toString()}</span>
             <span className="contador__rotulo">Lotes de insumo</span>
           </div>
           <div className="contador">
+            <FlaskConical size={18} className="contador__icone" aria-hidden="true" strokeWidth={1.75} />
             <span className="contador__numero">{contadores.totalLotesProducao.toString()}</span>
             <span className="contador__rotulo">Lotes de produção</span>
           </div>
           <div className="contador">
+            <Package size={18} className="contador__icone" aria-hidden="true" strokeWidth={1.75} />
             <span className="contador__numero">{contadores.totalEnvasamentos.toString()}</span>
             <span className="contador__rotulo">Envasamentos</span>
           </div>
           <div className="contador">
+            <BottleWine size={18} className="contador__icone" aria-hidden="true" strokeWidth={1.75} />
             <span className="contador__numero">{contadores.totalGarrafas.toString()}</span>
             <span className="contador__rotulo">Garrafas emitidas</span>
           </div>

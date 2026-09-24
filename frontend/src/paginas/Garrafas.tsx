@@ -97,7 +97,7 @@ export function Garrafas() {
             </p>
           </li>
         ))}
-        {!carregando && linhas.length === 0 && <li>Nenhuma garrafa emitida ainda.</li>}
+        {!carregando && linhas.length === 0 && <li className="lista-vazia">Nenhuma garrafa emitida ainda.</li>}
       </ul>
     </section>
   );

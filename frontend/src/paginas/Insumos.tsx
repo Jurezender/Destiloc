@@ -224,7 +224,7 @@ export function Insumos() {
             </p>
           </li>
         ))}
-        {!carregando && linhas.length === 0 && <li>Nenhum insumo cadastrado ainda.</li>}
+        {!carregando && linhas.length === 0 && <li className="lista-vazia">Nenhum insumo cadastrado ainda.</li>}
       </ul>
     </section>
   );

@@ -277,7 +277,7 @@ export function Lotes() {
             </p>
           </li>
         ))}
-        {!carregando && linhas.length === 0 && <li>Nenhum lote cadastrado ainda.</li>}
+        {!carregando && linhas.length === 0 && <li className="lista-vazia">Nenhum lote cadastrado ainda.</li>}
       </ul>
     </section>
   );

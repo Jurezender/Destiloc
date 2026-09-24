@@ -243,7 +243,7 @@ export function LoteDetalhe() {
             #{insumo.id.toString()} — {RETULO_TIPO_INSUMO[insumo.tipo]} — fornecedor {encurtarEndereco(insumo.fornecedor)}
           </li>
         ))}
-        {insumosVinculados.length === 0 && <li>Nenhum insumo vinculado ainda.</li>}
+        {insumosVinculados.length === 0 && <li className="lista-vazia">Nenhum insumo vinculado ainda.</li>}
       </ul>
       {lote.estado === EstadoProducao.Concluido ? (
         <p className="dica">Produção concluída — não aceita novos vínculos de insumo.</p>
@@ -285,7 +285,7 @@ export function LoteDetalhe() {
             ))}
             {etapas.length === 0 && (
               <tr>
-                <td colSpan={7}>Nenhuma etapa registrada ainda.</td>
+                <td colSpan={7} className="celula-vazia">Nenhuma etapa registrada ainda.</td>
               </tr>
             )}
           </tbody>

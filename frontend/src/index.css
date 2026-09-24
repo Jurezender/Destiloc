@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@400;500;600;700&display=swap');
 
 /* ─── Tokens de design ──────────────────────────────────────────────────────── */
 :root {
@@ -16,10 +16,15 @@
 --azul-arroxeado:        var(--cafe-noir);
 --off-white:             var(--bone);
 
+/* Aliases de compatibilidade — nomes anteriores da paleta */
+--floresta:              var(--kombu-green);
+--vinho-profundo:        var(--cafe-noir);
+--verde-oliva:           var(--moss-green);
+
 
 /* Superfícies */
---cor-fundo-pagina:      #F5EFE3;
---cor-fundo-card:        #FFFCF7;
+--cor-fundo-pagina:      #EDE0CC;
+--cor-fundo-card:        #FAF6F0;
 --cor-fundo-header:      var(--kombu-green);
 --cor-fundo-header-linha: var(--avela);
 --branco:                #FFFFFF;
@@ -78,7 +83,7 @@
   --s-2xl: 3rem;
 
   /* Legado (mantido para compatibilidade com QRCodeGarrafa) */
-  --cor-fundo-suave: rgba(91, 38, 51, 0.05);
+  --cor-fundo-suave: rgba(76, 61, 25, 0.05);
   --cor-borda: #D4C4B0;
 
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -151,9 +156,11 @@ a:hover {
 }
 
 .layout__titulo {
-  font-size: 0.9375rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--cor-texto-invertido);
   white-space: nowrap;
   flex-shrink: 0;
@@ -168,24 +175,25 @@ a:hover {
 .layout__nav a {
   display: inline-flex;
   align-items: center;
+  gap: 0.375rem;
   padding: 0.375rem 0.75rem;
   border-radius: var(--raio-sm);
+  border-bottom: 2px solid transparent;
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(245, 239, 227, 0.65);
+  color: rgba(229, 215, 196, 0.6);
   text-decoration: none;
-  transition: background-color 0.15s, color 0.15s;
+  transition: color 0.15s, border-color 0.15s;
 }
 
 .layout__nav a:hover {
-  background-color: rgba(245, 239, 227, 0.1);
   color: var(--cor-texto-invertido);
   text-decoration: none;
 }
 
 .layout__nav a.active {
-  background-color: rgba(245, 239, 227, 0.13);
   color: var(--cor-texto-invertido);
+  border-bottom-color: var(--avela);
   font-weight: 600;
   text-decoration: none;
 }
@@ -243,7 +251,7 @@ button {
 
 button:hover:not(:disabled) {
   background-color: var(--cor-primaria-hover);
-  box-shadow: 0 2px 6px rgba(91, 38, 51, 0.28);
+  box-shadow: 0 2px 8px rgba(76, 61, 25, 0.32);
 }
 
 button:focus-visible {
@@ -259,6 +267,7 @@ button:disabled {
 /* ─── Formulários ────────────────────────────────────────────────────────────── */
 fieldset {
   border: 1px solid var(--cor-borda);
+  border-left: 3px solid var(--cafe-noir);
   border-radius: var(--raio-md);
   padding: var(--s-lg);
   background-color: var(--cor-fundo-card);
@@ -267,11 +276,11 @@ fieldset {
 }
 
 fieldset legend {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--cor-texto-secundario);
+  color: var(--cafe-noir);
   padding-inline: var(--s-sm);
 }
 
@@ -408,25 +417,46 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-  background-color: rgba(91, 38, 51, 0.03);
+  background-color: rgba(76, 61, 25, 0.04);
 }
 
 /* ─── Classes de estado ──────────────────────────────────────────────────────── */
 .erro {
+  display: block;
   color: var(--cor-erro);
+  background-color: var(--cor-fundo-erro);
+  border-left: 3px solid var(--cor-erro);
+  border-radius: var(--raio-sm);
+  padding: 0.5625rem var(--s-md);
   font-size: 0.875rem;
   font-weight: 500;
+  margin-block: var(--s-sm);
+  line-height: 1.5;
 }
 
 .ok {
+  display: block;
   color: var(--cor-ok);
+  background-color: var(--cor-fundo-ok);
+  border-left: 3px solid var(--cor-ok);
+  border-radius: var(--raio-sm);
+  padding: 0.5625rem var(--s-md);
   font-size: 0.875rem;
   font-weight: 500;
+  margin-block: var(--s-sm);
+  line-height: 1.5;
 }
 
 .dica {
+  display: block;
   color: var(--cor-texto-secundario);
+  background-color: rgba(207, 187, 153, 0.12);
+  border-left: 3px solid var(--avela);
+  border-radius: var(--raio-sm);
+  padding: 0.5rem var(--s-md);
   font-size: 0.8125rem;
+  margin-block: var(--s-sm);
+  line-height: 1.5;
 }
 
 /* ─── QR Code ────────────────────────────────────────────────────────────────── */
@@ -464,12 +494,12 @@ tbody tr:hover {
   border-radius: var(--raio-md);
   padding: var(--s-md) var(--s-lg);
   box-shadow: var(--sombra-card);
-  transition: box-shadow 0.15s, border-color 0.15s;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .lista-garrafas > li:hover {
-  box-shadow: var(--sombra-elevada);
-  border-color: #CCC8BE;
+  box-shadow: var(--sombra-elevada), inset 3px 0 0 var(--cafe-noir);
+  transform: translateY(-1px);
 }
 
 .lista-garrafas > li p {
@@ -483,12 +513,12 @@ tbody tr:hover {
   padding: var(--s-md) var(--s-lg);
   box-shadow: var(--sombra-card);
   font-size: 0.875rem;
-  transition: box-shadow 0.15s, border-color 0.15s;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .lista-lotes > li:hover {
-  box-shadow: var(--sombra-elevada);
-  border-color: #CCC8BE;
+  box-shadow: var(--sombra-elevada), inset 3px 0 0 var(--cafe-noir);
+  transform: translateY(-1px);
 }
 
 .lista-lotes > li a {
@@ -528,7 +558,7 @@ tbody tr:hover {
 
 /* Hero ──────────────────────────────────────────────────────────────────────── */
 .cp-hero {
-  background: linear-gradient(160deg, #1C2820 0%, var(--floresta) 55%, #1C2820 100%);
+  background: linear-gradient(160deg, #111904 0%, var(--kombu-green) 55%, #111904 100%);
   padding: var(--s-2xl) var(--s-xl);
   text-align: center;
   color: var(--cor-texto-invertido);
@@ -617,7 +647,7 @@ tbody tr:hover {
 }
 
 .cp-identidade__cabecalho {
-  background: linear-gradient(135deg, var(--vinho-profundo) 0%, #7A3549 100%);
+  background: linear-gradient(135deg, var(--cafe-noir) 0%, #6B5228 100%);
   padding: var(--s-lg) var(--s-xl);
 }
 
@@ -738,8 +768,8 @@ tbody tr:hover {
 }
 
 .cp-badge--neutro {
-  background-color: rgba(89, 99, 74, 0.12);
-  color: var(--verde-oliva);
+  background-color: rgba(136, 144, 99, 0.14);
+  color: var(--moss-green);
 }
 
 /* Grid de configuração de produção ──────────────────────────────────────────── */
@@ -763,7 +793,7 @@ tbody tr:hover {
 
 .cp-config-item--sim {
   background-color: var(--cor-fundo-ok);
-  border-color: rgba(89, 99, 74, 0.25);
+  border-color: rgba(136, 144, 99, 0.28);
 }
 
 .cp-config-item--nao {
@@ -821,8 +851,8 @@ tbody tr:hover {
   flex-shrink: 0;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--verde-oliva);
-  background-color: rgba(89, 99, 74, 0.1);
+  color: var(--moss-green);
+  background-color: rgba(136, 144, 99, 0.12);
   padding: 0.25rem 0.5rem;
   border-radius: var(--raio-sm);
   min-width: 2.5rem;
@@ -873,6 +903,25 @@ tbody tr:hover {
   padding: var(--s-lg) var(--s-xl);
 }
 
+/* Estado vazio nas listas operacionais */
+.lista-vazia {
+  text-align: center;
+  padding: var(--s-2xl) var(--s-lg);
+  color: var(--cor-texto-secundario);
+  font-size: 0.875rem;
+  font-style: italic;
+  list-style: none;
+}
+
+/* Célula vazia em tabelas */
+.celula-vazia {
+  text-align: center !important;
+  padding: var(--s-2xl) var(--s-lg) !important;
+  color: var(--cor-texto-secundario);
+  font-style: italic;
+  vertical-align: middle !important;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════════
    UTILITÁRIOS — compartilhados por todas as páginas operacionais
 ═══════════════════════════════════════════════════════════════════════════════ */
@@ -886,9 +935,9 @@ tbody tr:hover {
   margin-top: var(--s-xl);
   margin-bottom: var(--s-md);
   padding-bottom: var(--s-sm);
-  border-bottom: 1px solid rgba(184, 155, 114, 0.4);
+  border-bottom: 1px solid rgba(207, 187, 153, 0.45);
   font-size: 1.0625rem;
-  color: var(--verde-oliva);
+  color: var(--moss-green);
   letter-spacing: -0.01em;
 }
 
@@ -938,10 +987,10 @@ tbody tr:hover {
   line-height: 1.4;
 }
 
-.badge--ok     { background-color: var(--cor-fundo-ok);     color: var(--cor-ok);         }
-.badge--erro   { background-color: var(--cor-fundo-erro);   color: var(--cor-erro);       }
-.badge--neutro { background-color: rgba(89, 99, 74, 0.12);  color: var(--verde-oliva);    }
-.badge--aviso  { background-color: rgba(184, 155, 114, 0.2); color: #7A5C1E;              }
+.badge--ok     { background-color: var(--cor-fundo-ok);      color: var(--cor-ok);    }
+.badge--erro   { background-color: var(--cor-fundo-erro);    color: var(--cor-erro);  }
+.badge--neutro { background-color: rgba(136, 144, 99, 0.14); color: var(--moss-green); }
+.badge--aviso  { background-color: rgba(207, 187, 153, 0.22); color: #6B4E1A;         }
 
 /* Classe utilitária para endereços e hashes */
 .mono {
@@ -985,7 +1034,7 @@ tbody tr:hover {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--cor-texto-secundario);
+  color: var(--moss-green);
   margin-bottom: var(--s-xs);
 }
 
@@ -1039,6 +1088,12 @@ tbody tr:hover {
   border-radius: var(--raio-md);
   padding: var(--s-md) var(--s-lg);
   box-shadow: var(--sombra-card);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.lista-envasamentos > li:hover {
+  box-shadow: var(--sombra-elevada), inset 3px 0 0 var(--cafe-noir);
+  transform: translateY(-1px);
 }
 
 /* Lista compacta — para correções, avaliações, endereços */
@@ -1087,6 +1142,7 @@ tbody tr:hover {
   gap: 1px;
   background-color: var(--cor-borda);
   border: 1px solid var(--cor-borda);
+  border-top: 3px solid var(--cafe-noir);
   border-radius: var(--raio-md);
   overflow: hidden;
   margin-block: var(--s-md);
@@ -1095,6 +1151,14 @@ tbody tr:hover {
 .contador {
   background-color: var(--cor-fundo-card);
   padding: var(--s-md) var(--s-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-xs);
+}
+
+.contador__icone {
+  color: var(--moss-green);
+  flex-shrink: 0;
 }
 
 .contador__numero {
@@ -1102,7 +1166,7 @@ tbody tr:hover {
   font-size: 1.875rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  color: var(--vinho-profundo);
+  color: var(--cafe-noir);
   line-height: 1.1;
 }
 
@@ -1113,7 +1177,6 @@ tbody tr:hover {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--cor-texto-secundario);
-  margin-top: var(--s-xs);
 }
 
 /* Responsivo — ConsultaPublica ───────────────────────────────────────────────── */

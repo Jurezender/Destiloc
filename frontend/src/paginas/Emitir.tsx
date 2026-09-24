@@ -149,7 +149,7 @@ export function Emitir() {
             aoAtualizar={carregar}
           />
         ))}
-        {!carregando && envasamentos.length === 0 && <li>Nenhum envasamento registrado ainda.</li>}
+        {!carregando && envasamentos.length === 0 && <li className="lista-vazia">Nenhum envasamento registrado ainda.</li>}
       </ul>
 
       <h2>Registrar novo envasamento</h2>
