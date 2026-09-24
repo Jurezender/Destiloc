@@ -248,7 +248,7 @@ export function Lotes() {
       <h1>Lotes de produção</h1>
       {papeis.produtor && <NovoLoteProducao onCriado={carregar} />}
       {!papeis.produtor && (
-        <p className="dica">Sua conta não tem PRODUTOR_ROLE, você ainda pode consultar os lotes cadastrados.</p>
+        <p className="dica">Sua conta não tem PRODUTOR_ROLE. Você ainda pode consultar os lotes cadastrados.</p>
       )}
 
       <h2>Lotes cadastrados</h2>

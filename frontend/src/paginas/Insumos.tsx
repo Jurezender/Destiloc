@@ -196,7 +196,7 @@ export function Insumos() {
       <h1>Lotes de insumo</h1>
       {papeis.fornecedor && <NovoLoteInsumo onCriado={carregar} />}
       {!papeis.fornecedor && (
-        <p className="dica">Sua conta não tem FORNECEDOR_ROLE, você ainda pode consultar os insumos cadastrados.</p>
+        <p className="dica">Sua conta não tem FORNECEDOR_ROLE. Você ainda pode consultar os insumos cadastrados.</p>
       )}
 
       <h2>Insumos cadastrados</h2>
