@@ -1,5 +1,6 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { obterPool } from '../db/cliente.js';
+import { exigirAdmin, exigirCarteiraAutorizada } from '../middlewares/autorizacao.js';
 
 const REGEX_ENDERECO = /^0x[0-9a-fA-F]{40}$/;
 
@@ -17,26 +18,30 @@ interface RegistroUpsert extends RegistroCarteira {
 }
 
 const carteiras: FastifyPluginAsync = async (app) => {
-  app.get<{ Params: { address: string } }>('/carteiras/:address', async (req, reply) => {
-    const { address } = req.params;
+  app.get<{ Params: { address: string } }>(
+    '/carteiras/:address',
+    { preHandler: [exigirCarteiraAutorizada] },
+    async (req, reply) => {
+      const { address } = req.params;
 
-    if (!REGEX_ENDERECO.test(address)) {
-      return reply.status(400).send({ erro: 'Endereço de carteira inválido.' });
-    }
+      if (!REGEX_ENDERECO.test(address)) {
+        return reply.status(400).send({ erro: 'Endereço de carteira inválido.' });
+      }
 
-    const resultado = await obterPool().query<RegistroCarteira>(
-      `SELECT address, apelido, papel_principal, anotacoes, cadastrada_em, atualizada_em
-       FROM carteiras_conhecidas
-       WHERE address = $1`,
-      [address],
-    );
+      const resultado = await obterPool().query<RegistroCarteira>(
+        `SELECT address, apelido, papel_principal, anotacoes, cadastrada_em, atualizada_em
+         FROM carteiras_conhecidas
+         WHERE address = $1`,
+        [address],
+      );
 
-    if (resultado.rows.length === 0) {
-      return reply.status(404).send({ erro: 'Carteira não encontrada.' });
-    }
+      if (resultado.rows.length === 0) {
+        return reply.status(404).send({ erro: 'Carteira não encontrada.' });
+      }
 
-    return reply.send(resultado.rows[0]);
-  });
+      return reply.send(resultado.rows[0]);
+    },
+  );
 
   app.put<{
     Params: { address: string };
@@ -48,6 +53,7 @@ const carteiras: FastifyPluginAsync = async (app) => {
   }>(
     '/carteiras/:address',
     {
+      preHandler: [exigirAdmin],
       schema: {
         body: {
           type: 'object',

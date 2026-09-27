@@ -2,6 +2,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import { obterPool } from '../db/cliente.js';
 import { calcularHashConteudo } from '../servicos/hash.js';
 import { fixarJsonNoPinata } from '../servicos/pinata.js';
+import { exigirCarteiraAutorizada } from '../middlewares/autorizacao.js';
 
 const TIPOS_VALIDOS = [
   'insumo',
@@ -18,6 +19,7 @@ const ipfs: FastifyPluginAsync = async (app) => {
   app.post<{ Body: { conteudo: Record<string, unknown>; tipo: string } }>(
     '/ipfs/upload',
     {
+      preHandler: [exigirCarteiraAutorizada],
       schema: {
         body: {
           type: 'object',

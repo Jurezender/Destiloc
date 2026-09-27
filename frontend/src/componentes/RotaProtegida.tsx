@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
+import { Navigate } from "react-router-dom";
 import {
   eDispositivoMobile,
   urlDeepLinkMetaMask,
   useCarteira,
 } from "../contexto/CarteiraContexto";
+import { useAuth } from "../contexto/AuthContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 
 interface Props {
@@ -13,14 +15,14 @@ interface Props {
   mensagemPapel?: string;
 }
 
-/**
- * Guarda de rota para as áreas operacionais: exige MetaMask instalada,
- * carteira conectada, e (opcionalmente) um papel específico nos contratos.
- * As rotas de consulta pública NÃO usam este componente — de propósito.
- */
 export function RotaProtegida({ children, exigirPapel, mensagemPapel }: Props) {
+  const { token, carteira, carregando: carregandoAuth } = useAuth();
   const { disponivel, conta, conectando, erro, conectar } = useCarteira();
   const papeis = usePapeis();
+
+  if (carregandoAuth) return <p>Verificando sessão…</p>;
+  if (!token) return <Navigate to="/login" replace />;
+  if (!carteira || carteira.status !== "autorizada") return <Navigate to="/vincular-carteira" replace />;
 
   if (!disponivel) {
     if (eDispositivoMobile()) {
@@ -54,6 +56,19 @@ export function RotaProtegida({ children, exigirPapel, mensagemPapel }: Props) {
           {conectando ? "Conectando…" : "Conectar MetaMask"}
         </button>
         {erro && <p className="erro">{erro}</p>}
+      </div>
+    );
+  }
+
+  if (conta.toLowerCase() !== carteira.address.toLowerCase()) {
+    return (
+      <div className="aviso-acesso">
+        <h2>Carteira incorreta</h2>
+        <p>
+          A conta MetaMask conectada (<strong>{conta}</strong>) não é a carteira autorizada para
+          esta conta. Conecte a carteira <strong>{carteira.address}</strong> na MetaMask para
+          continuar.
+        </p>
       </div>
     );
   }

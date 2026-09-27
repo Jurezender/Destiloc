@@ -4,6 +4,15 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 vi.mock('../src/db/cliente.js', () => ({
   obterPool: vi.fn(),
 }));
+vi.mock('../src/middlewares/autorizacao.js', () => ({
+  autenticarJWT: vi.fn(async () => {}),
+  exigirCarteiraAutorizada: vi.fn(async (req: { carteiraAddress: string }) => {
+    req.carteiraAddress = '0xTestAddress';
+  }),
+  exigirAdmin: vi.fn(async (req: { carteiraAddress: string }) => {
+    req.carteiraAddress = '0xTestAddress';
+  }),
+}));
 
 import { construirApp } from '../src/app.js';
 import { obterPool } from '../src/db/cliente.js';

@@ -1,13 +1,14 @@
-import { BottleWine, FlaskConical, Home, Leaf, Users } from "lucide-react";
+import { BottleWine, FlaskConical, Home, Leaf, Settings, Users } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { StatusCarteira } from "./StatusCarteira";
 
 const LINKS = [
-  { para: "/",              rotulo: "Início",        Icone: Home         },
-  { para: "/participantes", rotulo: "Participantes", Icone: Users        },
-  { para: "/insumos",       rotulo: "Insumos",       Icone: Leaf         },
-  { para: "/lotes",         rotulo: "Lotes",         Icone: FlaskConical },
-  { para: "/garrafas",      rotulo: "Garrafas",      Icone: BottleWine   },
+  { para: "/",                rotulo: "Início",        Icone: Home         },
+  { para: "/participantes",   rotulo: "Participantes", Icone: Users        },
+  { para: "/insumos",         rotulo: "Insumos",       Icone: Leaf         },
+  { para: "/lotes",           rotulo: "Lotes",         Icone: FlaskConical },
+  { para: "/garrafas",        rotulo: "Garrafas",      Icone: BottleWine   },
+  { para: "/admin/carteiras", rotulo: "Admin",         Icone: Settings     },
 ];
 
 export function Layout() {
