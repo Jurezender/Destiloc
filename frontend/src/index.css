@@ -1713,6 +1713,34 @@ details[open] .cp-tecnico__chevron {
   }
 }
 
+/* ─── Mapa de consultas (ConsultaPublica) ───────────────────────────────────── */
+.cp-mapa-container {
+  width: 100%;
+  height: 300px;
+  border-radius: 0 0 8px 8px;
+}
+
+@media (min-width: 640px) {
+  .cp-mapa-container {
+    height: 400px;
+  }
+}
+
+.cp-mapa-popup {
+  font-family: var(--fonte-corpo, Inter, sans-serif);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.cp-mapa-popup__alerta {
+  color: #8A6800;
+  font-weight: 600;
+}
+
+.cp-mapa-popup__normal {
+  color: #2D5038;
+}
+
 /* Mobile pequeno (< 480px): títulos de seção e listas */
 @media (max-width: 480px) {
   .secao-titulo-area {

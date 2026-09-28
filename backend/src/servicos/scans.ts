@@ -16,6 +16,8 @@ export interface EntradaScan {
 
 export interface ItemHistorico {
   id: number;
+  latitude: number;
+  longitude: number;
   cidade: string | null;
   estado: string | null;
   pais: string | null;
@@ -225,6 +227,8 @@ export async function listarScans(
   const pool = obterPool();
   const res = await pool.query<{
     id: string;
+    latitude: string;
+    longitude: string;
     cidade: string | null;
     estado: string | null;
     pais: string | null;
@@ -232,7 +236,7 @@ export async function listarScans(
     suspeito: boolean;
     motivo_suspeita: string | null;
   }>(
-    `SELECT id, cidade, estado, pais, escaneado_em, suspeito, motivo_suspeita
+    `SELECT id, latitude, longitude, cidade, estado, pais, escaneado_em, suspeito, motivo_suspeita
      FROM scan_garrafa
      WHERE chain_id = $1 AND token_id = $2
      ORDER BY escaneado_em DESC
@@ -244,6 +248,8 @@ export async function listarScans(
     total: res.rows.length,
     scans: res.rows.map((row) => ({
       id: Number(row.id),
+      latitude: Number(row.latitude),
+      longitude: Number(row.longitude),
       cidade: row.cidade,
       estado: row.estado,
       pais: row.pais,

@@ -256,6 +256,8 @@ describe("listarScans", () => {
       rows: [
         {
           id: "1",
+          latitude: "-23.55",
+          longitude: "-46.63",
           cidade: "São Paulo",
           estado: "São Paulo",
           pais: "Brasil",
@@ -270,6 +272,8 @@ describe("listarScans", () => {
 
     expect(resultado.total).toBe(1);
     expect(resultado.scans[0].id).toBe(1);
+    expect(resultado.scans[0].latitude).toBeCloseTo(-23.55, 5);
+    expect(resultado.scans[0].longitude).toBeCloseTo(-46.63, 5);
     expect(resultado.scans[0].cidade).toBe("São Paulo");
     expect(resultado.scans[0].escaneadoEm).toBe(dataExemplo.toISOString());
     expect(resultado.scans[0].suspeito).toBe(false);

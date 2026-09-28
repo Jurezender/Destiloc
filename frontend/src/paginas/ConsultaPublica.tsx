@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { MapaScans } from "../componentes/MapaScans";
 import { REDES } from "../contracts/redes";
 import {
   encurtarEndereco,
@@ -64,6 +65,8 @@ interface DadosConsulta {
 
 interface ItemHistorico {
   id: number;
+  latitude: number;
+  longitude: number;
   cidade: string | null;
   estado: string | null;
   pais: string | null;
@@ -461,6 +464,9 @@ export function ConsultaPublica() {
               )}
             </div>
           </section>
+
+          {/* Mapa das consultas (seção 5) */}
+          {historico && <MapaScans scans={historico.scans} />}
 
           {/* Verificação técnica */}
           <details className="cp-tecnico">
