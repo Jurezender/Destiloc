@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexto/AuthContexto";
 import { useCarteira } from "../contexto/CarteiraContexto";
-
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+import { API_URL, fetchApi } from "../lib/api";
 
 export function VincularCarteira() {
   const { token, usuario, carteira, atualizarCarteira } = useAuth();
@@ -17,7 +16,7 @@ export function VincularCarteira() {
       <div className="aviso-acesso">
         <h2>Carteira já autorizada</h2>
         <p>
-          Sua carteira <strong>{carteira.address}</strong> está autorizada.
+          Sua carteira <strong className="mono">{carteira.address}</strong> está autorizada.
         </p>
         <button onClick={() => navegar("/", { replace: true })}>Ir para o início</button>
       </div>
@@ -29,7 +28,7 @@ export function VincularCarteira() {
     setProcessando(true);
     setErro(null);
     try {
-      const challengeRes = await fetch(`${API_URL}/auth/carteira/challenge`, {
+      const challengeRes = await fetchApi(`${API_URL}/auth/carteira/challenge`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,8 +38,11 @@ export function VincularCarteira() {
       });
 
       if (!challengeRes.ok) {
-        const body = (await challengeRes.json()) as { erro?: string };
-        throw new Error(body.erro ?? "Erro ao solicitar desafio.");
+        const body = await challengeRes.json().catch(() => ({})) as { erro?: string };
+        if (challengeRes.status === 409) {
+          throw new Error("Esta carteira já está vinculada a outra conta.");
+        }
+        throw new Error(body.erro ?? "Não foi possível iniciar a verificação.");
       }
 
       const { mensagem, nonce } = (await challengeRes.json()) as {
@@ -50,7 +52,7 @@ export function VincularCarteira() {
 
       const assinatura = await signer.signMessage(mensagem);
 
-      const verificarRes = await fetch(`${API_URL}/auth/carteira/verificar`, {
+      const verificarRes = await fetchApi(`${API_URL}/auth/carteira/verificar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -60,8 +62,11 @@ export function VincularCarteira() {
       });
 
       if (!verificarRes.ok) {
-        const body = (await verificarRes.json()) as { erro?: string };
-        throw new Error(body.erro ?? "Erro ao verificar assinatura.");
+        const body = await verificarRes.json().catch(() => ({})) as { erro?: string };
+        if (verificarRes.status === 422) {
+          throw new Error("Assinatura inválida. Tente novamente.");
+        }
+        throw new Error(body.erro ?? "Não foi possível verificar a assinatura.");
       }
 
       const data = (await verificarRes.json()) as { address: string; status: string };
@@ -72,69 +77,80 @@ export function VincularCarteira() {
       setErro(
         msg.includes("rejected") || msg.includes("ACTION_REJECTED")
           ? "Assinatura cancelada na MetaMask."
-          : msg
+          : msg,
       );
     } finally {
       setProcessando(false);
     }
   };
 
+  const nomeExibicao = usuario?.nome_responsavel || usuario?.email;
+
   return (
     <section>
       <h1>Vincular carteira</h1>
-      <p>
-        Olá, <strong>{usuario?.email}</strong>.
+      <p className="dica">
+        Para acessar as áreas operacionais você precisa vincular uma carteira Ethereum e aguardar
+        aprovação do administrador. Nenhuma transação será realizada neste processo.
       </p>
 
-      {carteira && (
+      {nomeExibicao && (
+        <p style={{ marginBlock: "var(--s-md)" }}>
+          Olá, <strong>{nomeExibicao}</strong>.
+        </p>
+      )}
+
+      {carteira?.status === "pendente" && (
         <div className="aviso-acesso">
-          {carteira.status === "pendente" && (
-            <>
-              <h2>Aguardando aprovação</h2>
-              <p>
-                Sua carteira <strong>{carteira.address}</strong> foi vinculada e está aguardando
-                aprovação de um administrador.
-              </p>
-            </>
-          )}
-          {carteira.status === "revogada" && (
-            <>
-              <h2>Acesso revogado</h2>
-              <p>
-                O acesso da carteira <strong>{carteira.address}</strong> foi revogado. Você pode
-                vincular uma nova carteira ou entrar em contato com um administrador.
-              </p>
-            </>
-          )}
+          <h2>Aguardando aprovação</h2>
+          <p>
+            Sua carteira <strong className="mono">{carteira.address}</strong> foi vinculada e está
+            aguardando aprovação do administrador. Você receberá acesso assim que for aprovado.
+          </p>
+        </div>
+      )}
+
+      {carteira?.status === "revogada" && (
+        <div className="aviso-acesso">
+          <h2>Acesso revogado</h2>
+          <p>
+            O acesso da carteira <strong className="mono">{carteira.address}</strong> foi revogado.
+            Você pode vincular uma nova carteira ou entrar em contato com o administrador.
+          </p>
         </div>
       )}
 
       {(!carteira || carteira.status === "revogada") && (
         <>
-          <h2>Vincular com MetaMask</h2>
+          <h2 style={{ marginTop: "var(--s-xl)" }}>Vincular com MetaMask</h2>
+
           {!disponivel && (
-            <p className="erro">MetaMask não detectada. Instale a extensão para continuar.</p>
+            <p className="erro" style={{ marginTop: "var(--s-md)" }}>
+              MetaMask não detectada. Instale a extensão para continuar.
+            </p>
           )}
+
           {disponivel && !conta && (
-            <button onClick={() => void conectar()} disabled={conectando}>
-              {conectando ? "Conectando…" : "Conectar MetaMask"}
-            </button>
-          )}
-          {erroMeta && <p className="erro">{erroMeta}</p>}
-          {disponivel && conta && (
-            <>
-              <p>
-                Conta MetaMask detectada: <strong>{conta}</strong>
-              </p>
-              <p>
-                Ao clicar em "Vincular", você assinará uma mensagem com sua MetaMask para provar que
-                é o dono desta carteira. Nenhuma transação será realizada.
-              </p>
-              <button onClick={() => void vincular()} disabled={processando}>
-                {processando ? "Processando…" : "Vincular esta carteira"}
+            <div style={{ marginTop: "var(--s-md)" }}>
+              <button onClick={() => void conectar()} disabled={conectando}>
+                {conectando ? "Conectando…" : "Conectar MetaMask"}
               </button>
+              {erroMeta && <p className="erro">{erroMeta}</p>}
+            </div>
+          )}
+
+          {disponivel && conta && (
+            <div style={{ marginTop: "var(--s-md)" }}>
+              <p>
+                Conta detectada: <strong className="mono">{conta}</strong>
+              </p>
+              <div className="acoes">
+                <button onClick={() => void vincular()} disabled={processando}>
+                  {processando ? "Aguarde…" : "Vincular esta carteira"}
+                </button>
+              </div>
               {erro && <p className="erro">{erro}</p>}
-            </>
+            </div>
           )}
         </>
       )}

@@ -7,13 +7,16 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { API_URL, fetchApi } from "../lib/api";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 const TOKEN_KEY = "destiloc_token";
 
 interface Usuario {
   id: number;
   email: string;
+  nome_responsavel?: string;
+  nome_empresa?: string;
+  tipo_participante?: string | null;
 }
 
 export interface Carteira {
@@ -88,15 +91,21 @@ export function AuthProvedor({ children }: { children: ReactNode }) {
   }, [token]);
 
   const login = useCallback(async (email: string, senha: string) => {
-    const res = await fetch(`${API_URL}/auth/login`, {
+    const res = await fetchApi(`${API_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, senha }),
     });
 
     if (!res.ok) {
-      const body = (await res.json()) as { erro?: string };
-      throw new Error(body.erro ?? "Credenciais inválidas.");
+      const body = await res.json().catch(() => ({})) as { erro?: string };
+      if (res.status === 401) {
+        throw new Error("E-mail ou senha incorretos.");
+      }
+      if (res.status >= 500) {
+        throw new Error("Serviço temporariamente indisponível. Tente novamente em instantes.");
+      }
+      throw new Error(body.erro ?? "Não foi possível fazer login.");
     }
 
     const data = (await res.json()) as {

@@ -62,6 +62,14 @@ async function montarApp(): Promise<FastifyInstance> {
   return app;
 }
 
+const PAYLOAD_REGISTRAR = {
+  email: 'a@b.com',
+  senha: 'senha123',
+  nome_responsavel: 'João Silva',
+  nome_empresa: 'Destilaria Teste',
+  tipo_participante: 'produtor',
+};
+
 describe('POST /auth/registrar', () => {
   beforeEach(() => vi.clearAllMocks());
 
@@ -71,7 +79,7 @@ describe('POST /auth/registrar', () => {
     const res = await app.inject({
       method: 'POST',
       url: '/auth/registrar',
-      payload: { email: 'a@b.com', senha: 'senha123' },
+      payload: PAYLOAD_REGISTRAR,
     });
     expect(res.statusCode).toBe(201);
     expect(JSON.parse(res.body)).toMatchObject({ id: 1, email: 'a@b.com' });
@@ -82,7 +90,7 @@ describe('POST /auth/registrar', () => {
     const res = await app.inject({
       method: 'POST',
       url: '/auth/registrar',
-      payload: { email: 'invalido', senha: 'senha123' },
+      payload: { ...PAYLOAD_REGISTRAR, email: 'invalido' },
     });
     expect(res.statusCode).toBe(400);
   });
@@ -94,7 +102,7 @@ describe('POST /auth/registrar', () => {
     const res = await app.inject({
       method: 'POST',
       url: '/auth/registrar',
-      payload: { email: 'dup@b.com', senha: 'senha123' },
+      payload: { ...PAYLOAD_REGISTRAR, email: 'dup@b.com' },
     });
     expect(res.statusCode).toBe(409);
   });

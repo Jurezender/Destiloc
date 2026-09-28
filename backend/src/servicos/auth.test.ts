@@ -18,6 +18,12 @@ const mockPool = () => {
   return query;
 };
 
+const PERFIL_TESTE = {
+  nome_responsavel: 'João Silva',
+  nome_empresa: 'Destilaria Teste',
+  tipo_participante: 'produtor' as const,
+};
+
 describe('registrarUsuario', () => {
   beforeEach(() => vi.clearAllMocks());
 
@@ -25,25 +31,28 @@ describe('registrarUsuario', () => {
     const query = mockPool();
     query.mockResolvedValueOnce({ rows: [{ id: 1, email: 'a@b.com' }] });
 
-    const resultado = await registrarUsuario('A@B.COM', 'senha123');
+    const resultado = await registrarUsuario('A@B.COM', 'senha123', PERFIL_TESTE);
     expect(resultado).toEqual({ id: 1, email: 'a@b.com' });
     expect(query).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO usuarios'),
-      ['a@b.com', '$hash'],
+      ['a@b.com', '$hash', 'João Silva', 'Destilaria Teste', 'produtor'],
     );
   });
 
   it('normaliza email para lowercase', async () => {
     const query = mockPool();
     query.mockResolvedValueOnce({ rows: [{ id: 2, email: 'user@example.com' }] });
-    await registrarUsuario('User@Example.COM', 'senha123');
-    expect(query).toHaveBeenCalledWith(expect.any(String), ['user@example.com', '$hash']);
+    await registrarUsuario('User@Example.COM', 'senha123', PERFIL_TESTE);
+    expect(query).toHaveBeenCalledWith(
+      expect.any(String),
+      ['user@example.com', '$hash', 'João Silva', 'Destilaria Teste', 'produtor'],
+    );
   });
 
   it('lança EmailJaCadastradoError em conflito único', async () => {
     const query = mockPool();
     query.mockRejectedValueOnce({ code: '23505' });
-    await expect(registrarUsuario('a@b.com', 'senha')).rejects.toBeInstanceOf(
+    await expect(registrarUsuario('a@b.com', 'senha', PERFIL_TESTE)).rejects.toBeInstanceOf(
       EmailJaCadastradoError,
     );
   });
@@ -51,7 +60,7 @@ describe('registrarUsuario', () => {
   it('repropaga outros erros do banco', async () => {
     const query = mockPool();
     query.mockRejectedValueOnce(new Error('conexão perdida'));
-    await expect(registrarUsuario('a@b.com', 'senha')).rejects.toThrow('conexão perdida');
+    await expect(registrarUsuario('a@b.com', 'senha', PERFIL_TESTE)).rejects.toThrow('conexão perdida');
   });
 });
 

@@ -1483,6 +1483,134 @@ details[open] .cp-tecnico__chevron {
   font-style: italic;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PÁGINAS DE AUTENTICAÇÃO (Login, Registrar)
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.auth-pagina {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--cor-fundo-pagina);
+}
+
+.auth-cabecalho {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--s-xl);
+  height: 3.5rem;
+  background-color: var(--cor-fundo-header);
+  border-bottom: 1px solid rgba(245, 239, 227, 0.12);
+  flex-shrink: 0;
+}
+
+.auth-cabecalho__logo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cor-texto-invertido);
+}
+
+.auth-conteudo {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: var(--s-2xl) var(--s-md);
+}
+
+.auth-painel {
+  width: 100%;
+  max-width: 26rem;
+}
+
+.auth-painel fieldset {
+  margin-block: 0 var(--s-sm);
+}
+
+.auth-painel__titulo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--cafe-noir);
+  line-height: 1.2;
+  margin-bottom: var(--s-xs);
+}
+
+.auth-painel__subtitulo {
+  font-size: 0.875rem;
+  color: var(--cor-texto-secundario);
+  margin-bottom: var(--s-xl);
+  line-height: 1.55;
+}
+
+.auth-btn-principal {
+  width: 100%;
+  justify-content: center;
+  padding-block: 0.6875rem;
+  font-size: 0.9375rem;
+  margin-top: var(--s-md);
+}
+
+.auth-rodape {
+  margin-top: var(--s-lg);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--cor-texto-secundario);
+}
+
+/* ─── Variantes de botão ─────────────────────────────────────────────────────── */
+
+.botao-link {
+  background: none;
+  color: var(--cor-texto-link);
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  font-weight: 500;
+  box-shadow: none;
+  line-height: inherit;
+}
+
+.botao-link:hover:not(:disabled) {
+  background: none;
+  box-shadow: none;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  color: var(--cor-primaria-hover);
+}
+
+.botao--perigo {
+  background-color: var(--cor-erro);
+}
+
+.botao--perigo:hover:not(:disabled) {
+  background-color: #7A2929;
+  box-shadow: 0 2px 8px rgba(155, 53, 53, 0.32);
+}
+
+.botao--secundario {
+  background-color: transparent;
+  color: var(--cor-texto-primario);
+  border: 1px solid var(--cor-borda);
+}
+
+.botao--secundario:hover:not(:disabled) {
+  background-color: var(--cor-fundo-card);
+  color: var(--cor-texto-primario);
+  box-shadow: none;
+}
+
+/* ─── Tabela: grupo de ações por linha ───────────────────────────────────────── */
+.acoes-tabela {
+  display: flex;
+  gap: var(--s-xs);
+  flex-wrap: wrap;
+}
+
 /* Responsivo — ConsultaPublica ───────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .cp-hero {

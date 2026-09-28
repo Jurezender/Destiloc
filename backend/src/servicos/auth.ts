@@ -10,17 +10,26 @@ export class EmailJaCadastradoError extends Error {
   }
 }
 
+export interface PerfilRegistro {
+  nome_responsavel: string;
+  nome_empresa: string;
+  tipo_participante: 'fornecedor' | 'produtor' | 'envasador';
+}
+
 export async function registrarUsuario(
   email: string,
   senha: string,
+  perfil: PerfilRegistro,
 ): Promise<{ id: number; email: string }> {
   const emailNorm = email.toLowerCase().trim();
   const senhaHash = await bcrypt.hash(senha, BCRYPT_ROUNDS);
 
   try {
     const res = await obterPool().query<{ id: number; email: string }>(
-      `INSERT INTO usuarios (email, senha_hash) VALUES ($1, $2) RETURNING id, email`,
-      [emailNorm, senhaHash],
+      `INSERT INTO usuarios (email, senha_hash, nome_responsavel, nome_empresa, tipo_participante)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, email`,
+      [emailNorm, senhaHash, perfil.nome_responsavel.trim(), perfil.nome_empresa.trim(), perfil.tipo_participante],
     );
     return res.rows[0];
   } catch (err: unknown) {

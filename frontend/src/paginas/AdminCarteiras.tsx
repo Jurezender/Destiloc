@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../contexto/AuthContexto";
-
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+import { API_URL, fetchApi } from "../lib/api";
 
 interface CarteiraAdmin {
   address: string;
@@ -25,7 +24,7 @@ export function AdminCarteiras() {
     setCarregando(true);
     setErro(null);
     try {
-      const res = await fetch(`${API_URL}/admin/carteiras`, {
+      const res = await fetchApi(`${API_URL}/admin/carteiras`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.status === 403) {
@@ -50,7 +49,7 @@ export function AdminCarteiras() {
     if (!token) return;
     setAtualizando(address);
     try {
-      const res = await fetch(`${API_URL}/admin/carteiras/${address}/status`, {
+      const res = await fetchApi(`${API_URL}/admin/carteiras/${address}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -97,59 +96,64 @@ export function AdminCarteiras() {
       {carteiras.length === 0 ? (
         <p>Nenhuma carteira vinculada ainda.</p>
       ) : (
-        <table className="tabela-admin">
-          <thead>
-            <tr>
-              <th>Usuário</th>
-              <th>Endereço</th>
-              <th>Status</th>
-              <th>Vinculada em</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {carteiras.map((c) => (
-              <tr key={c.address}>
-                <td>{c.usuario_email}</td>
-                <td title={c.address}>
-                  {c.address.slice(0, 10)}…{c.address.slice(-6)}
-                </td>
-                <td>
-                  <span
-                    className={`badge ${
-                      c.status === "autorizada"
-                        ? "badge--ok"
-                        : c.status === "pendente"
-                          ? "badge--aviso"
-                          : "badge--erro"
-                    }`}
-                  >
-                    {c.status}
-                  </span>
-                </td>
-                <td>{new Date(c.vinculada_em).toLocaleDateString("pt-BR")}</td>
-                <td>
-                  {c.status !== "autorizada" && (
-                    <button
-                      onClick={() => void atualizarStatus(c.address, "autorizada")}
-                      disabled={atualizando === c.address}
-                    >
-                      Autorizar
-                    </button>
-                  )}
-                  {c.status !== "revogada" && (
-                    <button
-                      onClick={() => void atualizarStatus(c.address, "revogada")}
-                      disabled={atualizando === c.address}
-                    >
-                      Revogar
-                    </button>
-                  )}
-                </td>
+        <div className="tabela-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Usuário</th>
+                <th>Endereço</th>
+                <th>Status</th>
+                <th>Vinculada em</th>
+                <th>Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {carteiras.map((c) => (
+                <tr key={c.address}>
+                  <td>{c.usuario_email}</td>
+                  <td title={c.address} className="mono">
+                    {c.address.slice(0, 10)}…{c.address.slice(-6)}
+                  </td>
+                  <td>
+                    <span
+                      className={`badge ${
+                        c.status === "autorizada"
+                          ? "badge--ok"
+                          : c.status === "pendente"
+                            ? "badge--aviso"
+                            : "badge--erro"
+                      }`}
+                    >
+                      {c.status}
+                    </span>
+                  </td>
+                  <td>{new Date(c.vinculada_em).toLocaleDateString("pt-BR")}</td>
+                  <td>
+                    <div className="acoes-tabela">
+                      {c.status !== "autorizada" && (
+                        <button
+                          onClick={() => void atualizarStatus(c.address, "autorizada")}
+                          disabled={atualizando === c.address}
+                        >
+                          Autorizar
+                        </button>
+                      )}
+                      {c.status !== "revogada" && (
+                        <button
+                          className="botao--perigo"
+                          onClick={() => void atualizarStatus(c.address, "revogada")}
+                          disabled={atualizando === c.address}
+                        >
+                          Revogar
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
       <button onClick={() => void carregar()}>Atualizar</button>
     </section>

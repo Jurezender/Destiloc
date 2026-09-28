@@ -12,6 +12,7 @@ const MIGRATIONS = [
   '001_usuarios.sql',
   '002_carteiras_vinculadas.sql',
   '003_auth_challenges.sql',
+  '004_usuarios_perfil.sql',
 ];
 
 async function migrar() {
