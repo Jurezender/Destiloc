@@ -37,7 +37,7 @@ export function Registrar() {
           senha,
           nome_responsavel: nomeResponsavel,
           nome_empresa: nomeEmpresa,
-          tipo_participante: tipoParticipante,
+          ...(tipoParticipante ? { tipo_participante: tipoParticipante } : {}),
         }),
       });
 
@@ -130,13 +130,12 @@ export function Registrar() {
                 />
               </label>
               <label>
-                Tipo de participante
+                Tipo de participante (opcional)
                 <select
                   value={tipoParticipante}
                   onChange={(e) => setTipoParticipante(e.target.value)}
-                  required
                 >
-                  <option value="">Selecione…</option>
+                  <option value="">Selecione o tipo de participante (opcional)</option>
                   <option value="fornecedor">Fornecedor de Insumos</option>
                   <option value="produtor">Produtor</option>
                   <option value="envasador">Envasador</option>

@@ -13,7 +13,7 @@ export class EmailJaCadastradoError extends Error {
 export interface PerfilRegistro {
   nome_responsavel: string;
   nome_empresa: string;
-  tipo_participante: 'fornecedor' | 'produtor' | 'envasador';
+  tipo_participante?: 'fornecedor' | 'produtor' | 'envasador';
 }
 
 export async function registrarUsuario(

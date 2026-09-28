@@ -25,7 +25,7 @@ const auth: FastifyPluginAsync = async (app) => {
       schema: {
         body: {
           type: 'object',
-          required: ['email', 'senha', 'nome_responsavel', 'nome_empresa', 'tipo_participante'],
+          required: ['email', 'senha', 'nome_responsavel', 'nome_empresa'],
           properties: {
             email: { type: 'string', minLength: 5 },
             senha: { type: 'string', minLength: 8 },
