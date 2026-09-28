@@ -23,6 +23,8 @@ const HISTORICO_EXEMPLO: scansServico.HistoricoScans = {
   scans: [
     {
       id: 1,
+      latitude: -23.55,
+      longitude: -46.63,
       cidade: "São Paulo",
       estado: "São Paulo",
       pais: "Brasil",
