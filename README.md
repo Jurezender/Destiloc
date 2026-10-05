@@ -1,9 +1,10 @@
-# Destiloc — Rastreabilidade de Bebidas Destiladas
+# Destiloc - Rastreabilidade de Bebidas Destiladas
 
 Trabalho de Conclusão de Curso · Bacharelado em Sistemas de Informação
 Instituto Federal do Espírito Santo, Campus Cachoeiro de Itapemirim
 
 Autoria: Julia Rezende Rodrigues
+
 Orientação: Prof. Dr. João Paulo de Brito Gonçalves
 
 ---
@@ -40,7 +41,7 @@ Destiloc é um protótipo de rastreabilidade de bebidas destiladas que utiliza b
              │                               │
     ┌────────▼────────┐             ┌────────▼────────┐
     │ PostgreSQL/Neon │             │  IPFS / Pinata  │
-    │ Cache, scans,   │             │ Arquivos e JSON  │
+    │ Cache, scans,   │             │ Arquivos e JSON │
     │ participantes   │             │ de metadados    │
     └─────────────────┘             └─────────────────┘
                          │
@@ -243,8 +244,3 @@ npm run deploy:sepolia
 
 > **Nunca versione o `.env` com chave privada real.** Use sempre uma carteira de teste sem fundos reais. O `.env` já está no `.gitignore`.
 
----
-
-## Licença
-
-MIT
