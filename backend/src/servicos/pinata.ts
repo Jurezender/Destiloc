@@ -44,7 +44,7 @@ export async function fixarArquivoNoPinata(
 ): Promise<string> {
   const jwt = obterJwt();
 
-  const blob = new Blob([buffer], { type: mimeType });
+  const blob = new Blob([new Uint8Array(buffer)], { type: mimeType });
   const form = new FormData();
   form.append('file', blob, nome);
   form.append('pinataMetadata', JSON.stringify({ name: nome }));
