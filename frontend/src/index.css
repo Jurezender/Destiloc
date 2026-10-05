@@ -1604,6 +1604,52 @@ details[open] .cp-tecnico__chevron {
   box-shadow: none;
 }
 
+/* ─── Popup / Modal ─────────────────────────────────────────────────────────── */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(36, 33, 31, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--s-md);
+}
+
+.popup-carteira-trocada {
+  background-color: var(--cor-fundo-card);
+  border: 1px solid var(--cor-borda);
+  border-top: 3px solid var(--cor-erro);
+  border-radius: var(--raio-lg);
+  box-shadow: var(--sombra-elevada);
+  padding: var(--s-xl) var(--s-2xl);
+  max-width: 30rem;
+  width: 100%;
+}
+
+.popup-carteira-trocada h2 {
+  color: var(--cor-erro);
+  margin-bottom: var(--s-md);
+}
+
+.popup-carteira-trocada p {
+  font-size: 0.9375rem;
+  color: var(--cor-texto-secundario);
+  line-height: 1.6;
+  margin-bottom: var(--s-sm);
+}
+
+.popup-carteira-trocada p strong {
+  color: var(--cor-texto-primario);
+  word-break: break-all;
+}
+
+.popup-carteira-trocada__acoes {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--s-lg);
+}
+
 /* ─── Tabela: grupo de ações por linha ───────────────────────────────────────── */
 .acoes-tabela {
   display: flex;
@@ -1683,6 +1729,11 @@ details[open] .cp-tecnico__chevron {
 
 /* Mobile (< 600px): formulários, inputs e grades */
 @media (max-width: 600px) {
+  /* Oculta e-mail no cabeçalho — mantém apenas "Sair · endereço" */
+  .status-carteira__usuario {
+    display: none;
+  }
+
   .layout__conteudo {
     padding: var(--s-md);
   }
@@ -1743,6 +1794,15 @@ details[open] .cp-tecnico__chevron {
 
 /* Mobile pequeno (< 480px): títulos de seção e listas */
 @media (max-width: 480px) {
+  /* Oculta indicador de rede no cabeçalho para liberar espaço */
+  .status-carteira__rede {
+    display: none;
+  }
+
+  .popup-carteira-trocada {
+    padding: var(--s-lg) var(--s-lg);
+  }
+
   .secao-titulo-area {
     flex-wrap: wrap;
     gap: var(--s-sm);

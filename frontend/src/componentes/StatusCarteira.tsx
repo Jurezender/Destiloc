@@ -39,8 +39,10 @@ export function StatusCarteira() {
     <span className="status-carteira">
       {usuario && (
         <>
-          <span className="status-carteira__email">{usuario.email}</span>
-          {" · "}
+          <span className="status-carteira__usuario">
+            <span className="status-carteira__email">{usuario.email}</span>
+            {" · "}
+          </span>
           <button className="status-carteira__sair" onClick={logout}>
             Sair
           </button>
@@ -48,8 +50,10 @@ export function StatusCarteira() {
         </>
       )}
       <strong>{encurtarEndereco(conta)}</strong>
-      {" · "}
-      {rede ? rede.rotulo : chainId ? `Rede desconhecida (${chainId})` : "Sem rede"}
+      <span className="status-carteira__rede">
+        {" · "}
+        {rede ? rede.rotulo : chainId ? `Rede desconhecida (${chainId})` : "Sem rede"}
+      </span>
     </span>
   );
 }
