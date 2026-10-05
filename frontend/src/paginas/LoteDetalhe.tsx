@@ -185,7 +185,7 @@ export function LoteDetalhe() {
     <section>
       <Link className="link-voltar" to="/lotes">← Lotes de produção</Link>
       <div className="secao-titulo-area">
-        <h1>Lote #{lote.id.toString()} — {RETULO_TIPO_BEBIDA[lote.tipoBebida]}</h1>
+        <h1>Lote #{lote.id.toString()} - {RETULO_TIPO_BEBIDA[lote.tipoBebida]}</h1>
         <span className={`badge ${lote.estado === EstadoProducao.Concluido ? "badge--ok" : lote.estado === EstadoProducao.EmProducao ? "badge--neutro" : "badge--aviso"}`}>
           {RETULO_ESTADO_PRODUCAO[lote.estado]}
         </span>
@@ -227,20 +227,20 @@ export function LoteDetalhe() {
           <p className="dica">Só o produtor responsável, com PRODUTOR_ROLE, pode alterar a configuração.</p>
         )
       ) : (
-        <p className="dica">Configuração congelada — só pode ser alterada enquanto o lote está em "Criado".</p>
+        <p className="dica">Configuração congelada, só pode ser alterada enquanto o lote está em "Criado".</p>
       )}
 
       <h2>Insumos vinculados</h2>
       <ul>
         {insumosVinculados.map((insumo) => (
           <li key={insumo.id.toString()}>
-            #{insumo.id.toString()} — {RETULO_TIPO_INSUMO[insumo.tipo]} — fornecedor {encurtarEndereco(insumo.fornecedor)}
+            #{insumo.id.toString()} - {RETULO_TIPO_INSUMO[insumo.tipo]} - fornecedor {encurtarEndereco(insumo.fornecedor)}
           </li>
         ))}
         {insumosVinculados.length === 0 && <li className="lista-vazia">Nenhum insumo vinculado ainda.</li>}
       </ul>
       {lote.estado === EstadoProducao.Concluido ? (
-        <p className="dica">Produção concluída — não aceita novos vínculos de insumo.</p>
+        <p className="dica">Produção concluída, não aceita novos vínculos de insumo.</p>
       ) : podeOperar ? (
         <VincularInsumo loteId={lote.id} chainId={chainId!} signer={signer!} aoVincular={carregar} />
       ) : (
@@ -272,7 +272,7 @@ export function LoteDetalhe() {
                 <td>{evento.metadataURI}</td>
                 <td>
                   {evento.insumosUtilizados.length === 0
-                    ? "—"
+                    ? "-"
                     : evento.insumosUtilizados.map((insumoId) => `#${insumoId.toString()}`).join(", ")}
                 </td>
               </tr>
@@ -314,7 +314,7 @@ export function LoteDetalhe() {
           <br />
           Metadados de conclusão: {lote.metadataURIConclusao}
           <br />
-          Produção concluída — apta para envasamento.{" "}
+          Produção concluída, apta para envasamento.{" "}
           <Link to={`/lotes/${lote.id.toString()}/emitir`}>Ir para envasamento e emissão</Link>
         </p>
       ) : lote.estado === EstadoProducao.EmProducao ? (
@@ -651,7 +651,7 @@ function RegistrarEtapa({
               checked={insumosSelecionados.has(insumo.id.toString())}
               onChange={() => alternarInsumo(insumo.id.toString())}
             />
-            #{insumo.id.toString()} — {RETULO_TIPO_INSUMO[insumo.tipo]}
+            #{insumo.id.toString()} - {RETULO_TIPO_INSUMO[insumo.tipo]}
           </label>
         ))}
       </fieldset>
@@ -667,7 +667,7 @@ function RegistrarEtapa({
 
       <AnexosIpfs
         key={chaveAnexos}
-        rotulo="Documentos desta etapa (PDF, JPG, PNG — opcional)"
+        rotulo="Documentos desta etapa (PDF, JPG, PNG - opcional)"
         onChange={atualizarAnexos}
         desabilitado={enviandoIpfs || enviando}
       />
@@ -769,7 +769,7 @@ function ConcluirProducao({
       <legend>Concluir produção</legend>
       <AnexosIpfs
         key={chaveAnexos}
-        rotulo="Documentos da conclusão (PDF, JPG, PNG — opcional)"
+        rotulo="Documentos da conclusão (PDF, JPG, PNG - opcional)"
         onChange={atualizarAnexos}
         desabilitado={enviandoIpfs || enviando}
       />

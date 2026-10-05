@@ -149,7 +149,7 @@ export function InsumoDetalhe() {
     <section>
       <Link className="link-voltar" to="/insumos">← Lotes de insumo</Link>
       <div className="secao-titulo-area">
-        <h1>Insumo #{lote.id.toString()} — {RETULO_TIPO_INSUMO[lote.tipo]}</h1>
+        <h1>Insumo #{lote.id.toString()} - {RETULO_TIPO_INSUMO[lote.tipo]}</h1>
         <span className={`badge ${invalidacao.invalidado ? "badge--erro" : "badge--ok"}`}>
           {invalidacao.invalidado ? "Invalidado" : "Válido"}
         </span>
@@ -174,7 +174,7 @@ export function InsumoDetalhe() {
       {invalidacao.invalidado ? (
         <p className="dica">
           Este lote foi invalidado em {formatarTimestamp(invalidacao.registradoEm)} e está definitivamente
-          encerrado — não aceita novas avaliações nem correções documentais.
+          encerrado, não aceita novas avaliações nem correções documentais.
           {" "}Metadados: <span className="mono">{invalidacao.metadataURI}</span>
         </p>
       ) : podeCorrigirOuInvalidar ? (
@@ -194,7 +194,7 @@ export function InsumoDetalhe() {
         {correcoes.length === 0 && <li className="dica">Nenhuma correção registrada ainda.</li>}
       </ul>
       {invalidacao.invalidado ? (
-        <p className="dica">Lote invalidado — não aceita novas correções documentais.</p>
+        <p className="dica">Lote invalidado, não aceita novas correções documentais.</p>
       ) : podeCorrigirOuInvalidar ? (
         <RegistrarCorrecao loteId={lote.id} chainId={chainId!} signer={signer!} aoRegistrar={carregar} />
       ) : (
@@ -204,7 +204,7 @@ export function InsumoDetalhe() {
       <h2>Avaliação</h2>
       {!papeis.produtor ? (
         <p className="dica">
-          Sua conta não tem PRODUTOR_ROLE (concedido no ContratoAcesso) — não pode avaliar insumos.
+          Sua conta não tem PRODUTOR_ROLE (concedido no ContratoAcesso), você não pode avaliar insumos.
         </p>
       ) : (
         <>
@@ -224,7 +224,7 @@ export function InsumoDetalhe() {
             {avaliacoes.length === 0 && <li className="dica">Você ainda não avaliou este insumo.</li>}
           </ul>
           {invalidacao.invalidado ? (
-            <p className="dica">Lote invalidado — não aceita novas avaliações.</p>
+            <p className="dica">Lote invalidado, não aceita novas avaliações.</p>
           ) : (
             <AvaliarInsumo loteId={lote.id} chainId={chainId!} signer={signer!} aoAvaliar={carregar} />
           )}
@@ -318,12 +318,12 @@ function InvalidarLote({
       <legend>Invalidar lote</legend>
       <p className="dica">Esta ação é definitiva: o lote não poderá ser reativado, avaliado ou corrigido depois.</p>
       <label>
-        Motivo (opcional — vai para os metadados enviados ao IPFS)
+        Motivo (opcional, vai para os metadados enviados ao IPFS)
         <input value={motivo} onChange={(e) => setMotivo(e.target.value)} />
       </label>
       <AnexosIpfs
         key={chaveAnexos}
-        rotulo="Documentos de suporte (PDF, JPG, PNG — opcional)"
+        rotulo="Documentos de suporte (PDF, JPG, PNG - opcional)"
         onChange={atualizarAnexos}
         desabilitado={enviandoIpfs || enviando}
       />
@@ -428,7 +428,7 @@ function RegistrarCorrecao({
       <legend>Registrar correção documental</legend>
       <AnexosIpfs
         key={chaveAnexos}
-        rotulo="Documentos da correção (PDF, JPG, PNG — opcional)"
+        rotulo="Documentos da correção (PDF, JPG, PNG - opcional)"
         onChange={atualizarAnexos}
         desabilitado={enviandoIpfs || enviando}
       />
@@ -553,12 +553,12 @@ function AvaliarInsumo({
         </select>
       </label>
       <label>
-        Observações (opcional — vai para os metadados enviados ao IPFS)
+        Observações (opcional, vai para os metadados enviados ao IPFS)
         <input value={observacoes} onChange={(e) => setObservacoes(e.target.value)} />
       </label>
       <AnexosIpfs
         key={chaveAnexos}
-        rotulo="Documentos/evidências (PDF, JPG, PNG — opcional)"
+        rotulo="Documentos/evidências (PDF, JPG, PNG - opcional)"
         onChange={atualizarAnexos}
         desabilitado={enviandoIpfs || enviando}
       />

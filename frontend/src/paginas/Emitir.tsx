@@ -106,7 +106,7 @@ export function Emitir() {
   if (statusLote === "nao-concluido") {
     return (
       <p className="erro">
-        A produção deste lote ainda não foi concluída — o envasamento só é permitido depois da conclusão da
+        A produção deste lote ainda não foi concluída. O envasamento só é permitido depois da conclusão da
         produção. <Link to={`/lotes/${id}`}>Voltar ao lote</Link>
       </p>
     );
@@ -117,7 +117,7 @@ export function Emitir() {
       <Link className="link-voltar" to={`/lotes/${id}`}>← Lote #{id}</Link>
       <h1>
         Envasamento do lote #{id}
-        {loteInfo ? ` — ${RETULO_TIPO_BEBIDA[loteInfo.tipoBebida]}` : ""}
+        {loteInfo ? ` - ${RETULO_TIPO_BEBIDA[loteInfo.tipoBebida]}` : ""}
       </h1>
       {loteInfo && (
         <p>Produtor: <span className="mono">{loteInfo.produtor}</span></p>
@@ -404,7 +404,7 @@ function RegistrarEnvasamento({
         />
       </label>
       <label>
-        Descrição (opcional — vai para os metadados enviados ao IPFS)
+        Descrição (opcional, vai para os metadados enviados ao IPFS)
         <input value={descricao} onChange={(e) => setDescricao(e.target.value)} />
       </label>
       <AnexosIpfs

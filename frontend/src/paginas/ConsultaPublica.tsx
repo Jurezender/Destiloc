@@ -13,7 +13,7 @@ import {
 import { EstadoProducao, EtapaProducao, TipoBebida, TipoInsumo } from "../lib/tipos";
 
 // Todos os valores uint256/uint64 da blockchain chegam como string
-// para preservar precisão — os enums chegam como number.
+// para preservar precisão, os enums chegam como number.
 interface DadosConsulta {
   garrafa: {
     tokenId: string;
@@ -190,7 +190,7 @@ export function ConsultaPublica() {
           const corpo = (await garrafaResposta.json()) as { erro?: string };
           if (corpo.erro) erroMsg = corpo.erro;
         } catch {
-          // Corpo não é JSON (ex: 504 HTML da Vercel) — usa mensagem pelo status
+          // Corpo não é JSON (ex: 504 HTML da Vercel) usa mensagem pelo status
         }
         setMensagemErro(mensagemAmigavel(erroMsg));
         setEstado("erro-consulta");
@@ -207,7 +207,7 @@ export function ConsultaPublica() {
 
       const dadosGarrafa = (await garrafaResposta.json()) as DadosConsulta;
 
-      // Histórico é uma consulta rápida (só banco) — feita após registrar o scan
+      // Histórico é uma consulta rápida (só banco) feita após registrar o scan
       const historicoResposta = await fetch(
         `${API_URL}/garrafa/${chainId}/${tokenId}/scans`
       );
@@ -262,7 +262,7 @@ export function ConsultaPublica() {
             <p className="cp-consentimento__texto">
               Sua privacidade é protegida por{" "}
               <strong>minimização de dados</strong>: apenas a cidade e o estado são
-              armazenados — nunca o endereço exato.
+              armazenados, nunca o endereço exato.
             </p>
             <div className="cp-consentimento__acoes">
               <button type="button" onClick={solicitarLocalizacao}>

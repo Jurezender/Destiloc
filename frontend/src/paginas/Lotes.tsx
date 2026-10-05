@@ -186,7 +186,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
       </fieldset>
 
       <label>
-        Descrição (opcional — vai para os metadados enviados ao IPFS)
+        Descrição (opcional, vai para os metadados enviados ao IPFS)
         <input value={descricao} onChange={(e) => setDescricao(e.target.value)} />
       </label>
       <AnexosIpfs
@@ -276,7 +276,7 @@ export function Lotes() {
           <li key={linha.id.toString()}>
             <div className="item-lista__cabecalho">
               <Link className="item-lista__titulo" to={`/lotes/${linha.id}`}>
-                #{linha.id.toString()} — {RETULO_TIPO_BEBIDA[linha.tipoBebida]}
+                #{linha.id.toString()} - {RETULO_TIPO_BEBIDA[linha.tipoBebida]}
               </Link>
               <span className={`badge ${linha.estado === EstadoProducao.Concluido ? "badge--ok" : linha.estado === EstadoProducao.EmProducao ? "badge--neutro" : "badge--aviso"}`}>
                 {RETULO_ESTADO_PRODUCAO[linha.estado]}

@@ -127,11 +127,11 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
         </select>
       </label>
       <label>
-        Descrição (opcional — vai para os metadados enviados ao IPFS)
+        Descrição (opcional, vai para os metadados enviados ao IPFS)
         <input value={descricao} onChange={(e) => setDescricao(e.target.value)} />
       </label>
       <label>
-        Origem (opcional — vai para os metadados enviados ao IPFS)
+        Origem (opcional, vai para os metadados enviados ao IPFS)
         <input value={origem} onChange={(e) => setOrigem(e.target.value)} />
       </label>
       <AnexosIpfs
@@ -220,7 +220,7 @@ export function Insumos() {
           <li key={linha.id.toString()}>
             <div className="item-lista__cabecalho">
               <Link className="item-lista__titulo" to={`/insumos/${linha.id}`}>
-                #{linha.id.toString()} — {RETULO_TIPO_INSUMO[linha.tipo]}
+                #{linha.id.toString()} - {RETULO_TIPO_INSUMO[linha.tipo]}
               </Link>
               <span className={`badge ${linha.valido ? "badge--ok" : "badge--erro"}`}>
                 {linha.valido ? "Válido" : "Invalidado"}
