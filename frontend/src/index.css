@@ -1604,6 +1604,111 @@ details[open] .cp-tecnico__chevron {
   box-shadow: none;
 }
 
+/* ─── Anexos IPFS ────────────────────────────────────────────────────────────── */
+.anexos-ipfs {
+  margin-block: var(--s-md);
+}
+
+.anexos-ipfs__rotulo {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--cor-texto-primario);
+  margin-bottom: var(--s-sm);
+}
+
+.anexos-ipfs__lista {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-xs);
+  margin-bottom: var(--s-sm);
+}
+
+.anexos-ipfs__item {
+  display: flex;
+  align-items: center;
+  gap: var(--s-sm);
+  padding: 0.4375rem var(--s-md);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-sm);
+  background-color: var(--cor-fundo-card);
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.anexos-ipfs__item--enviando {
+  border-color: var(--avela);
+  background-color: rgba(207, 187, 153, 0.1);
+}
+
+.anexos-ipfs__item--ok {
+  border-color: rgba(136, 144, 99, 0.4);
+  background-color: var(--cor-fundo-ok);
+}
+
+.anexos-ipfs__item--erro {
+  border-color: rgba(155, 53, 53, 0.3);
+  background-color: var(--cor-fundo-erro);
+}
+
+.anexos-ipfs__nome {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.anexos-ipfs__estado {
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.anexos-ipfs__estado--ok    { color: var(--cor-ok); }
+.anexos-ipfs__estado--erro  { color: var(--cor-erro); }
+.anexos-ipfs__estado--enviando { color: var(--cor-texto-secundario); }
+
+.anexos-ipfs__link {
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.anexos-ipfs__btn {
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.anexos-ipfs__adicionar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-xs);
+  padding: 0.4375rem var(--s-md);
+  border: 1px dashed var(--cor-borda);
+  border-radius: var(--raio-sm);
+  background-color: transparent;
+  color: var(--cor-texto-secundario);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+}
+
+.anexos-ipfs__adicionar:hover:not(.anexos-ipfs__adicionar--desabilitado) {
+  border-color: var(--cor-primaria);
+  color: var(--cor-texto-primario);
+  background-color: rgba(76, 61, 25, 0.04);
+}
+
+.anexos-ipfs__adicionar--desabilitado {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
 /* ─── Popup / Modal ─────────────────────────────────────────────────────────── */
 .popup-overlay {
   position: fixed;

@@ -9,6 +9,7 @@ import { EstadoProducao, TipoBebida } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
 import { adicionarJSON } from "../ipfs/kubo";
 import { montarMetadadosLoteProducao, type ConfiguracaoProducaoMetadados } from "../ipfs/metadados";
+import { AnexosIpfs } from "../componentes/AnexosIpfs";
 
 interface LinhaLote {
   id: bigint;
@@ -42,13 +43,20 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
   const [tipoBebida, setTipoBebida] = useState("");
   const [configuracao, setConfiguracao] = useState<ConfiguracaoProducaoMetadados>(CONFIGURACAO_PADRAO);
   const [descricao, setDescricao] = useState("");
-  const [documentos, setDocumentos] = useState("");
+  const [documentosCids, setDocumentosCids] = useState<string[]>([]);
+  const [arquivosSubindo, setArquivosSubindo] = useState(false);
+  const [chaveAnexos, setChaveAnexos] = useState(0);
   const [metadataURI, setMetadataURI] = useState("");
   const [enviandoIpfs, setEnviandoIpfs] = useState(false);
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
+
+  const atualizarAnexos = useCallback((cids: string[], subindo: boolean) => {
+    setDocumentosCids(cids);
+    setArquivosSubindo(subindo);
+  }, []);
 
   function flagBloqueada(campo: keyof ConfiguracaoProducaoMetadados): boolean {
     if (tipoBebida === "") return false;
@@ -64,6 +72,10 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
       setErroIpfs("Selecione o tipo de bebida antes de gerar os metadados.");
       return;
     }
+    if (arquivosSubindo) {
+      setErroIpfs("Aguarde o envio dos arquivos antes de gerar a referência.");
+      return;
+    }
     setErroIpfs(null);
     setEnviandoIpfs(true);
     try {
@@ -71,10 +83,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
         tipoBebida: Number(tipoBebida) as TipoBebida,
         configuracao,
         descricao: descricao.trim() || undefined,
-        documentos: documentos
-          .split("\n")
-          .map((linha) => linha.trim())
-          .filter(Boolean),
+        documentos: documentosCids.length > 0 ? documentosCids : undefined,
       });
       const referencia = await adicionarJSON(metadados);
       setMetadataURI(referencia);
@@ -108,7 +117,9 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
       setTipoBebida("");
       setConfiguracao(CONFIGURACAO_PADRAO);
       setDescricao("");
-      setDocumentos("");
+      setDocumentosCids([]);
+      setArquivosSubindo(false);
+      setChaveAnexos((k) => k + 1);
       setMetadataURI("");
       setFeedback({ tipo: "ok", texto: "Lote de produção criado com sucesso." });
       onCriado();
@@ -178,11 +189,12 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
         Descrição (opcional — vai para os metadados enviados ao IPFS)
         <input value={descricao} onChange={(e) => setDescricao(e.target.value)} />
       </label>
-      <label>
-        Documentos (um por linha, opcional — vira um JSON enviado ao IPFS)
-        <textarea rows={3} value={documentos} onChange={(e) => setDocumentos(e.target.value)} />
-      </label>
-      <button type="button" onClick={() => void gerarViaIpfs()} disabled={enviandoIpfs}>
+      <AnexosIpfs
+        key={chaveAnexos}
+        onChange={atualizarAnexos}
+        desabilitado={enviandoIpfs || enviando}
+      />
+      <button type="button" onClick={() => void gerarViaIpfs()} disabled={enviandoIpfs || arquivosSubindo}>
         {enviandoIpfs ? "Enviando ao IPFS…" : "Gerar referência no IPFS"}
       </button>
       {erroIpfs && <p className="erro">{erroIpfs}</p>}

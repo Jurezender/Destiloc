@@ -23,6 +23,7 @@ import {
 } from "../lib/validacaoSequencia";
 import { adicionarJSON } from "../ipfs/kubo";
 import { montarMetadadosConclusaoProducao, montarMetadadosEtapaProducao } from "../ipfs/metadados";
+import { AnexosIpfs } from "../componentes/AnexosIpfs";
 
 type Signer = NonNullable<ReturnType<typeof useCarteira>["signer"]>;
 
@@ -52,13 +53,6 @@ interface EtapaRegistrada {
   registradoEm: bigint;
   metadataURI: string;
   insumosUtilizados: bigint[];
-}
-
-function documentosEmLinhas(texto: string): string[] {
-  return texto
-    .split("\n")
-    .map((linha) => linha.trim())
-    .filter(Boolean);
 }
 
 function segundosDoDatetimeLocal(valor: string): number {
@@ -510,13 +504,20 @@ function RegistrarEtapa({
   const [insumosSelecionados, setInsumosSelecionados] = useState<Set<string>>(new Set());
   const [inicio, setInicio] = useState("");
   const [fim, setFim] = useState("");
-  const [documentos, setDocumentos] = useState("");
+  const [documentosCids, setDocumentosCids] = useState<string[]>([]);
+  const [arquivosSubindo, setArquivosSubindo] = useState(false);
+  const [chaveAnexos, setChaveAnexos] = useState(0);
   const [metadataURI, setMetadataURI] = useState("");
   const [enviandoIpfs, setEnviandoIpfs] = useState(false);
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
+
+  const atualizarAnexos = useCallback((cids: string[], subindo: boolean) => {
+    setDocumentosCids(cids);
+    setArquivosSubindo(subindo);
+  }, []);
 
   function alternarInsumo(id: string) {
     setInsumosSelecionados((atual) => {
@@ -546,6 +547,10 @@ function RegistrarEtapa({
       setErroIpfs("Informe o início e o fim informados antes de gerar os metadados.");
       return;
     }
+    if (arquivosSubindo) {
+      setErroIpfs("Aguarde o envio dos arquivos antes de gerar a referência.");
+      return;
+    }
     setErroIpfs(null);
     setEnviandoIpfs(true);
     try {
@@ -555,7 +560,7 @@ function RegistrarEtapa({
         insumosUtilizados: Array.from(insumosSelecionados),
         inicioInformado: String(segundosDoDatetimeLocal(inicio)),
         fimInformado: String(segundosDoDatetimeLocal(fim)),
-        documentos: documentosEmLinhas(documentos),
+        documentos: documentosCids.length > 0 ? documentosCids : undefined,
       });
       const referencia = await adicionarJSON(metadados);
       setMetadataURI(referencia);
@@ -606,7 +611,9 @@ function RegistrarEtapa({
       setInsumosSelecionados(new Set());
       setInicio("");
       setFim("");
-      setDocumentos("");
+      setDocumentosCids([]);
+      setArquivosSubindo(false);
+      setChaveAnexos((k) => k + 1);
       setMetadataURI("");
       setFeedback({ tipo: "ok", texto: "Etapa registrada com sucesso." });
       aoRegistrar();
@@ -658,11 +665,13 @@ function RegistrarEtapa({
         <input type="datetime-local" value={fim} onChange={(e) => setFim(e.target.value)} />
       </label>
 
-      <label>
-        Documentos desta etapa (um por linha, opcional — vira um JSON enviado ao IPFS)
-        <textarea rows={3} value={documentos} onChange={(e) => setDocumentos(e.target.value)} />
-      </label>
-      <button type="button" onClick={() => void gerarViaIpfs()} disabled={enviandoIpfs}>
+      <AnexosIpfs
+        key={chaveAnexos}
+        rotulo="Documentos desta etapa (PDF, JPG, PNG — opcional)"
+        onChange={atualizarAnexos}
+        desabilitado={enviandoIpfs || enviando}
+      />
+      <button type="button" onClick={() => void gerarViaIpfs()} disabled={enviandoIpfs || arquivosSubindo}>
         {enviandoIpfs ? "Enviando ao IPFS…" : "Gerar referência no IPFS"}
       </button>
       {erroIpfs && <p className="erro">{erroIpfs}</p>}
@@ -691,7 +700,9 @@ function ConcluirProducao({
   signer: Signer;
   aoConcluir: () => void;
 }) {
-  const [documentos, setDocumentos] = useState("");
+  const [documentosCids, setDocumentosCids] = useState<string[]>([]);
+  const [arquivosSubindo, setArquivosSubindo] = useState(false);
+  const [chaveAnexos, setChaveAnexos] = useState(0);
   const [metadataURI, setMetadataURI] = useState("");
   const [enviandoIpfs, setEnviandoIpfs] = useState(false);
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
@@ -699,13 +710,22 @@ function ConcluirProducao({
   const [erro, setErro] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
+  const atualizarAnexos = useCallback((cids: string[], subindo: boolean) => {
+    setDocumentosCids(cids);
+    setArquivosSubindo(subindo);
+  }, []);
+
   async function gerarViaIpfs() {
+    if (arquivosSubindo) {
+      setErroIpfs("Aguarde o envio dos arquivos antes de gerar a referência.");
+      return;
+    }
     setErroIpfs(null);
     setEnviandoIpfs(true);
     try {
       const metadados = montarMetadadosConclusaoProducao({
         loteProducaoId: loteId.toString(),
-        documentos: documentosEmLinhas(documentos),
+        documentos: documentosCids.length > 0 ? documentosCids : undefined,
       });
       const referencia = await adicionarJSON(metadados);
       setMetadataURI(referencia);
@@ -731,7 +751,9 @@ function ConcluirProducao({
       const producao = obterContrato("ContratoProducao", chainId, signer);
       const tx = await producao.concluirProducao(loteId, metadataURI.trim());
       await tx.wait();
-      setDocumentos("");
+      setDocumentosCids([]);
+      setArquivosSubindo(false);
+      setChaveAnexos((k) => k + 1);
       setMetadataURI("");
       setFeedback({ tipo: "ok", texto: "Produção concluída com sucesso." });
       aoConcluir();
@@ -745,11 +767,13 @@ function ConcluirProducao({
   return (
     <fieldset disabled={enviando}>
       <legend>Concluir produção</legend>
-      <label>
-        Documentos da conclusão (um por linha, opcional — vira um JSON enviado ao IPFS)
-        <textarea rows={3} value={documentos} onChange={(e) => setDocumentos(e.target.value)} />
-      </label>
-      <button type="button" onClick={() => void gerarViaIpfs()} disabled={enviandoIpfs}>
+      <AnexosIpfs
+        key={chaveAnexos}
+        rotulo="Documentos da conclusão (PDF, JPG, PNG — opcional)"
+        onChange={atualizarAnexos}
+        desabilitado={enviandoIpfs || enviando}
+      />
+      <button type="button" onClick={() => void gerarViaIpfs()} disabled={enviandoIpfs || arquivosSubindo}>
         {enviandoIpfs ? "Enviando ao IPFS…" : "Gerar referência no IPFS"}
       </button>
       {erroIpfs && <p className="erro">{erroIpfs}</p>}

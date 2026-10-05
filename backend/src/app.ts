@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
+import multipart from '@fastify/multipart';
 import carteiras from './rotas/carteiras.js';
 import ipfs from './rotas/ipfs.js';
 import garrafa from './rotas/garrafa.js';
@@ -22,6 +23,10 @@ export async function construirApp() {
 
   await app.register(cors, {
     origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  });
+
+  await app.register(multipart, {
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB por arquivo
   });
 
   const jwtSecret = process.env.JWT_SECRET ?? 'secret-apenas-para-testes-nunca-em-producao';

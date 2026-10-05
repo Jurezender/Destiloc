@@ -9,6 +9,7 @@ import { TipoInsumo } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
 import { adicionarJSON } from "../ipfs/kubo";
 import { montarMetadadosInsumo } from "../ipfs/metadados";
+import { AnexosIpfs } from "../componentes/AnexosIpfs";
 
 interface LinhaInsumo {
   id: bigint;
@@ -28,19 +29,14 @@ const OPCOES_TIPO_INSUMO = [
   TipoInsumo.Outro,
 ];
 
-function documentosEmLinhas(texto: string): string[] {
-  return texto
-    .split("\n")
-    .map((linha) => linha.trim())
-    .filter(Boolean);
-}
-
 function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
   const { chainId, signer } = useCarteira();
   const [tipo, setTipo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [origem, setOrigem] = useState("");
-  const [documentos, setDocumentos] = useState("");
+  const [documentosCids, setDocumentosCids] = useState<string[]>([]);
+  const [arquivosSubindo, setArquivosSubindo] = useState(false);
+  const [chaveAnexos, setChaveAnexos] = useState(0);
   const [metadataURI, setMetadataURI] = useState("");
   const [enviandoIpfs, setEnviandoIpfs] = useState(false);
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
@@ -48,9 +44,18 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
   const [erro, setErro] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
+  const atualizarAnexos = useCallback((cids: string[], subindo: boolean) => {
+    setDocumentosCids(cids);
+    setArquivosSubindo(subindo);
+  }, []);
+
   async function gerarViaIpfs() {
     if (tipo === "") {
       setErroIpfs("Selecione o tipo de insumo antes de gerar os metadados.");
+      return;
+    }
+    if (arquivosSubindo) {
+      setErroIpfs("Aguarde o envio dos arquivos antes de gerar a referência.");
       return;
     }
     setErroIpfs(null);
@@ -60,7 +65,7 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
         tipoInsumo: Number(tipo) as TipoInsumo,
         descricao: descricao.trim() || undefined,
         origem: origem.trim() || undefined,
-        documentos: documentosEmLinhas(documentos),
+        documentos: documentosCids.length > 0 ? documentosCids : undefined,
       });
       const referencia = await adicionarJSON(metadados);
       setMetadataURI(referencia);
@@ -94,7 +99,9 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
       setTipo("");
       setDescricao("");
       setOrigem("");
-      setDocumentos("");
+      setDocumentosCids([]);
+      setArquivosSubindo(false);
+      setChaveAnexos((k) => k + 1);
       setMetadataURI("");
       setFeedback({ tipo: "ok", texto: "Lote de insumo registrado com sucesso." });
       onCriado();
@@ -127,11 +134,12 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
         Origem (opcional — vai para os metadados enviados ao IPFS)
         <input value={origem} onChange={(e) => setOrigem(e.target.value)} />
       </label>
-      <label>
-        Documentos (um por linha, opcional — vira um JSON enviado ao IPFS)
-        <textarea rows={3} value={documentos} onChange={(e) => setDocumentos(e.target.value)} />
-      </label>
-      <button type="button" onClick={() => void gerarViaIpfs()} disabled={enviandoIpfs}>
+      <AnexosIpfs
+        key={chaveAnexos}
+        onChange={atualizarAnexos}
+        desabilitado={enviandoIpfs || enviando}
+      />
+      <button type="button" onClick={() => void gerarViaIpfs()} disabled={enviandoIpfs || arquivosSubindo}>
         {enviandoIpfs ? "Enviando ao IPFS…" : "Gerar referência no IPFS"}
       </button>
       {erroIpfs && <p className="erro">{erroIpfs}</p>}

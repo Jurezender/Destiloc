@@ -9,6 +9,7 @@ import { TipoBebida } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
 import { adicionarJSON } from "../ipfs/kubo";
 import { montarMetadadosEnvasamento } from "../ipfs/metadados";
+import { AnexosIpfs } from "../componentes/AnexosIpfs";
 
 type Signer = NonNullable<ReturnType<typeof useCarteira>["signer"]>;
 
@@ -25,13 +26,6 @@ interface EnvasamentoInfo {
   registradoEm: bigint;
   concluidoEm: bigint;
   metadataURI: string;
-}
-
-function documentosEmLinhas(texto: string): string[] {
-  return texto
-    .split("\n")
-    .map((linha) => linha.trim())
-    .filter(Boolean);
 }
 
 export function Emitir() {
@@ -320,7 +314,9 @@ function RegistrarEnvasamento({
 }) {
   const [quantidadeDeclarada, setQuantidadeDeclarada] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [documentos, setDocumentos] = useState("");
+  const [documentosCids, setDocumentosCids] = useState<string[]>([]);
+  const [arquivosSubindo, setArquivosSubindo] = useState(false);
+  const [chaveAnexos, setChaveAnexos] = useState(0);
   const [metadataURI, setMetadataURI] = useState("");
   const [enviandoIpfs, setEnviandoIpfs] = useState(false);
   const [erroIpfs, setErroIpfs] = useState<string | null>(null);
@@ -328,11 +324,20 @@ function RegistrarEnvasamento({
   const [erro, setErro] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
+  const atualizarAnexos = useCallback((cids: string[], subindo: boolean) => {
+    setDocumentosCids(cids);
+    setArquivosSubindo(subindo);
+  }, []);
+
   const quantidadeValida = /^\d+$/.test(quantidadeDeclarada.trim()) && quantidadeDeclarada.trim() !== "0";
 
   async function gerarViaIpfs() {
     if (!quantidadeValida) {
       setErroIpfs("Informe a quantidade declarada (número inteiro maior que zero) antes de gerar os metadados.");
+      return;
+    }
+    if (arquivosSubindo) {
+      setErroIpfs("Aguarde o envio dos arquivos antes de gerar a referência.");
       return;
     }
     setErroIpfs(null);
@@ -342,7 +347,7 @@ function RegistrarEnvasamento({
         loteProducaoId,
         quantidadeDeclarada: quantidadeDeclarada.trim(),
         descricao: descricao.trim() || undefined,
-        documentos: documentosEmLinhas(documentos),
+        documentos: documentosCids.length > 0 ? documentosCids : undefined,
       });
       const referencia = await adicionarJSON(metadados);
       setMetadataURI(referencia);
@@ -374,7 +379,9 @@ function RegistrarEnvasamento({
       await tx.wait();
       setQuantidadeDeclarada("");
       setDescricao("");
-      setDocumentos("");
+      setDocumentosCids([]);
+      setArquivosSubindo(false);
+      setChaveAnexos((k) => k + 1);
       setMetadataURI("");
       setFeedback({ tipo: "ok", texto: "Envasamento registrado com sucesso." });
       aoRegistrar();
@@ -400,11 +407,12 @@ function RegistrarEnvasamento({
         Descrição (opcional — vai para os metadados enviados ao IPFS)
         <input value={descricao} onChange={(e) => setDescricao(e.target.value)} />
       </label>
-      <label>
-        Documentos (um por linha, opcional — vira um JSON enviado ao IPFS)
-        <textarea rows={3} value={documentos} onChange={(e) => setDocumentos(e.target.value)} />
-      </label>
-      <button type="button" onClick={() => void gerarViaIpfs()} disabled={enviandoIpfs}>
+      <AnexosIpfs
+        key={chaveAnexos}
+        onChange={atualizarAnexos}
+        desabilitado={enviandoIpfs || enviando}
+      />
+      <button type="button" onClick={() => void gerarViaIpfs()} disabled={enviandoIpfs || arquivosSubindo}>
         {enviandoIpfs ? "Enviando ao IPFS…" : "Gerar referência no IPFS"}
       </button>
       {erroIpfs && <p className="erro">{erroIpfs}</p>}
