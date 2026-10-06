@@ -1023,6 +1023,19 @@ tbody tr:hover {
   text-decoration: underline;
 }
 
+/* Link "Ver documento" nas páginas autenticadas ────────────────────────────── */
+.link-ipfs {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--cafe-noir);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.link-ipfs:hover {
+  text-decoration: underline;
+}
+
 /* Acordeão de verificação técnica ───────────────────────────────────────────── */
 .cp-tecnico {
   background: var(--branco);

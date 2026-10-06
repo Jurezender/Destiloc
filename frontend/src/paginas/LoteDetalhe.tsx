@@ -24,6 +24,7 @@ import {
 import { adicionarJSON } from "../ipfs/kubo";
 import { montarMetadadosConclusaoProducao, montarMetadadosEtapaProducao } from "../ipfs/metadados";
 import { AnexosIpfs } from "../componentes/AnexosIpfs";
+import { LinkMetadados } from "../componentes/LinkMetadados";
 
 type Signer = NonNullable<ReturnType<typeof useCarteira>["signer"]>;
 
@@ -201,7 +202,7 @@ export function LoteDetalhe() {
         </div>
         <div className="info-campo info-campo--largo">
           <dt className="info-campo__rotulo">Metadados</dt>
-          <dd className="info-campo__valor mono">{lote.metadataURI}</dd>
+          <dd className="info-campo__valor"><LinkMetadados uri={lote.metadataURI} /></dd>
         </div>
       </dl>
       {erro && <p className="erro">{erro}</p>}
@@ -269,7 +270,7 @@ export function LoteDetalhe() {
                 <td>{formatarTimestamp(evento.inicioInformado)}</td>
                 <td>{formatarTimestamp(evento.fimInformado)}</td>
                 <td>{formatarTimestamp(evento.registradoEm)}</td>
-                <td>{evento.metadataURI}</td>
+                <td><LinkMetadados uri={evento.metadataURI} /></td>
                 <td>
                   {evento.insumosUtilizados.length === 0
                     ? "-"
@@ -312,7 +313,7 @@ export function LoteDetalhe() {
         <p className="ok">
           Produção concluída em {formatarTimestamp(lote.concluidoEm)}.
           <br />
-          Metadados de conclusão: {lote.metadataURIConclusao}
+          Metadados de conclusão: <LinkMetadados uri={lote.metadataURIConclusao} />
           <br />
           Produção concluída, apta para envasamento.{" "}
           <Link to={`/lotes/${lote.id.toString()}/emitir`}>Ir para envasamento e emissão</Link>

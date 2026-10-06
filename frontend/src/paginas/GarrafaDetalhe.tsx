@@ -5,6 +5,7 @@ import { useCarteira } from "../contexto/CarteiraContexto";
 import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
 import { formatarTimestamp } from "../lib/formatadores";
+import { LinkMetadados } from "../componentes/LinkMetadados";
 
 interface DadosGarrafa {
   tokenId: bigint;
@@ -118,7 +119,7 @@ export function GarrafaDetalhe() {
         </div>
         <div className="info-campo info-campo--largo">
           <dt className="info-campo__rotulo">Metadados do envasamento</dt>
-          <dd className="info-campo__valor mono">{dados.metadataURI}</dd>
+          <dd className="info-campo__valor"><LinkMetadados uri={dados.metadataURI} /></dd>
         </div>
         <div className="info-campo info-campo--largo">
           <dt className="info-campo__rotulo">Endereço técnico ERC-721</dt>

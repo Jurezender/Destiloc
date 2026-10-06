@@ -10,6 +10,7 @@ import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
 import { adicionarJSON } from "../ipfs/kubo";
 import { montarMetadadosEnvasamento } from "../ipfs/metadados";
 import { AnexosIpfs } from "../componentes/AnexosIpfs";
+import { LinkMetadados } from "../componentes/LinkMetadados";
 
 type Signer = NonNullable<ReturnType<typeof useCarteira>["signer"]>;
 
@@ -256,7 +257,7 @@ function LinhaEnvasamento({
         )}
         <div className="info-campo info-campo--largo">
           <dt className="info-campo__rotulo">Metadados</dt>
-          <dd className="info-campo__valor mono">{envasamento.metadataURI}</dd>
+          <dd className="info-campo__valor"><LinkMetadados uri={envasamento.metadataURI} /></dd>
         </div>
       </dl>
 

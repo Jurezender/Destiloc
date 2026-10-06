@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { adicionarArquivo } from "../ipfs/kubo";
+import { ipfsParaUrl } from "../lib/ipfs";
 
 interface AnexoInfo {
   id: string;
@@ -89,9 +90,9 @@ export function AnexosIpfs({
               )}
               {anexo.estado === "ok" && anexo.cid && (
                 <a
-                  href={`https://ipfs.io/ipfs/${anexo.cid.slice(7)}`}
+                  href={ipfsParaUrl(anexo.cid)}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="anexos-ipfs__link"
                 >
                   Ver documento

@@ -11,6 +11,7 @@ import {
   RETULO_TIPO_INSUMO,
 } from "../lib/formatadores";
 import { EstadoProducao, EtapaProducao, TipoBebida, TipoInsumo } from "../lib/tipos";
+import { ipfsParaUrl } from "../lib/ipfs";
 
 // Todos os valores uint256/uint64 da blockchain chegam como string
 // para preservar precisão, os enums chegam como number.
@@ -90,11 +91,6 @@ type EstadoConsulta =
   | "erro-consulta";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
-
-function ipfsParaUrl(uri: string): string {
-  if (uri.startsWith("ipfs://")) return `https://ipfs.io/ipfs/${uri.slice(7)}`;
-  return uri;
-}
 
 function mensagemAmigavel(erro: string): string {
   if (erro.includes("não existe") || erro.includes("não encontrad")) {

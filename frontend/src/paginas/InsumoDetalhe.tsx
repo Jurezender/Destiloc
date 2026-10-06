@@ -14,6 +14,7 @@ import {
   montarMetadadosInvalidacao,
 } from "../ipfs/metadados";
 import { AnexosIpfs } from "../componentes/AnexosIpfs";
+import { LinkMetadados } from "../componentes/LinkMetadados";
 
 type Signer = NonNullable<ReturnType<typeof useCarteira>["signer"]>;
 
@@ -165,7 +166,7 @@ export function InsumoDetalhe() {
         </div>
         <div className="info-campo info-campo--largo">
           <dt className="info-campo__rotulo">Metadados</dt>
-          <dd className="info-campo__valor mono">{lote.metadataURI}</dd>
+          <dd className="info-campo__valor"><LinkMetadados uri={lote.metadataURI} /></dd>
         </div>
       </dl>
       {erro && <p className="erro">{erro}</p>}
@@ -175,7 +176,7 @@ export function InsumoDetalhe() {
         <p className="dica">
           Este lote foi invalidado em {formatarTimestamp(invalidacao.registradoEm)} e está definitivamente
           encerrado, não aceita novas avaliações nem correções documentais.
-          {" "}Metadados: <span className="mono">{invalidacao.metadataURI}</span>
+          {" "}Metadados: <LinkMetadados uri={invalidacao.metadataURI} />
         </p>
       ) : podeCorrigirOuInvalidar ? (
         <InvalidarLote loteId={lote.id} chainId={chainId!} signer={signer!} aoInvalidar={carregar} />
@@ -188,7 +189,7 @@ export function InsumoDetalhe() {
         {correcoes.map((correcao) => (
           <li key={correcao.indice}>
             {formatarTimestamp(correcao.registradoEm)}
-            {" · "}<span className="mono">{correcao.metadataURI}</span>
+            {" · "}<LinkMetadados uri={correcao.metadataURI} />
           </li>
         ))}
         {correcoes.length === 0 && <li className="dica">Nenhuma correção registrada ainda.</li>}
@@ -218,7 +219,7 @@ export function InsumoDetalhe() {
               <li key={avaliacao.indice}>
                 {formatarTimestamp(avaliacao.registradoEm)}
                 {" · "}{RETULO_RESULTADO_AVALIACAO[avaliacao.resultado]}
-                {" · "}<span className="mono">{avaliacao.metadataURI}</span>
+                {" · "}<LinkMetadados uri={avaliacao.metadataURI} />
               </li>
             ))}
             {avaliacoes.length === 0 && <li className="dica">Você ainda não avaliou este insumo.</li>}
