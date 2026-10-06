@@ -1,4 +1,5 @@
 import { ipfsParaUrl } from "../lib/ipfs";
+import { DocumentosAnexados } from "./DocumentosAnexados";
 
 interface Props {
   uri: string;
@@ -18,8 +19,9 @@ export function LinkMetadados({ uri }: Props) {
             rel="noopener noreferrer"
             className="link-ipfs"
           >
-            Ver documento
+            Ver metadata
           </a>
+          <DocumentosAnexados metadataUri={uri} />
         </>
       )}
     </>

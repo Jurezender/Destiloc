@@ -310,14 +310,14 @@ export function LoteDetalhe() {
 
       <h2>Conclusão</h2>
       {lote.estado === EstadoProducao.Concluido ? (
-        <p className="ok">
+        <div className="ok">
           Produção concluída em {formatarTimestamp(lote.concluidoEm)}.
           <br />
           Metadados de conclusão: <LinkMetadados uri={lote.metadataURIConclusao} />
           <br />
           Produção concluída, apta para envasamento.{" "}
           <Link to={`/lotes/${lote.id.toString()}/emitir`}>Ir para envasamento e emissão</Link>
-        </p>
+        </div>
       ) : lote.estado === EstadoProducao.EmProducao ? (
         podeOperar ? (
           erroInsumosConclusao ? (

@@ -12,6 +12,7 @@ import {
 } from "../lib/formatadores";
 import { EstadoProducao, EtapaProducao, TipoBebida, TipoInsumo } from "../lib/tipos";
 import { ipfsParaUrl } from "../lib/ipfs";
+import { DocumentosAnexados } from "../componentes/DocumentosAnexados";
 
 // Todos os valores uint256/uint64 da blockchain chegam como string
 // para preservar precisão, os enums chegam como number.
@@ -403,14 +404,17 @@ export function ConsultaPublica() {
                           </span>
                         )}
                         {evento.metadataURI && (
-                          <a
-                            href={ipfsParaUrl(evento.metadataURI)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="cp-link-ipfs"
-                          >
-                            Ver detalhes →
-                          </a>
+                          <>
+                            <a
+                              href={ipfsParaUrl(evento.metadataURI)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="cp-link-ipfs"
+                            >
+                              Ver detalhes →
+                            </a>
+                            <DocumentosAnexados metadataUri={evento.metadataURI} />
+                          </>
                         )}
                       </div>
                     </li>
@@ -511,6 +515,7 @@ export function ConsultaPublica() {
                       <a href={ipfsParaUrl(dados.lote.metadataURI)} target="_blank" rel="noopener noreferrer" className="cp-link-ipfs">
                         Abrir no IPFS →
                       </a>
+                      <DocumentosAnexados metadataUri={dados.lote.metadataURI} />
                     </dd>
                   </div>
                 )}
@@ -521,6 +526,7 @@ export function ConsultaPublica() {
                       <a href={ipfsParaUrl(dados.lote.metadataURIConclusao)} target="_blank" rel="noopener noreferrer" className="cp-link-ipfs">
                         Abrir no IPFS →
                       </a>
+                      <DocumentosAnexados metadataUri={dados.lote.metadataURIConclusao} />
                     </dd>
                   </div>
                 )}
@@ -531,6 +537,7 @@ export function ConsultaPublica() {
                       <a href={ipfsParaUrl(dados.envasamento.metadataURI)} target="_blank" rel="noopener noreferrer" className="cp-link-ipfs">
                         Abrir no IPFS →
                       </a>
+                      <DocumentosAnexados metadataUri={dados.envasamento.metadataURI} />
                     </dd>
                   </div>
                 )}

@@ -173,11 +173,11 @@ export function InsumoDetalhe() {
 
       <h2>Invalidação</h2>
       {invalidacao.invalidado ? (
-        <p className="dica">
+        <div className="dica">
           Este lote foi invalidado em {formatarTimestamp(invalidacao.registradoEm)} e está definitivamente
           encerrado, não aceita novas avaliações nem correções documentais.
           {" "}Metadados: <LinkMetadados uri={invalidacao.metadataURI} />
-        </p>
+        </div>
       ) : podeCorrigirOuInvalidar ? (
         <InvalidarLote loteId={lote.id} chainId={chainId!} signer={signer!} aoInvalidar={carregar} />
       ) : (

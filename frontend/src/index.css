@@ -1036,6 +1036,27 @@ tbody tr:hover {
   text-decoration: underline;
 }
 
+/* Lista de documentos originais (nível 2 IPFS) ─────────────────────────────── */
+.documentos-anexados {
+  margin: 0.375rem 0 0 0;
+  padding: 0;
+  list-style: none;
+  border-left: 2px solid var(--bege-escuro, #c4b49a);
+  padding-left: 0.625rem;
+}
+
+.documentos-anexados__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.125rem 0;
+}
+
+.documentos-anexados__nome {
+  font-size: 0.8125rem;
+  color: var(--cafe-escuro, #2c1a0e);
+}
+
 /* Acordeão de verificação técnica ───────────────────────────────────────────── */
 .cp-tecnico {
   background: var(--branco);
