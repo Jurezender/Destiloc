@@ -89,7 +89,7 @@ export function AnexosIpfs({
               )}
               {anexo.estado === "ok" && anexo.cid && (
                 <a
-                  href={`https://gateway.pinata.cloud/ipfs/${anexo.cid.replace("ipfs://", "")}`}
+                  href={`https://ipfs.io/ipfs/${anexo.cid.slice(7)}`}
                   target="_blank"
                   rel="noreferrer"
                   className="anexos-ipfs__link"
