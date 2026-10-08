@@ -12,18 +12,19 @@ const admin: FastifyPluginAsync = async (app) => {
     async (_req, reply) => {
       const res = await obterPool().query<{
         address: string;
-        status: string;
         vinculada_em: Date;
-        revisada_em: Date | null;
-        revisada_por: string | null;
         usuario_email: string;
-        usuario_id: number;
+        nome_responsavel: string;
+        nome_empresa: string;
+        tipo_participante: string | null;
       }>(
-        `SELECT cv.address, cv.status, cv.vinculada_em, cv.revisada_em, cv.revisada_por,
-                u.email AS usuario_email, u.id AS usuario_id
+        `SELECT cv.address, cv.vinculada_em,
+                u.email AS usuario_email,
+                u.nome_responsavel, u.nome_empresa, u.tipo_participante
          FROM carteiras_vinculadas cv
          JOIN usuarios u ON u.id = cv.usuario_id
-         ORDER BY cv.vinculada_em DESC`,
+         WHERE cv.status = 'pendente'
+         ORDER BY cv.vinculada_em ASC`,
       );
 
       return reply.send({ carteiras: res.rows });

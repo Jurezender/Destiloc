@@ -428,6 +428,92 @@ fieldset:disabled {
   margin-block: var(--s-sm);
 }
 
+/* ─── Cards de solicitação de acesso ─────────────────────────────────────────── */
+.lista-solicitacoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-md);
+  margin-block: var(--s-lg);
+  max-width: 36rem;
+}
+
+.card-solicitacao {
+  background-color: var(--cor-fundo-card);
+  border: 1px solid var(--cor-borda);
+  border-left: 3px solid var(--cafe-noir);
+  border-radius: var(--raio-md);
+  padding: var(--s-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-xs);
+}
+
+.card-solicitacao__cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--s-sm);
+  margin-bottom: var(--s-xs);
+}
+
+.card-solicitacao__nome {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.card-solicitacao__data {
+  font-size: 0.75rem;
+  color: var(--cor-texto-secundario);
+  white-space: nowrap;
+}
+
+.card-solicitacao__detalhe {
+  font-size: 0.8125rem;
+  color: var(--cor-texto-secundario);
+}
+
+.card-solicitacao__papel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-xs);
+  margin-top: var(--s-sm);
+}
+
+.card-solicitacao__label-papel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cor-texto-secundario);
+}
+
+.card-solicitacao__papel-linha {
+  display: flex;
+  align-items: center;
+  gap: var(--s-sm);
+  flex-wrap: wrap;
+}
+
+.card-solicitacao__papel-linha select {
+  font-size: 0.875rem;
+  padding: 0.3125rem 0.625rem;
+  width: auto;
+}
+
+.card-solicitacao__erro-chain {
+  margin-top: var(--s-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-xs);
+}
+
+.card-solicitacao__acoes {
+  display: flex;
+  gap: var(--s-sm);
+  margin-top: var(--s-sm);
+  flex-wrap: wrap;
+}
+
 /* ─── Grades ─────────────────────────────────────────────────────────────────── */
 .grade-formularios,
 .grade-listas {
