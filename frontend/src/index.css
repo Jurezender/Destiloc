@@ -133,70 +133,109 @@ a:hover {
 /* ─── Layout ─────────────────────────────────────────────────────────────────── */
 .layout {
   display: flex;
-  flex-direction: column;
   min-height: 100vh;
 }
 
-.layout__cabecalho {
+.layout__barra {
+  width: 11.5rem;
+  flex-shrink: 0;
   display: flex;
-  align-items: center;
-  gap: var(--s-lg);
-  padding: 0 var(--s-xl);
-  height: 3.5rem;
+  flex-direction: column;
   background-color: var(--cor-fundo-header);
-  border-bottom: 1px solid rgba(245, 239, 227, 0.12);
+  border-right: 1px solid rgba(245, 239, 227, 0.08);
   position: sticky;
   top: 0;
+  height: 100vh;
+  overflow-y: auto;
   z-index: 10;
 }
 
+.layout__topo {
+  padding: var(--s-md);
+  border-bottom: 1px solid rgba(245, 239, 227, 0.1);
+  flex-shrink: 0;
+}
+
 .layout__titulo {
+  display: block;
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--cor-texto-invertido);
   white-space: nowrap;
-  flex-shrink: 0;
+}
+
+.layout__usuario-nome {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgba(245, 239, 227, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.25rem;
 }
 
 .layout__nav {
   display: flex;
+  flex-direction: column;
   gap: 0.125rem;
   flex: 1;
+  padding: var(--s-sm);
 }
 
 .layout__nav a {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   border-radius: var(--raio-sm);
-  border-bottom: 2px solid transparent;
+  border-left: 2px solid transparent;
   font-size: 0.875rem;
   font-weight: 500;
   color: rgba(229, 215, 196, 0.6);
   text-decoration: none;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s, background-color 0.15s;
 }
 
 .layout__nav a:hover {
   color: var(--cor-texto-invertido);
+  background-color: rgba(245, 239, 227, 0.06);
   text-decoration: none;
 }
 
 .layout__nav a.active {
   color: var(--cor-texto-invertido);
-  border-bottom-color: var(--avela);
+  border-left-color: var(--avela);
+  background-color: rgba(245, 239, 227, 0.07);
   font-weight: 600;
   text-decoration: none;
 }
 
+.layout__sair {
+  background-color: transparent;
+  color: rgba(245, 239, 227, 0.45);
+  padding: 0.5rem var(--s-md);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  margin: var(--s-xs) var(--s-sm) var(--s-sm);
+}
+
+.layout__sair:hover:not(:disabled) {
+  background-color: rgba(245, 239, 227, 0.07);
+  color: var(--cor-texto-invertido);
+  box-shadow: none;
+}
+
 .layout__conteudo {
+  flex: 1;
+  min-width: 0;
   padding: var(--s-xl) var(--s-lg);
   max-width: 62rem;
-  width: 100%;
   margin: 0 auto;
 }
 
@@ -1898,31 +1937,70 @@ details[open] .cp-tecnico__chevron {
 
 /* Responsivo — global ────────────────────────────────────────────────────────── */
 
-/* Tablet (< 768px): cabeçalho e padding lateral do conteúdo */
+/* Tablet (< 768px): barra lateral vira barra horizontal */
 @media (max-width: 768px) {
-  .layout__cabecalho {
+  .layout {
+    flex-direction: column;
+  }
+
+  .layout__barra {
+    width: 100%;
     height: auto;
+    position: sticky;
+    top: 0;
+    flex-direction: row;
+    align-items: center;
     flex-wrap: wrap;
     padding: var(--s-sm) var(--s-md);
     row-gap: var(--s-xs);
+    overflow-y: visible;
+  }
+
+  .layout__topo {
+    padding: 0;
+    border-bottom: none;
+    flex: 1;
   }
 
   .layout__titulo {
-    flex: 1;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
+  }
+
+  .layout__usuario-nome {
+    display: none;
   }
 
   .layout__nav {
+    flex-direction: row;
+    flex-wrap: wrap;
     order: 3;
     width: 100%;
-    flex-wrap: wrap;
-    gap: var(--s-xs);
-    padding-bottom: var(--s-xs);
+    flex: none;
+    padding: 0 0 var(--s-xs) 0;
+    gap: 0.125rem;
   }
 
   .layout__nav a {
+    border-left: none;
+    border-bottom: 2px solid transparent;
     font-size: 0.8125rem;
     padding: 0.25rem 0.5rem;
+  }
+
+  .layout__nav a:hover {
+    background-color: transparent;
+  }
+
+  .layout__nav a.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--avela);
+    background-color: transparent;
+  }
+
+  .layout__sair {
+    order: 2;
+    margin: 0 0 0 auto;
+    padding: 0.375rem 0.5rem;
   }
 
   .layout__conteudo {

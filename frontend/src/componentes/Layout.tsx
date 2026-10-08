@@ -4,7 +4,6 @@ import { useAuth } from "../contexto/AuthContexto";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { encurtarEndereco } from "../lib/formatadores";
-import { StatusCarteira } from "./StatusCarteira";
 
 const TODOS_LINKS = [
   { para: "/",                rotulo: "Início",        Icone: Home,         apenasAdmin: false },
@@ -47,13 +46,20 @@ function PopupCarteiraTrocada() {
 
 export function Layout() {
   const { admin } = usePapeis();
+  const { usuario, logout } = useAuth();
   const links = TODOS_LINKS.filter((l) => !l.apenasAdmin || admin);
+
+  const nomeExibido =
+    usuario?.nome_responsavel || usuario?.nome_empresa || usuario?.email || "";
 
   return (
     <div className="layout">
       <PopupCarteiraTrocada />
-      <header className="layout__cabecalho">
-        <span className="layout__titulo">Destiloc</span>
+      <aside className="layout__barra">
+        <div className="layout__topo">
+          <span className="layout__titulo">Destiloc</span>
+          <span className="layout__usuario-nome">{nomeExibido}</span>
+        </div>
         <nav className="layout__nav">
           {links.map(({ para, rotulo, Icone }) => (
             <NavLink key={para} to={para} end={para === "/"}>
@@ -62,8 +68,8 @@ export function Layout() {
             </NavLink>
           ))}
         </nav>
-        <StatusCarteira />
-      </header>
+        <button className="layout__sair" onClick={logout}>Sair</button>
+      </aside>
       <main className="layout__conteudo">
         <Outlet />
       </main>

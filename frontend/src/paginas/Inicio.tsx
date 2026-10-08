@@ -56,7 +56,7 @@ export function Inicio() {
         Rede: <strong>{rede ? rede.rotulo : `chainId ${chainId}`}</strong>
       </p>
 
-      <h2>Seus papéis</h2>
+      <h2>Papéis atrelados à sua conta</h2>
       {papeis.carregando && (
         <div className="carregando">
           <span className="carregando__indicador" aria-hidden="true" />
@@ -65,12 +65,16 @@ export function Inicio() {
       )}
       {papeis.erro && <p className="erro">{papeis.erro}</p>}
       {!papeis.carregando && !papeis.erro && (
-        <ul className="lista-papeis">
-          <li>Administrador <span className={`badge ${papeis.admin ? "badge--ok" : "badge--neutro"}`}>{papeis.admin ? "Sim" : "Não"}</span></li>
-          <li>Fornecedor <span className={`badge ${papeis.fornecedor ? "badge--ok" : "badge--neutro"}`}>{papeis.fornecedor ? "Sim" : "Não"}</span></li>
-          <li>Produtor <span className={`badge ${papeis.produtor ? "badge--ok" : "badge--neutro"}`}>{papeis.produtor ? "Sim" : "Não"}</span></li>
-          <li>Envasador <span className={`badge ${papeis.envasador ? "badge--ok" : "badge--neutro"}`}>{papeis.envasador ? "Sim" : "Não"}</span></li>
-        </ul>
+        papeis.admin || papeis.fornecedor || papeis.produtor || papeis.envasador ? (
+          <ul className="lista-papeis">
+            {papeis.admin && <li>Administrador</li>}
+            {papeis.fornecedor && <li>Fornecedor</li>}
+            {papeis.produtor && <li>Produtor</li>}
+            {papeis.envasador && <li>Envasador</li>}
+          </ul>
+        ) : (
+          <p className="dica">Nenhum papel atribuído à sua carteira ainda.</p>
+        )
       )}
 
       <h2>Contadores gerais</h2>
