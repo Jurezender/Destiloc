@@ -151,7 +151,7 @@ export function Emitir() {
       {papeis.envasador ? (
         <RegistrarEnvasamento loteProducaoId={id!} chainId={chainId!} signer={signer!} aoRegistrar={carregar} />
       ) : (
-        <p className="dica">Sua conta não tem ENVASADOR_ROLE; só pode consultar.</p>
+        <p className="dica">Sua conta não tem o papel de Envasador, você ainda pode consultar as garrafas disponíveis.</p>
       )}
     </section>
   );
@@ -283,7 +283,7 @@ function LinhaEnvasamento({
             </p>
           )
         ) : (
-          <p className="dica">Sua conta não tem ENVASADOR_ROLE; só pode consultar.</p>
+          <p className="dica">Sua conta não tem o papel de Envasador, você ainda pode consultar as garrafas disponíveis.</p>
         ))}
 
       {tokenIdsEmitidos && tokenIdsEmitidos.length > 0 && (

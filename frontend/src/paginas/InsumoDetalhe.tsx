@@ -181,7 +181,7 @@ export function InsumoDetalhe() {
       ) : podeCorrigirOuInvalidar ? (
         <InvalidarLote loteId={lote.id} chainId={chainId!} signer={signer!} aoInvalidar={carregar} />
       ) : (
-        <p className="dica">Só o fornecedor original, com FORNECEDOR_ROLE, pode invalidar este lote.</p>
+        <p className="dica">Só o fornecedor original, com papel de Fornecedor, pode invalidar este lote.</p>
       )}
 
       <h2>Correções documentais</h2>
@@ -199,13 +199,13 @@ export function InsumoDetalhe() {
       ) : podeCorrigirOuInvalidar ? (
         <RegistrarCorrecao loteId={lote.id} chainId={chainId!} signer={signer!} aoRegistrar={carregar} />
       ) : (
-        <p className="dica">Só o fornecedor original, com FORNECEDOR_ROLE, pode registrar correções documentais.</p>
+        <p className="dica">Somente o fornecedor original, com papel de Fornecedor, pode registrar correções documentais.</p>
       )}
 
       <h2>Avaliação</h2>
       {!papeis.produtor ? (
         <p className="dica">
-          Sua conta não tem PRODUTOR_ROLE (concedido no ContratoAcesso), você não pode avaliar insumos.
+          Sua conta não tem papel de Produtor, você não pode avaliar insumos.
         </p>
       ) : (
         <>

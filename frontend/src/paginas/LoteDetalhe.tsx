@@ -225,7 +225,7 @@ export function LoteDetalhe() {
             aoAtualizar={carregar}
           />
         ) : (
-          <p className="dica">Só o produtor responsável, com PRODUTOR_ROLE, pode alterar a configuração.</p>
+          <p className="dica">Só o produtor responsável, com papel de Produtor, pode alterar a configuração.</p>
         )
       ) : (
         <p className="dica">Configuração congelada, só pode ser alterada enquanto o lote está em "Criado".</p>
@@ -245,7 +245,7 @@ export function LoteDetalhe() {
       ) : podeOperar ? (
         <VincularInsumo loteId={lote.id} chainId={chainId!} signer={signer!} aoVincular={carregar} />
       ) : (
-        <p className="dica">Só o produtor responsável, com PRODUTOR_ROLE, pode vincular insumos.</p>
+        <p className="dica">Só o produtor responsável, com papel de Produtor, pode vincular insumos.</p>
       )}
 
       <h2>Etapas registradas</h2>
@@ -305,7 +305,7 @@ export function LoteDetalhe() {
             <p className="dica">Nenhuma etapa aplicável está pendente de registro.</p>
           )
         ) : (
-          <p className="dica">Só o produtor responsável, com PRODUTOR_ROLE, pode registrar etapas.</p>
+          <p className="dica">Só o produtor responsável, com papel de Produtor, pode registrar etapas.</p>
         ))}
 
       <h2>Conclusão</h2>
@@ -326,7 +326,7 @@ export function LoteDetalhe() {
             <ConcluirProducao loteId={lote.id} chainId={chainId!} signer={signer!} aoConcluir={carregar} />
           )
         ) : (
-          <p className="dica">Só o produtor responsável, com PRODUTOR_ROLE, pode concluir a produção.</p>
+          <p className="dica">Só o produtor responsável, com papel de Produtor, pode concluir a produção.</p>
         )
       ) : (
         <p className="dica">A produção precisa ter ao menos uma etapa registrada antes de poder ser concluída.</p>
