@@ -11,6 +11,7 @@ import { GarrafaDetalhe } from "./paginas/GarrafaDetalhe";
 import { Inicio } from "./paginas/Inicio";
 import { InsumoDetalhe } from "./paginas/InsumoDetalhe";
 import { Insumos } from "./paginas/Insumos";
+import { EsqueciSenha } from "./paginas/EsqueciSenha";
 import { Login } from "./paginas/Login";
 import { LoteDetalhe } from "./paginas/LoteDetalhe";
 import { Lotes } from "./paginas/Lotes";
@@ -28,6 +29,7 @@ export function App() {
         {/* Páginas de autenticação: sem layout operacional. */}
         <Route path="/login" element={<Login />} />
         <Route path="/registrar" element={<Registrar />} />
+        <Route path="/esqueci-senha" element={<EsqueciSenha />} />
 
         {/* Operacional: layout com nav, MetaMask e papéis. */}
         <Route element={<AreaOperacional />}>

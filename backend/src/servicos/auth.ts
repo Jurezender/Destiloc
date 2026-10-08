@@ -13,7 +13,8 @@ export class EmailJaCadastradoError extends Error {
 export interface PerfilRegistro {
   nome_responsavel: string;
   nome_empresa: string;
-  tipo_participante?: 'fornecedor' | 'produtor' | 'envasador';
+  tipo_participante?: 'fornecedor' | 'produtor' | 'envasador' | 'admin';
+  cnpj?: string;
 }
 
 export async function registrarUsuario(
@@ -26,10 +27,10 @@ export async function registrarUsuario(
 
   try {
     const res = await obterPool().query<{ id: number; email: string }>(
-      `INSERT INTO usuarios (email, senha_hash, nome_responsavel, nome_empresa, tipo_participante)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO usuarios (email, senha_hash, nome_responsavel, nome_empresa, tipo_participante, cnpj)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, email`,
-      [emailNorm, senhaHash, perfil.nome_responsavel.trim(), perfil.nome_empresa.trim(), perfil.tipo_participante],
+      [emailNorm, senhaHash, perfil.nome_responsavel.trim(), perfil.nome_empresa.trim(), perfil.tipo_participante, perfil.cnpj ?? null],
     );
     return res.rows[0];
   } catch (err: unknown) {

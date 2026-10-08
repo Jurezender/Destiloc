@@ -28,49 +28,40 @@ export function Login() {
 
   return (
     <div className="auth-pagina">
-      <header className="auth-cabecalho">
-        <span className="auth-cabecalho__logo">Destiloc</span>
-      </header>
-      <main className="auth-conteudo">
-        <div className="auth-painel">
-          <h1 className="auth-painel__titulo">Entrar no sistema</h1>
-          <p className="auth-painel__subtitulo">
-            Acesso exclusivo para participantes autorizados da cadeia produtiva.
-          </p>
-          <form onSubmit={(e) => void handleSubmit(e)}>
-            <fieldset disabled={enviando}>
-              <legend>Credenciais</legend>
-              <label>
-                E-mail
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                />
-              </label>
-              <label>
-                Senha
-                <input
-                  type="password"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                />
-              </label>
-              {erro && <p className="erro">{erro}</p>}
-              <button type="submit" className="auth-btn-principal">
-                {enviando ? "Entrando…" : "Entrar"}
-              </button>
-            </fieldset>
-          </form>
-          <p className="auth-rodape">
-            Não tem conta? <Link to="/registrar">Criar conta</Link>
-          </p>
+      <div className="auth-painel">
+        <span className="auth-painel__logo">Destiloc</span>
+        <h1 className="auth-painel__titulo">Login</h1>
+        <form onSubmit={(e) => void handleSubmit(e)}>
+          <label className="auth-label">
+            E-mail
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+            />
+          </label>
+          <label className="auth-label">
+            Senha
+            <input
+              type="password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              required
+              autoComplete="current-password"
+            />
+          </label>
+          {erro && <p className="auth-erro">{erro}</p>}
+          <button type="submit" className="auth-btn-principal" disabled={enviando}>
+            {enviando ? "Entrando…" : "Entrar"}
+          </button>
+        </form>
+        <div className="auth-links">
+          <Link to="/esqueci-senha" className="auth-link">Esqueci minha senha</Link>
+          <Link to="/registrar" className="auth-link">Criar conta</Link>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

@@ -1518,66 +1518,89 @@ details[open] .cp-tecnico__chevron {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   PÁGINAS DE AUTENTICAÇÃO (Login, Registrar)
+   PÁGINAS DE AUTENTICAÇÃO (Login, Registrar, EsqueciSenha)
 ═══════════════════════════════════════════════════════════════════════════════ */
 
 .auth-pagina {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  background-color: var(--cor-fundo-pagina);
-}
-
-.auth-cabecalho {
-  display: flex;
-  align-items: center;
-  padding: 0 var(--s-xl);
-  height: 3.5rem;
-  background-color: var(--cor-fundo-header);
-  border-bottom: 1px solid rgba(245, 239, 227, 0.12);
-  flex-shrink: 0;
-}
-
-.auth-cabecalho__logo {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--cor-texto-invertido);
-}
-
-.auth-conteudo {
-  flex: 1;
-  display: flex;
+  align-items: flex-start;
   justify-content: center;
+  background-color: var(--cor-fundo-pagina);
   padding: var(--s-2xl) var(--s-md);
 }
 
 .auth-painel {
   width: 100%;
+  max-width: 22rem;
+  background-color: var(--kombu-green);
+  border-radius: var(--raio-lg);
+  padding: var(--s-2xl) var(--s-xl);
+  box-shadow:
+    0 8px 32px rgba(32, 40, 8, 0.28),
+    0 2px 8px rgba(32, 40, 8, 0.16);
+}
+
+.auth-painel--largo {
   max-width: 26rem;
 }
 
-.auth-painel fieldset {
-  margin-block: 0 var(--s-sm);
+.auth-painel__logo {
+  display: block;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--avela);
+  text-align: center;
+  margin-bottom: var(--s-sm);
 }
 
 .auth-painel__titulo {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: 1.875rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--cafe-noir);
-  line-height: 1.2;
-  margin-bottom: var(--s-xs);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245, 239, 227, 0.45);
+  text-align: center;
+  margin-bottom: var(--s-xl);
+  line-height: 1.4;
 }
 
-.auth-painel__subtitulo {
-  font-size: 0.875rem;
-  color: var(--cor-texto-secundario);
-  margin-bottom: var(--s-xl);
-  line-height: 1.55;
+.auth-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(245, 239, 227, 0.65);
+  margin-bottom: var(--s-md);
+}
+
+.auth-painel input,
+.auth-painel select {
+  max-width: 100%;
+  background-color: rgba(255, 255, 255, 0.07);
+  border-color: rgba(207, 187, 153, 0.22);
+  color: var(--cor-texto-invertido);
+}
+
+.auth-painel input::placeholder {
+  color: rgba(245, 239, 227, 0.28);
+}
+
+.auth-painel input:focus,
+.auth-painel select:focus {
+  border-color: rgba(207, 187, 153, 0.55);
+  box-shadow: 0 0 0 3px rgba(207, 187, 153, 0.1);
+}
+
+.auth-painel select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23CFBB99' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.auth-painel select option {
+  background-color: #202808;
+  color: #F5EFE3;
 }
 
 .auth-btn-principal {
@@ -1585,14 +1608,55 @@ details[open] .cp-tecnico__chevron {
   justify-content: center;
   padding-block: 0.6875rem;
   font-size: 0.9375rem;
-  margin-top: var(--s-md);
+  margin-top: var(--s-lg);
+  background-color: var(--avela);
+  color: var(--kombu-green);
+  font-weight: 600;
 }
 
-.auth-rodape {
-  margin-top: var(--s-lg);
+.auth-btn-principal:hover:not(:disabled) {
+  background-color: #D9C5A5;
+  color: var(--kombu-green);
+  box-shadow: 0 2px 8px rgba(207, 187, 153, 0.3);
+}
+
+.auth-erro {
+  color: #FFA5A5;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin-block: var(--s-sm);
   text-align: center;
+}
+
+.auth-ok {
+  color: #A8D8A0;
   font-size: 0.875rem;
-  color: var(--cor-texto-secundario);
+  font-weight: 500;
+  margin-block: var(--s-sm);
+  text-align: center;
+  line-height: 1.55;
+}
+
+.auth-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-sm);
+  margin-top: var(--s-lg);
+}
+
+.auth-link {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(207, 187, 153, 0.65);
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  color: var(--avela);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 /* ─── Variantes de botão ─────────────────────────────────────────────────────── */

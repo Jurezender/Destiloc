@@ -25,27 +25,28 @@ const auth: FastifyPluginAsync = async (app) => {
       schema: {
         body: {
           type: 'object',
-          required: ['email', 'senha', 'nome_responsavel', 'nome_empresa'],
+          required: ['email', 'senha', 'nome_responsavel', 'nome_empresa', 'tipo_participante'],
           properties: {
             email: { type: 'string', minLength: 5 },
             senha: { type: 'string', minLength: 8 },
             nome_responsavel: { type: 'string', minLength: 2 },
             nome_empresa: { type: 'string', minLength: 2 },
-            tipo_participante: { type: 'string', enum: ['fornecedor', 'produtor', 'envasador'] },
+            tipo_participante: { type: 'string', enum: ['fornecedor', 'produtor', 'envasador', 'admin'] },
+            cnpj: { type: 'string', minLength: 14 },
           },
           additionalProperties: false,
         },
       },
     },
     async (req, reply) => {
-      const { email, senha, nome_responsavel, nome_empresa, tipo_participante } = req.body;
+      const { email, senha, nome_responsavel, nome_empresa, tipo_participante, cnpj } = req.body;
 
       if (!REGEX_EMAIL.test(email)) {
         return reply.status(400).send({ erro: 'E-mail inválido.' });
       }
 
       try {
-        const usuario = await registrarUsuario(email, senha, { nome_responsavel, nome_empresa, tipo_participante });
+        const usuario = await registrarUsuario(email, senha, { nome_responsavel, nome_empresa, tipo_participante, cnpj });
         return reply.status(201).send({ id: usuario.id, email: usuario.email });
       } catch (err) {
         if (err instanceof EmailJaCadastradoError) {

@@ -9,6 +9,7 @@ export function Registrar() {
   const [nomeResponsavel, setNomeResponsavel] = useState("");
   const [nomeEmpresa, setNomeEmpresa] = useState("");
   const [tipoParticipante, setTipoParticipante] = useState("");
+  const [cnpj, setCnpj] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmacao, setConfirmacao] = useState("");
@@ -17,6 +18,8 @@ export function Registrar() {
   const [sucesso, setSucesso] = useState(false);
 
   if (token) return <Navigate to="/" replace />;
+
+  const exibirCnpj = tipoParticipante !== "" && tipoParticipante !== "admin";
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -37,7 +40,8 @@ export function Registrar() {
           senha,
           nome_responsavel: nomeResponsavel,
           nome_empresa: nomeEmpresa,
-          ...(tipoParticipante ? { tipo_participante: tipoParticipante } : {}),
+          tipo_participante: tipoParticipante,
+          ...(exibirCnpj ? { cnpj } : {}),
         }),
       });
 
@@ -71,122 +75,121 @@ export function Registrar() {
   if (sucesso) {
     return (
       <div className="auth-pagina">
-        <header className="auth-cabecalho">
-          <span className="auth-cabecalho__logo">Destiloc</span>
-        </header>
-        <main className="auth-conteudo">
-          <div className="auth-painel">
-            <h1 className="auth-painel__titulo">Conta criada</h1>
-            <p className="ok">
-              Sua conta foi criada com sucesso. O próximo passo é vincular sua carteira Ethereum
-              e aguardar aprovação do administrador.
-            </p>
-            <p className="auth-painel__subtitulo" style={{ marginTop: "1rem" }}>
-              Redirecionando para o login…
-            </p>
-          </div>
-        </main>
+        <div className="auth-painel auth-painel--largo">
+          <span className="auth-painel__logo">Destiloc</span>
+          <h1 className="auth-painel__titulo">Conta criada</h1>
+          <p className="auth-ok">
+            Sua conta foi criada com sucesso. O próximo passo é vincular sua carteira Ethereum
+            e aguardar aprovação do administrador.
+          </p>
+          <p className="auth-ok" style={{ marginTop: "0.5rem", opacity: 0.7 }}>
+            Redirecionando para o login…
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="auth-pagina">
-      <header className="auth-cabecalho">
-        <span className="auth-cabecalho__logo">Destiloc</span>
-      </header>
-      <main className="auth-conteudo">
-        <div className="auth-painel">
-          <h1 className="auth-painel__titulo">Criar conta</h1>
-          <p className="auth-painel__subtitulo">
-            Após criar a conta você precisará vincular sua carteira Ethereum.
-            O acesso operacional requer aprovação do administrador.
-          </p>
-          <form onSubmit={(e) => void handleSubmit(e)}>
-            <fieldset disabled={enviando}>
-              <legend>Dados do responsável</legend>
-              <label>
-                Nome do responsável
-                <input
-                  type="text"
-                  value={nomeResponsavel}
-                  onChange={(e) => setNomeResponsavel(e.target.value)}
-                  required
-                  minLength={2}
-                  autoComplete="name"
-                  placeholder="Nome completo"
-                />
-              </label>
-              <label>
-                Nome da empresa ou produtor
-                <input
-                  type="text"
-                  value={nomeEmpresa}
-                  onChange={(e) => setNomeEmpresa(e.target.value)}
-                  required
-                  minLength={2}
-                  autoComplete="organization"
-                  placeholder="Razão social ou nome fantasia"
-                />
-              </label>
-              <label>
-                Tipo de participante (opcional)
-                <select
-                  value={tipoParticipante}
-                  onChange={(e) => setTipoParticipante(e.target.value)}
-                >
-                  <option value="">Selecione o tipo de participante (opcional)</option>
-                  <option value="fornecedor">Fornecedor de Insumos</option>
-                  <option value="produtor">Produtor</option>
-                  <option value="envasador">Envasador</option>
-                </select>
-              </label>
-            </fieldset>
-            <fieldset disabled={enviando}>
-              <legend>Acesso ao sistema</legend>
-              <label>
-                E-mail
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                />
-              </label>
-              <label>
-                Senha (mínimo 8 caracteres)
-                <input
-                  type="password"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  required
-                  minLength={8}
-                  autoComplete="new-password"
-                />
-              </label>
-              <label>
-                Confirmar senha
-                <input
-                  type="password"
-                  value={confirmacao}
-                  onChange={(e) => setConfirmacao(e.target.value)}
-                  required
-                  minLength={8}
-                  autoComplete="new-password"
-                />
-              </label>
-              {erro && <p className="erro">{erro}</p>}
-              <button type="submit" className="auth-btn-principal">
-                {enviando ? "Criando conta…" : "Criar conta"}
-              </button>
-            </fieldset>
-          </form>
-          <p className="auth-rodape">
-            Já tem conta? <Link to="/login">Entrar</Link>
-          </p>
+      <div className="auth-painel auth-painel--largo">
+        <span className="auth-painel__logo">Destiloc</span>
+        <h1 className="auth-painel__titulo">Criar conta</h1>
+        <form onSubmit={(e) => void handleSubmit(e)}>
+          <label className="auth-label">
+            Nome do responsável
+            <input
+              type="text"
+              value={nomeResponsavel}
+              onChange={(e) => setNomeResponsavel(e.target.value)}
+              required
+              minLength={2}
+              autoComplete="name"
+              placeholder="Nome completo"
+            />
+          </label>
+          <label className="auth-label">
+            Nome da empresa
+            <input
+              type="text"
+              value={nomeEmpresa}
+              onChange={(e) => setNomeEmpresa(e.target.value)}
+              required
+              minLength={2}
+              autoComplete="organization"
+              placeholder="Razão social ou nome fantasia"
+            />
+          </label>
+          <label className="auth-label">
+            Papel
+            <select
+              value={tipoParticipante}
+              onChange={(e) => { setTipoParticipante(e.target.value); setCnpj(""); }}
+              required
+            >
+              <option value="" disabled>Selecione o papel</option>
+              <option value="fornecedor">Fornecedor de Insumos</option>
+              <option value="produtor">Produtor</option>
+              <option value="envasador">Envasador</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </label>
+          {exibirCnpj && (
+            <label className="auth-label">
+              CNPJ
+              <input
+                type="text"
+                value={cnpj}
+                onChange={(e) => setCnpj(e.target.value)}
+                required
+                minLength={14}
+                placeholder="00.000.000/0001-00"
+                autoComplete="off"
+              />
+            </label>
+          )}
+          <label className="auth-label">
+            E-mail
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+            />
+          </label>
+          <label className="auth-label">
+            Senha
+            <input
+              type="password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              required
+              minLength={8}
+              autoComplete="new-password"
+              placeholder="Mínimo 8 caracteres"
+            />
+          </label>
+          <label className="auth-label">
+            Confirmar senha
+            <input
+              type="password"
+              value={confirmacao}
+              onChange={(e) => setConfirmacao(e.target.value)}
+              required
+              minLength={8}
+              autoComplete="new-password"
+            />
+          </label>
+          {erro && <p className="auth-erro">{erro}</p>}
+          <button type="submit" className="auth-btn-principal" disabled={enviando}>
+            {enviando ? "Criando conta…" : "Criar conta"}
+          </button>
+        </form>
+        <div className="auth-links">
+          <Link to="/login" className="auth-link">Já tem conta? Entrar</Link>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
