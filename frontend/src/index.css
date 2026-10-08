@@ -382,6 +382,37 @@ fieldset:disabled {
   pointer-events: none;
 }
 
+/* ─── Seção de papel (substitui fieldset nas telas de gerenciar papéis) ────── */
+.secao-papel {
+  border: 1px solid var(--cor-borda);
+  border-left: 3px solid var(--cafe-noir);
+  border-radius: var(--raio-md);
+  padding: var(--s-lg) var(--s-lg) var(--s-md);
+  background-color: var(--cor-fundo-card);
+  position: relative;
+}
+
+.secao-papel__rotulo {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--cafe-noir);
+  margin-bottom: var(--s-md);
+}
+
+.secao-papel label {
+  display: block;
+  font-size: 0.875rem;
+  margin-bottom: var(--s-sm);
+}
+
+.secao-papel--desabilitado {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 /* ─── Grupos de ações ────────────────────────────────────────────────────────── */
 .acoes {
   display: flex;
@@ -1259,6 +1290,22 @@ details[open] .cp-tecnico__chevron {
 }
 
 .link-voltar:hover {
+  color: var(--cor-texto-link);
+  text-decoration: none;
+}
+
+/* Link de ação secundária — abaixo de títulos de seção */
+.link-acao {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--cor-texto-secundario);
+  text-decoration: none;
+  margin-bottom: var(--s-lg);
+  transition: color 0.15s;
+}
+
+.link-acao:hover {
   color: var(--cor-texto-link);
   text-decoration: none;
 }

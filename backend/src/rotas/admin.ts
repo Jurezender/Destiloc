@@ -30,6 +30,26 @@ const admin: FastifyPluginAsync = async (app) => {
     },
   );
 
+  app.get(
+    '/admin/participantes',
+    { preHandler: [exigirAdmin] },
+    async (_req, reply) => {
+      const res = await obterPool().query<{
+        address: string;
+        nome_responsavel: string;
+        nome_empresa: string;
+        tipo_participante: string | null;
+      }>(
+        `SELECT cv.address, u.nome_responsavel, u.nome_empresa, u.tipo_participante
+         FROM carteiras_vinculadas cv
+         JOIN usuarios u ON u.id = cv.usuario_id
+         WHERE cv.status = 'autorizada'
+         ORDER BY u.nome_responsavel, u.nome_empresa`,
+      );
+      return reply.send({ participantes: res.rows });
+    },
+  );
+
   app.patch<{
     Params: { address: string };
     Body: { status: 'autorizada' | 'revogada' };

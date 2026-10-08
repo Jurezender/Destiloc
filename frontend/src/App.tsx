@@ -15,6 +15,7 @@ import { EsqueciSenha } from "./paginas/EsqueciSenha";
 import { Login } from "./paginas/Login";
 import { LoteDetalhe } from "./paginas/LoteDetalhe";
 import { Lotes } from "./paginas/Lotes";
+import { PapeisParticipantes } from "./paginas/PapeisParticipantes";
 import { Participantes } from "./paginas/Participantes";
 import { Registrar } from "./paginas/Registrar";
 import { VincularCarteira } from "./paginas/VincularCarteira";
@@ -65,6 +66,17 @@ export function App() {
                 mensagemPapel="Só administradores (em algum dos três contratos) podem gerenciar participantes."
               >
                 <Participantes />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="participantes/papeis"
+            element={
+              <RotaProtegida
+                exigirPapel={(p) => p.admin}
+                mensagemPapel="Só administradores podem gerenciar papéis."
+              >
+                <PapeisParticipantes />
               </RotaProtegida>
             }
           />

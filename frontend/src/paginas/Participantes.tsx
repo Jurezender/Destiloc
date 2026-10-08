@@ -1,208 +1,106 @@
-import type { Contract, JsonRpcSigner } from "ethers";
+import type { Contract } from "ethers";
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../contexto/AuthContexto";
 import { useCarteira } from "../contexto/CarteiraContexto";
-import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
-import { feedbackDaTransacao, type FeedbackTx, mapearErroContrato } from "../lib/erros";
+import { mapearErroContrato } from "../lib/erros";
+import { encurtarEndereco } from "../lib/formatadores";
 import { PAPEL_ADMIN, PAPEL_ENVASADOR, PAPEL_FORNECEDOR, PAPEL_PRODUTOR } from "../lib/papeis";
+import { API_URL, fetchApi } from "../lib/api";
 
-interface Detentores {
-  admin: string[];
-  fornecedor: string[];
-  produtor: string[];
-  envasador: string[];
+interface ParticipanteDB {
+  address: string;
+  nome_responsavel: string;
+  nome_empresa: string;
+  tipo_participante: string | null;
 }
 
-async function aplicarPapel(
-  papel: string,
-  conta: string,
-  acao: "conceder" | "revogar",
-  signer: JsonRpcSigner,
-  chainId: number
-) {
-  const acesso = obterContrato("ContratoAcesso", chainId, signer);
-  const tx = acao === "conceder" ? await acesso.grantRole(papel, conta) : await acesso.revokeRole(papel, conta);
-  await tx.wait();
+interface Participante extends ParticipanteDB {
+  admin: boolean;
+  fornecedor: boolean;
+  produtor: boolean;
+  envasador: boolean;
 }
 
-async function listarDetentores(acesso: Contract, papel: string): Promise<string[]> {
+async function listarMembros(acesso: Contract, papel: string): Promise<string[]> {
   const total = Number(await acesso.getRoleMemberCount(papel));
   return Promise.all(
-    Array.from({ length: total }, (_, indice) => acesso.getRoleMember(papel, indice) as Promise<string>)
+    Array.from({ length: total }, (_, i) => acesso.getRoleMember(papel, i) as Promise<string>),
   );
 }
 
-function SecaoPapel({
-  titulo,
-  papel,
-  chainId,
-  signer,
-  aoConcluir,
-}: {
-  titulo: string;
-  papel: string;
-  chainId: number;
-  signer: JsonRpcSigner;
-  aoConcluir: () => void;
-}) {
-  const [endereco, setEndereco] = useState("");
-  const [status, setStatus] = useState<string | null>(null);
-  const [erro, setErro] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
-  const [executando, setExecutando] = useState(false);
-
-  async function executar(acao: "conceder" | "revogar") {
-    setErro(null);
-    setStatus(null);
-    setFeedback(null);
-    if (!endereco) {
-      setErro("Informe o endereço da conta.");
-      return;
-    }
-
-    setExecutando(true);
-    try {
-      const acesso = obterContrato("ContratoAcesso", chainId, signer);
-      const possuiPapel = (await acesso.hasRole(papel, endereco)) as boolean;
-      if (acao === "conceder" && possuiPapel) {
-        setErro("Esta conta já possui este papel.");
-        return;
-      }
-      if (acao === "revogar" && !possuiPapel) {
-        setErro("Esta conta não possui este papel.");
-        return;
-      }
-      setStatus(`${acao === "conceder" ? "Concedendo" : "Revogando"} papel no ContratoAcesso…`);
-      await aplicarPapel(papel, endereco, acao, signer, chainId);
-      setStatus(null);
-      setFeedback({ tipo: "ok", texto: `Papel ${acao === "conceder" ? "concedido" : "revogado"} com sucesso.` });
-      aoConcluir();
-    } catch (erroAcao) {
-      setStatus(null);
-      setFeedback(feedbackDaTransacao(erroAcao));
-    } finally {
-      setExecutando(false);
-    }
-  }
-
-  return (
-    <fieldset disabled={executando}>
-      <legend>{titulo}</legend>
-      <label>
-        Endereço da conta
-        <input value={endereco} onChange={(e) => setEndereco(e.target.value.trim())} placeholder="0x…" />
-      </label>
-      <div className="acoes">
-        <button type="button" onClick={() => void executar("conceder")}>
-          Conceder
-        </button>
-        <button type="button" onClick={() => void executar("revogar")}>
-          Revogar
-        </button>
-      </div>
-      {status && <p className="dica">{status}</p>}
-      {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
-      {erro && <p className="erro">{erro}</p>}
-    </fieldset>
-  );
-}
-
-function ListaEnderecos({ titulo, enderecos }: { titulo: string; enderecos: string[] }) {
-  return (
-    <div>
-      <h4>{titulo}</h4>
-      {enderecos.length === 0 ? (
-        <p className="dica">Nenhuma conta.</p>
-      ) : (
-        <ul className="lista-compacta">
-          {enderecos.map((endereco) => (
-            <li key={endereco} className="mono">{endereco}</li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
+const ROTULO_TIPO: Record<string, string> = {
+  admin: "Administrador",
+  fornecedor: "Fornecedor",
+  produtor: "Produtor",
+  envasador: "Envasador",
+};
 
 export function Participantes() {
+  const { token } = useAuth();
   const { chainId, signer } = useCarteira();
-  const papeis = usePapeis();
-  const [detentores, setDetentores] = useState<Detentores | null>(null);
-  const [carregando, setCarregando] = useState(false);
+  const [participantes, setParticipantes] = useState<Participante[]>([]);
+  const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
 
-  const carregarDetentores = useCallback(async () => {
-    if (!chainId || !signer) return;
-
+  const carregar = useCallback(async () => {
+    if (!token || !chainId || !signer) return;
     setCarregando(true);
     setErro(null);
     try {
       const acesso = obterContrato("ContratoAcesso", chainId, signer);
-      const [admin, fornecedor, produtor, envasador] = await Promise.all([
-        listarDetentores(acesso, PAPEL_ADMIN),
-        listarDetentores(acesso, PAPEL_FORNECEDOR),
-        listarDetentores(acesso, PAPEL_PRODUTOR),
-        listarDetentores(acesso, PAPEL_ENVASADOR),
-      ]);
-      setDetentores({ admin, fornecedor, produtor, envasador });
-    } catch (erroLeitura) {
-      setErro(mapearErroContrato(erroLeitura));
+
+      const [resDB, membrosAdmin, membrosFornecedor, membrosProdutor, membrosEnvasador] =
+        await Promise.all([
+          fetchApi(`${API_URL}/admin/participantes`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          listarMembros(acesso, PAPEL_ADMIN),
+          listarMembros(acesso, PAPEL_FORNECEDOR),
+          listarMembros(acesso, PAPEL_PRODUTOR),
+          listarMembros(acesso, PAPEL_ENVASADOR),
+        ]);
+
+      if (!resDB.ok) throw new Error(`Erro ao carregar participantes (HTTP ${resDB.status})`);
+      const { participantes: lista } = (await resDB.json()) as { participantes: ParticipanteDB[] };
+
+      const setAdmin      = new Set(membrosAdmin.map((a) => a.toLowerCase()));
+      const setFornecedor = new Set(membrosFornecedor.map((a) => a.toLowerCase()));
+      const setProdutor   = new Set(membrosProdutor.map((a) => a.toLowerCase()));
+      const setEnvasador  = new Set(membrosEnvasador.map((a) => a.toLowerCase()));
+
+      setParticipantes(
+        lista.map((p) => ({
+          ...p,
+          admin:      setAdmin.has(p.address.toLowerCase()),
+          fornecedor: setFornecedor.has(p.address.toLowerCase()),
+          produtor:   setProdutor.has(p.address.toLowerCase()),
+          envasador:  setEnvasador.has(p.address.toLowerCase()),
+        })),
+      );
+    } catch (erroCarregar) {
+      setErro(
+        erroCarregar instanceof Error ? erroCarregar.message : mapearErroContrato(erroCarregar),
+      );
     } finally {
       setCarregando(false);
     }
-  }, [chainId, signer]);
+  }, [token, chainId, signer]);
 
   useEffect(() => {
-    void carregarDetentores();
-  }, [carregarDetentores]);
+    void carregar();
+  }, [carregar]);
 
   if (!chainId || !signer) return null;
-
-  const aoConcluir = () => {
-    void carregarDetentores();
-    papeis.recarregar();
-  };
 
   return (
     <section>
       <h1>Participantes</h1>
-      <p className="dica">
-        Uma mesma conta pode acumular os papéis de
-        administrador, fornecedor, produtor e envasador.
-      </p>
+      <Link to="/participantes/papeis" className="link-acao">
+        Gerenciar papéis →
+      </Link>
 
-      <div className="grade-formularios">
-        <SecaoPapel
-          titulo="Fornecedor"
-          papel={PAPEL_FORNECEDOR}
-          chainId={chainId}
-          signer={signer}
-          aoConcluir={aoConcluir}
-        />
-        <SecaoPapel
-          titulo="Produtor"
-          papel={PAPEL_PRODUTOR}
-          chainId={chainId}
-          signer={signer}
-          aoConcluir={aoConcluir}
-        />
-        <SecaoPapel
-          titulo="Envasador"
-          papel={PAPEL_ENVASADOR}
-          chainId={chainId}
-          signer={signer}
-          aoConcluir={aoConcluir}
-        />
-        <SecaoPapel
-          titulo="Administrador"
-          papel={PAPEL_ADMIN}
-          chainId={chainId}
-          signer={signer}
-          aoConcluir={aoConcluir}
-        />
-      </div>
-
-      <h2>Contas atuais por papel</h2>
       {carregando && (
         <div className="carregando">
           <span className="carregando__indicador" aria-hidden="true" />
@@ -210,14 +108,64 @@ export function Participantes() {
         </div>
       )}
       {erro && <p className="erro">{erro}</p>}
-      {detentores && (
-        <div className="grade-listas">
-          <ListaEnderecos titulo="Administradores" enderecos={detentores.admin} />
-          <ListaEnderecos titulo="Fornecedores" enderecos={detentores.fornecedor} />
-          <ListaEnderecos titulo="Produtores" enderecos={detentores.produtor} />
-          <ListaEnderecos titulo="Envasadores" enderecos={detentores.envasador} />
+      {!carregando && !erro && participantes.length === 0 && (
+        <p className="dica">Nenhuma carteira autorizada ainda.</p>
+      )}
+      {!carregando && !erro && participantes.length > 0 && (
+        <div className="tabela-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Carteira</th>
+                <th>Papéis ativos</th>
+              </tr>
+            </thead>
+            <tbody>
+              {participantes.map((p) => {
+                const papeis = [
+                  p.admin      && "Administrador",
+                  p.fornecedor && "Fornecedor",
+                  p.produtor   && "Produtor",
+                  p.envasador  && "Envasador",
+                ].filter(Boolean) as string[];
+
+                return (
+                  <tr key={p.address}>
+                    <td>
+                      <span style={{ fontWeight: 500 }}>{p.nome_responsavel}</span>
+                      <br />
+                      <span style={{ fontSize: "0.8125rem", color: "var(--cor-texto-secundario)" }}>
+                        {p.nome_empresa}
+                        {p.tipo_participante && (
+                          <> · {ROTULO_TIPO[p.tipo_participante] ?? p.tipo_participante}</>
+                        )}
+                      </span>
+                    </td>
+                    <td title={p.address} className="mono">
+                      {encurtarEndereco(p.address)}
+                    </td>
+                    <td>
+                      {papeis.length === 0 ? (
+                        <span style={{ color: "var(--cor-texto-secundario)", fontStyle: "italic" }}>
+                          Nenhum
+                        </span>
+                      ) : (
+                        <div className="acoes-tabela">
+                          {papeis.map((r) => (
+                            <span key={r} className="badge badge--ok">{r}</span>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
+
     </section>
   );
 }
