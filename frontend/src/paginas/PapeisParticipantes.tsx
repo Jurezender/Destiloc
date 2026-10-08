@@ -1,6 +1,6 @@
 import type { JsonRpcSigner } from "ethers";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
@@ -28,14 +28,16 @@ function SecaoPapel({
   chainId,
   signer,
   aoConcluir,
+  enderecoInicial = "",
 }: {
   titulo: string;
   papel: string;
   chainId: number;
   signer: JsonRpcSigner;
   aoConcluir: () => void;
+  enderecoInicial?: string;
 }) {
-  const [endereco, setEndereco] = useState("");
+  const [endereco, setEndereco] = useState(enderecoInicial);
   const [status, setStatus] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
@@ -107,6 +109,8 @@ function SecaoPapel({
 export function PapeisParticipantes() {
   const { chainId, signer } = useCarteira();
   const papeis = usePapeis();
+  const [params] = useSearchParams();
+  const enderecoInicial = params.get("endereco") ?? "";
 
   if (!chainId || !signer) return null;
 
@@ -126,6 +130,7 @@ export function PapeisParticipantes() {
           chainId={chainId}
           signer={signer}
           aoConcluir={aoConcluir}
+          enderecoInicial={enderecoInicial}
         />
         <SecaoPapel
           titulo="Produtor"
@@ -133,6 +138,7 @@ export function PapeisParticipantes() {
           chainId={chainId}
           signer={signer}
           aoConcluir={aoConcluir}
+          enderecoInicial={enderecoInicial}
         />
         <SecaoPapel
           titulo="Envasador"
@@ -140,6 +146,7 @@ export function PapeisParticipantes() {
           chainId={chainId}
           signer={signer}
           aoConcluir={aoConcluir}
+          enderecoInicial={enderecoInicial}
         />
         <SecaoPapel
           titulo="Administrador"
@@ -147,6 +154,7 @@ export function PapeisParticipantes() {
           chainId={chainId}
           signer={signer}
           aoConcluir={aoConcluir}
+          enderecoInicial={enderecoInicial}
         />
       </div>
     </section>
