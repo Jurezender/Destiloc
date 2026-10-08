@@ -114,8 +114,8 @@ export function Registrar() {
               type="text"
               value={nomeEmpresa}
               onChange={(e) => setNomeEmpresa(e.target.value)}
-              required
-              minLength={2}
+              required={tipoParticipante !== "admin"}
+              minLength={tipoParticipante !== "admin" ? 2 : undefined}
               autoComplete="organization"
               placeholder="Razão social ou nome fantasia"
             />

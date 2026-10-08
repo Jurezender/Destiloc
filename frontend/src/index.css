@@ -239,30 +239,6 @@ a:hover {
   margin: 0 auto;
 }
 
-/* ─── Status da carteira ─────────────────────────────────────────────────────── */
-.status-carteira {
-  font-size: 0.8125rem;
-  color: rgba(245, 239, 227, 0.7);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-sm);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.status-carteira strong {
-  color: var(--cor-texto-invertido);
-  font-weight: 600;
-}
-
-.status-carteira--aviso {
-  color: rgba(245, 239, 227, 0.55);
-}
-
-.status-carteira button {
-  padding: 0.3125rem 0.875rem;
-  font-size: 0.8125rem;
-}
 
 /* ─── Botões ─────────────────────────────────────────────────────────────────── */
 button {
@@ -2143,11 +2119,6 @@ details[open] .cp-tecnico__chevron {
 
 /* Mobile (< 600px): formulários, inputs e grades */
 @media (max-width: 600px) {
-  /* Oculta e-mail no cabeçalho — mantém apenas "Sair · endereço" */
-  .status-carteira__usuario {
-    display: none;
-  }
-
   .layout__conteudo {
     padding: var(--s-md);
   }
@@ -2208,11 +2179,6 @@ details[open] .cp-tecnico__chevron {
 
 /* Mobile pequeno (< 480px): títulos de seção e listas */
 @media (max-width: 480px) {
-  /* Oculta indicador de rede no cabeçalho para liberar espaço */
-  .status-carteira__rede {
-    display: none;
-  }
-
   .popup-carteira-trocada {
     padding: var(--s-lg) var(--s-lg);
   }

@@ -13,7 +13,6 @@ interface ParticipanteDB {
   address: string;
   nome_responsavel: string;
   nome_empresa: string;
-  tipo_participante: string | null;
 }
 
 interface Participante extends ParticipanteDB {
@@ -30,12 +29,6 @@ async function listarMembros(acesso: Contract, papel: string): Promise<string[]>
   );
 }
 
-const ROTULO_TIPO: Record<string, string> = {
-  admin: "Administrador",
-  fornecedor: "Fornecedor",
-  produtor: "Produtor",
-  envasador: "Envasador",
-};
 
 export function Participantes() {
   const { token } = useAuth();
@@ -133,14 +126,20 @@ export function Participantes() {
                 return (
                   <tr key={p.address}>
                     <td>
-                      <span style={{ fontWeight: 500 }}>{p.nome_responsavel}</span>
-                      <br />
-                      <span style={{ fontSize: "0.8125rem", color: "var(--cor-texto-secundario)" }}>
-                        {p.nome_empresa}
-                        {p.tipo_participante && (
-                          <> · {ROTULO_TIPO[p.tipo_participante] ?? p.tipo_participante}</>
-                        )}
-                      </span>
+                      <Link
+                        to={`/participantes/papeis?endereco=${p.address}`}
+                        style={{ fontWeight: 500 }}
+                      >
+                        {p.nome_responsavel}
+                      </Link>
+                      {p.nome_empresa && (
+                        <>
+                          <br />
+                          <span style={{ fontSize: "0.8125rem", color: "var(--cor-texto-secundario)" }}>
+                            {p.nome_empresa}
+                          </span>
+                        </>
+                      )}
                     </td>
                     <td title={p.address} className="mono">
                       {encurtarEndereco(p.address)}
