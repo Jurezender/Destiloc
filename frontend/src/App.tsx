@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvedor } from "./contexto/AuthContexto";
+import { CarteiraProvedor } from "./contexto/CarteiraContexto";
 import { AreaOperacional } from "./componentes/AreaOperacional";
 import { RotaAutenticada } from "./componentes/RotaAutenticada";
 import { RotaProtegida } from "./componentes/RotaProtegida";
@@ -30,7 +31,7 @@ export function App() {
         {/* Páginas de autenticação: sem layout operacional. */}
         <Route path="/login" element={<Login />} />
         <Route path="/registrar" element={<Registrar />} />
-        <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+        <Route path="/esqueci-senha" element={<CarteiraProvedor><EsqueciSenha /></CarteiraProvedor>} />
 
         {/* Operacional: layout com nav, MetaMask e papéis. */}
         <Route element={<AreaOperacional />}>

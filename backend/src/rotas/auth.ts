@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { registrarUsuario, autenticarUsuario, EmailJaCadastradoError, type PerfilRegistro } from '../servicos/auth.js';
+import { registrarUsuario, autenticarUsuario, buscarCarteiraPorEmail, gerarTokenRedefinicao, redefinirSenha, EmailJaCadastradoError, type PerfilRegistro } from '../servicos/auth.js';
 import {
   gerarChallenge,
   verificarChallenge,
@@ -25,12 +25,12 @@ const auth: FastifyPluginAsync = async (app) => {
       schema: {
         body: {
           type: 'object',
-          required: ['email', 'senha', 'nome_responsavel', 'nome_empresa', 'tipo_participante'],
+          required: ['email', 'senha', 'nome_responsavel', 'tipo_participante'],
           properties: {
             email: { type: 'string', minLength: 5 },
             senha: { type: 'string', minLength: 8 },
             nome_responsavel: { type: 'string', minLength: 2 },
-            nome_empresa: { type: 'string', minLength: 2 },
+            nome_empresa: { type: 'string' },
             tipo_participante: { type: 'string', enum: ['fornecedor', 'produtor', 'envasador', 'admin'] },
             cnpj: { type: 'string', minLength: 14 },
           },
@@ -196,6 +196,92 @@ const auth: FastifyPluginAsync = async (app) => {
         }
         throw err;
       }
+    },
+  );
+  // Etapa 0: gera challenge de reset (sem JWT — usuário ainda não está logado)
+  app.post<{ Body: { email: string } }>(
+    '/auth/esqueci-senha/challenge',
+    {
+      schema: {
+        body: {
+          type: 'object',
+          required: ['email'],
+          properties: { email: { type: 'string' } },
+          additionalProperties: false,
+        },
+      },
+    },
+    async (req, reply) => {
+      const resultado = await buscarCarteiraPorEmail(req.body.email);
+      if (!resultado) {
+        return reply.status(404).send({ erro: 'Nenhuma conta encontrada com este e-mail.' });
+      }
+      const { mensagem, nonce } = await gerarChallenge(resultado.usuarioId, resultado.address);
+      return reply.send({ mensagem, nonce, address: resultado.address });
+    },
+  );
+
+  // Etapa 2: valida assinatura e emite token de reset
+  app.post<{ Body: { email: string; nonce: string; assinatura: string } }>(
+    '/auth/esqueci-senha/verificar-carteira',
+    {
+      schema: {
+        body: {
+          type: 'object',
+          required: ['email', 'nonce', 'assinatura'],
+          properties: {
+            email: { type: 'string' },
+            nonce: { type: 'string' },
+            assinatura: { type: 'string' },
+          },
+          additionalProperties: false,
+        },
+      },
+    },
+    async (req, reply) => {
+      const { email, nonce, assinatura } = req.body;
+
+      const resultado = await buscarCarteiraPorEmail(email);
+      if (!resultado) {
+        return reply.status(404).send({ erro: 'Nenhuma conta encontrada com este e-mail.' });
+      }
+
+      try {
+        await verificarChallenge(resultado.usuarioId, nonce, assinatura);
+      } catch (err) {
+        if (err instanceof ChallengeInvalidoError || err instanceof AssinaturaInvalidaError) {
+          return reply.status(422).send({ erro: (err as Error).message });
+        }
+        throw err;
+      }
+
+      const token = await gerarTokenRedefinicao(resultado.usuarioId);
+      return reply.send({ token });
+    },
+  );
+
+  // Etapa 3: salva nova senha usando o token emitido na etapa 2
+  app.post<{ Body: { token: string; novaSenha: string } }>(
+    '/auth/redefinir-senha',
+    {
+      schema: {
+        body: {
+          type: 'object',
+          required: ['token', 'novaSenha'],
+          properties: {
+            token: { type: 'string', minLength: 64, maxLength: 64 },
+            novaSenha: { type: 'string', minLength: 8 },
+          },
+          additionalProperties: false,
+        },
+      },
+    },
+    async (req, reply) => {
+      const sucesso = await redefinirSenha(req.body.token, req.body.novaSenha);
+      if (!sucesso) {
+        return reply.status(400).send({ erro: 'Sessão de redefinição expirada. Comece novamente.' });
+      }
+      return reply.send({ ok: true });
     },
   );
 };
