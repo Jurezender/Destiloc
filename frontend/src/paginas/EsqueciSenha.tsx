@@ -12,6 +12,7 @@ export function EsqueciSenha() {
   const [email, setEmail] = useState("");
   const [carteiraEsperada, setCarteiraEsperada] = useState("");
   const [nonce, setNonce] = useState("");
+  const [mensagemChallenge, setMensagemChallenge] = useState("");
   const [tokenReset, setTokenReset] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmar, setConfirmar] = useState("");
@@ -36,6 +37,7 @@ export function EsqueciSenha() {
       const data = (await res.json()) as { mensagem: string; nonce: string; address: string };
       setCarteiraEsperada(data.address.toLowerCase());
       setNonce(data.nonce);
+      setMensagemChallenge(data.mensagem);
       setEtapa("carteira");
     } catch {
       setErro("Não foi possível processar a solicitação. Tente novamente.");
@@ -60,7 +62,7 @@ export function EsqueciSenha() {
       const res = await fetchApi(`${API_URL}/auth/esqueci-senha/verificar-carteira`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, nonce, assinatura: await signer.signMessage(nonce) }),
+        body: JSON.stringify({ email, nonce, assinatura: await signer.signMessage(mensagemChallenge) }),
       });
       if (!res.ok) {
         const body = (await res.json().catch(() => ({}))) as { erro?: string };
