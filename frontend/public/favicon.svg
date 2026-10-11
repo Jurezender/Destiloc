@@ -1,11 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#202808"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <circle cx="256" cy="256" r="256" fill="#202808"/>
   <text
-    x="16" y="24"
+    x="256" y="256"
     font-family="'Cormorant Garamond', Georgia, serif"
-    font-size="23"
+    font-size="380"
     font-weight="600"
     fill="#CFBB99"
     text-anchor="middle"
-    letter-spacing="0.5">D</text>
+    dominant-baseline="central">D</text>
 </svg>
