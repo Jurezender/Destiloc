@@ -70,8 +70,8 @@ describe("N. Fluxo completo da arquitetura nova", function () {
   async function fluxoGinCompleto() {
     const ctx = await implantarArquitetura();
 
-    await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(TipoInsumo.BaseAlcoolica, URI.base);
-    await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(TipoInsumo.Zimbro, URI.zimbro);
+    await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(TipoInsumo.BaseAlcoolica, 100n, ctx.produtor.address, URI.base);
+    await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(TipoInsumo.Zimbro, 100n, ctx.produtor.address, URI.zimbro);
     const baseId = 1n;
     const zimbroId = 2n;
 
@@ -86,8 +86,8 @@ describe("N. Fluxo completo da arquitetura nova", function () {
     await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(loteId, zimbroId);
     await ctx.producao
       .connect(ctx.produtor)
-      .registrarEtapa(loteId, EtapaProducao.Aromatizacao, [baseId, zimbroId], 100, 200, URI.etapa);
-    await ctx.producao.connect(ctx.produtor).concluirProducao(loteId, URI.conclusao);
+      .registrarEtapa(loteId, EtapaProducao.Aromatizacao, [baseId, zimbroId], [100n, 100n], 100, 200, URI.etapa);
+    await ctx.producao.connect(ctx.produtor).concluirProducao(loteId, ctx.envasador.address, URI.conclusao);
 
     await ctx.envasamento.connect(ctx.envasador).registrarEnvasamento(loteId, 2, URI.envasamento);
     const envasamentoId = 1n;
@@ -173,7 +173,7 @@ describe("N. Fluxo completo da arquitetura nova", function () {
     await expect(
       ctx.producao
         .connect(ctx.fornecedor)
-        .registrarEtapa(ctx.loteId, EtapaProducao.Aromatizacao, [], 1, 2, URI.etapa)
+        .registrarEtapa(ctx.loteId, EtapaProducao.Aromatizacao, [], [], 1, 2, URI.etapa)
     ).to.be.revertedWithCustomError(ctx.producao, "SemPermissao");
     await expect(
       ctx.envasamento.connect(ctx.produtor).registrarEnvasamento(ctx.loteId, 1, URI.envasamento)
@@ -181,28 +181,33 @@ describe("N. Fluxo completo da arquitetura nova", function () {
     await expect(
       ctx.producao
         .connect(ctx.envasador)
-        .registrarEtapa(ctx.loteId, EtapaProducao.Aromatizacao, [], 1, 2, URI.etapa)
+        .registrarEtapa(ctx.loteId, EtapaProducao.Aromatizacao, [], [], 1, 2, URI.etapa)
     ).to.be.revertedWithCustomError(ctx.producao, "SemPermissao");
 
-    await ctx.insumos.connect(ctx.multipapeis).avaliarInsumo(ctx.zimbroId, Resultado.Aprovado, URI.avaliacao);
-    await ctx.insumos.connect(ctx.multipapeis).avaliarInsumo(ctx.baseId, Resultado.Aprovado, URI.avaliacao);
+    await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(TipoInsumo.BaseAlcoolica, 100n, ctx.multipapeis.address, URI.base);
+    const baseMultiId = await ctx.insumos.totalLotesInsumo();
+    await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(TipoInsumo.Zimbro, 100n, ctx.multipapeis.address, URI.zimbro);
+    const zimbroMultiId = await ctx.insumos.totalLotesInsumo();
+    await ctx.insumos.connect(ctx.multipapeis).avaliarInsumo(baseMultiId, Resultado.Aprovado, URI.avaliacao);
+    await ctx.insumos.connect(ctx.multipapeis).avaliarInsumo(zimbroMultiId, Resultado.Aprovado, URI.avaliacao);
     await ctx.producao
       .connect(ctx.multipapeis)
       .criarLoteProducao(TipoBebida.Gin, configuracaoGin, URI.producao);
     const loteMultipapeis = 2n;
-    await ctx.producao.connect(ctx.multipapeis).vincularInsumoAoLote(loteMultipapeis, ctx.baseId);
-    await ctx.producao.connect(ctx.multipapeis).vincularInsumoAoLote(loteMultipapeis, ctx.zimbroId);
+    await ctx.producao.connect(ctx.multipapeis).vincularInsumoAoLote(loteMultipapeis, baseMultiId);
+    await ctx.producao.connect(ctx.multipapeis).vincularInsumoAoLote(loteMultipapeis, zimbroMultiId);
     await ctx.producao
       .connect(ctx.multipapeis)
       .registrarEtapa(
         loteMultipapeis,
         EtapaProducao.Aromatizacao,
-        [ctx.baseId, ctx.zimbroId],
+        [baseMultiId, zimbroMultiId],
+        [100n, 100n],
         300,
         400,
         URI.etapa
       );
-    await ctx.producao.connect(ctx.multipapeis).concluirProducao(loteMultipapeis, URI.conclusao);
+    await ctx.producao.connect(ctx.multipapeis).concluirProducao(loteMultipapeis, ctx.multipapeis.address, URI.conclusao);
     await ctx.envasamento
       .connect(ctx.multipapeis)
       .registrarEnvasamento(loteMultipapeis, 1, URI.envasamento);

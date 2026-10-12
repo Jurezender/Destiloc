@@ -57,8 +57,9 @@ describe("K. ContratoInsumos", function () {
     };
   }
 
-  async function cadastrar(ctx, assinante = ctx.fornecedor, tipo = Tipo.Agua, uri = URI.a) {
-    await ctx.insumos.connect(assinante).registrarLoteInsumo(tipo, uri);
+  async function cadastrar(ctx, assinante = ctx.fornecedor, tipo = Tipo.Agua, uri = URI.a, destinatario = null) {
+    const dest = destinatario ?? ctx.produtor.address;
+    await ctx.insumos.connect(assinante).registrarLoteInsumo(tipo, 100n, dest, uri);
     return await ctx.insumos.totalLotesInsumo();
   }
 
@@ -85,9 +86,9 @@ describe("K. ContratoInsumos", function () {
   describe("cadastro", function () {
     it("fornecedor registra lote com autoria, timestamp e evento corretos", async function () {
       const ctx = await loadFixture(implantar);
-      const tx = await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(Tipo.Agua, URI.a);
+      const tx = await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(Tipo.Agua, 100n, ctx.produtor.address, URI.a);
       await expect(tx).to.emit(ctx.insumos, "LoteInsumoRegistrado")
-        .withArgs(1n, ctx.fornecedor.address, Tipo.Agua, URI.a, anyValue);
+        .withArgs(1n, ctx.fornecedor.address, Tipo.Agua, 100n, ctx.produtor.address, URI.a, anyValue);
       const recibo = await tx.wait();
       const bloco = await ethers.provider.getBlock(recibo.blockNumber);
       const lote = await ctx.insumos.obterLoteInsumo(1);
@@ -100,7 +101,7 @@ describe("K. ContratoInsumos", function () {
     it("nao fornecedor, admin e produtor sem FORNECEDOR_ROLE nao registram", async function () {
       const ctx = await loadFixture(implantar);
       for (const conta of [ctx.semPapel, ctx.admin, ctx.produtor]) {
-        await expect(ctx.insumos.connect(conta).registrarLoteInsumo(Tipo.Agua, URI.a))
+        await expect(ctx.insumos.connect(conta).registrarLoteInsumo(Tipo.Agua, 100n, ctx.produtor.address, URI.a))
           .to.be.revertedWithCustomError(ctx.insumos, "SemPermissao");
       }
     });
@@ -189,7 +190,7 @@ describe("K. ContratoInsumos", function () {
 
     it("conta com multiplos papeis e PRODUTOR_ROLE avalia", async function () {
       const ctx = await loadFixture(implantar);
-      await cadastrar(ctx);
+      await cadastrar(ctx, ctx.fornecedor, Tipo.Agua, URI.a, ctx.multipapeis.address);
       await ctx.insumos.connect(ctx.multipapeis).avaliarInsumo(1, Resultado.Aprovado, URI.b);
       expect(await ctx.insumos.aprovadoPor(1, ctx.multipapeis.address)).to.equal(true);
     });
@@ -205,14 +206,16 @@ describe("K. ContratoInsumos", function () {
         .to.be.revertedWithCustomError(ctx.insumos, "ReferenciaIPFSInvalida");
     });
 
-    it("aceita Rejeitado e mantem avaliacoes de produtores independentes", async function () {
+    it("aceita Rejeitado; cada insumo tem produtor designado com avaliacao independente", async function () {
       const ctx = await loadFixture(implantar);
-      await cadastrar(ctx);
+      await cadastrar(ctx, ctx.fornecedor, Tipo.Agua, URI.a, ctx.produtor.address);
+      await cadastrar(ctx, ctx.fornecedor, Tipo.Agua, URI.b, ctx.produtor2.address);
       await ctx.insumos.connect(ctx.produtor).avaliarInsumo(1, Resultado.Aprovado, URI.b);
-      await ctx.insumos.connect(ctx.produtor2).avaliarInsumo(1, Resultado.Rejeitado, URI.c);
+      await ctx.insumos.connect(ctx.produtor2).avaliarInsumo(2, Resultado.Rejeitado, URI.c);
       expect(await ctx.insumos.resultadoAtual(1, ctx.produtor.address)).to.equal(Resultado.Aprovado);
-      expect(await ctx.insumos.resultadoAtual(1, ctx.produtor2.address)).to.equal(Resultado.Rejeitado);
-      expect(await ctx.insumos.aprovadoPor(1, ctx.produtor2.address)).to.equal(false);
+      expect(await ctx.insumos.resultadoAtual(2, ctx.produtor2.address)).to.equal(Resultado.Rejeitado);
+      expect(await ctx.insumos.aprovadoPor(1, ctx.produtor.address)).to.equal(true);
+      expect(await ctx.insumos.aprovadoPor(2, ctx.produtor2.address)).to.equal(false);
     });
 
     it("reanexa avaliacao, preserva historico e usa a ultima como vigente", async function () {

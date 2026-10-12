@@ -49,15 +49,16 @@ describe("M. ContratoEnvasamento", function () {
     };
   }
 
-  async function criarProducaoConcluida(ctx) {
-    await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(TipoInsumo.BaseAlcoolica, URI.a);
+  async function criarProducaoConcluida(ctx, envasadorDesignado = null) {
+    const envDest = envasadorDesignado ?? ctx.envasador;
+    await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(TipoInsumo.BaseAlcoolica, 100n, ctx.produtor.address, URI.a);
     const insumoId = await ctx.insumos.totalLotesInsumo();
     await ctx.insumos.connect(ctx.produtor).avaliarInsumo(insumoId, Resultado.Aprovado, URI.b);
     await ctx.producao.connect(ctx.produtor).criarLoteProducao(Bebida.Vodca, configVazia, URI.a);
     const loteId = await ctx.producao.totalLotesProducao();
     await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(loteId, insumoId);
-    await ctx.producao.connect(ctx.produtor).registrarEtapa(loteId, Etapa.Filtragem, [insumoId], 1, 2, URI.b);
-    await ctx.producao.connect(ctx.produtor).concluirProducao(loteId, URI.c);
+    await ctx.producao.connect(ctx.produtor).registrarEtapa(loteId, Etapa.Filtragem, [insumoId], [1n], 1, 2, URI.b);
+    await ctx.producao.connect(ctx.produtor).concluirProducao(loteId, envDest.address, URI.c);
     return loteId;
   }
 
@@ -107,7 +108,7 @@ describe("M. ContratoEnvasamento", function () {
       }
     });
     it("conta multi-role com ENVASADOR_ROLE registra", async function () {
-      const ctx = await loadFixture(implantar); const loteId = await criarProducaoConcluida(ctx);
+      const ctx = await loadFixture(implantar); const loteId = await criarProducaoConcluida(ctx, ctx.multipapeis);
       await registrar(ctx, loteId, 1, URI.a, ctx.multipapeis);
       expect((await ctx.envasamento.obterEnvasamento(1)).envasador).to.equal(ctx.multipapeis.address);
     });
@@ -124,7 +125,7 @@ describe("M. ContratoEnvasamento", function () {
     });
     it("IDs sao sequenciais e uma producao aceita varios envasamentos indexados", async function () {
       const ctx = await loadFixture(implantar); const loteId = await criarProducaoConcluida(ctx);
-      expect(await registrar(ctx, loteId, 2)).to.equal(1n); expect(await registrar(ctx, loteId, 3, URI.b, ctx.envasador2)).to.equal(2n);
+      expect(await registrar(ctx, loteId, 2)).to.equal(1n); expect(await registrar(ctx, loteId, 3, URI.b)).to.equal(2n);
       expect(await ctx.envasamento.totalEnvasamentosDaProducao(loteId)).to.equal(2n);
       expect(await ctx.envasamento.envasamentoDaProducaoPorIndice(loteId, 0)).to.equal(1n);
       expect(await ctx.envasamento.envasamentoDaProducaoPorIndice(loteId, 1)).to.equal(2n);
@@ -170,8 +171,10 @@ describe("M. ContratoEnvasamento", function () {
       await expect(ctx.envasamento.connect(ctx.envasador).emitirGarrafas(1, 1)).to.be.revertedWithCustomError(ctx.envasamento, "EnvasamentoJaConcluido");
     });
     it("envasamentos diferentes mantem garrafas independentes e token IDs globais", async function () {
-      const ctx = await loadFixture(implantar); const loteId = await criarProducaoConcluida(ctx);
-      await registrar(ctx, loteId, 1, URI.a); await registrar(ctx, loteId, 2, URI.b, ctx.envasador2);
+      const ctx = await loadFixture(implantar);
+      const loteId = await criarProducaoConcluida(ctx);
+      const loteId2 = await criarProducaoConcluida(ctx, ctx.envasador2);
+      await registrar(ctx, loteId, 1, URI.a); await registrar(ctx, loteId2, 2, URI.b, ctx.envasador2);
       await ctx.envasamento.connect(ctx.envasador).emitirGarrafas(1, 1); await ctx.envasamento.connect(ctx.envasador2).emitirGarrafas(2, 2);
       expect(await ctx.envasamento.totalGarrafasDoEnvasamento(1)).to.equal(1n);
       expect(await ctx.envasamento.totalGarrafasDoEnvasamento(2)).to.equal(2n);
@@ -225,8 +228,10 @@ describe("M. ContratoEnvasamento", function () {
 
   describe("token URI, rastreabilidade e consultas", function () {
     it("garrafas compartilham URI do envasamento e envasamentos podem ter URIs diferentes", async function () {
-      const ctx = await loadFixture(implantar); const loteId = await criarProducaoConcluida(ctx);
-      await registrar(ctx, loteId, 2, URI.a); await registrar(ctx, loteId, 1, URI.d, ctx.envasador2);
+      const ctx = await loadFixture(implantar);
+      const loteId = await criarProducaoConcluida(ctx);
+      const loteId2 = await criarProducaoConcluida(ctx, ctx.envasador2);
+      await registrar(ctx, loteId, 2, URI.a); await registrar(ctx, loteId2, 1, URI.d, ctx.envasador2);
       await ctx.envasamento.connect(ctx.envasador).emitirGarrafas(1, 2); await ctx.envasamento.connect(ctx.envasador2).emitirGarrafas(2, 1);
       expect(await ctx.envasamento.tokenURI(1)).to.equal(URI.a); expect(await ctx.envasamento.tokenURI(2)).to.equal(URI.a); expect(await ctx.envasamento.tokenURI(3)).to.equal(URI.d);
       await expect(ctx.envasamento.tokenURI(99)).to.be.revertedWithCustomError(ctx.envasamento, "ERC721NonexistentToken");

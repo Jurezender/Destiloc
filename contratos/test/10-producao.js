@@ -1,4 +1,4 @@
-const { expect } = require("chai");
+﻿const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
@@ -29,7 +29,7 @@ const config = (maturacao = false, retificacao = false, blendagem = false, ajust
 
 describe("L. ContratoProducao", function () {
   async function implantar() {
-    const [admin, produtor, produtor2, fornecedor, multipapeis, semPapel] = await ethers.getSigners();
+    const [admin, produtor, produtor2, fornecedor, multipapeis, semPapel, envasador] = await ethers.getSigners();
     const acesso = await ethers.deployContract("ContratoAcesso", [admin.address]);
     await acesso.waitForDeployment();
     const insumos = await ethers.deployContract("ContratoInsumos", [await acesso.getAddress()]);
@@ -38,12 +38,14 @@ describe("L. ContratoProducao", function () {
     await producao.waitForDeployment();
     const FORNECEDOR = await acesso.FORNECEDOR_ROLE();
     const PRODUTOR = await acesso.PRODUTOR_ROLE();
+    const ENVASADOR = await acesso.ENVASADOR_ROLE();
     await acesso.grantRole(PRODUTOR, produtor.address);
     await acesso.grantRole(PRODUTOR, produtor2.address);
     await acesso.grantRole(FORNECEDOR, fornecedor.address);
     await acesso.grantRole(FORNECEDOR, multipapeis.address);
     await acesso.grantRole(PRODUTOR, multipapeis.address);
-    return { acesso, insumos, producao, admin, produtor, produtor2, fornecedor, multipapeis, semPapel, FORNECEDOR, PRODUTOR };
+    await acesso.grantRole(ENVASADOR, envasador.address);
+    return { acesso, insumos, producao, admin, produtor, produtor2, fornecedor, multipapeis, semPapel, envasador, FORNECEDOR, PRODUTOR, ENVASADOR };
   }
 
   async function criarLote(ctx, tipo = Bebida.Cachaca, cfg = config(), quem = ctx.produtor, uri = URI.a) {
@@ -52,14 +54,15 @@ describe("L. ContratoProducao", function () {
   }
 
   async function criarInsumo(ctx, tipo, produtor = ctx.produtor) {
-    await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(tipo, URI.a);
+    await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(tipo, 100n, produtor.address, URI.a);
     const id = await ctx.insumos.totalLotesInsumo();
     await ctx.insumos.connect(produtor).avaliarInsumo(id, Resultado.Aprovado, URI.b);
     return id;
   }
 
   async function etapa(ctx, loteId, qual, usados = [], quem = ctx.produtor, uri = URI.c) {
-    return ctx.producao.connect(quem).registrarEtapa(loteId, qual, usados, 10, 20, uri);
+    const quantidades = usados.map(() => 1n);
+    return ctx.producao.connect(quem).registrarEtapa(loteId, qual, usados, quantidades, 10, 20, uri);
   }
 
   async function prepararCachaca(ctx, cfg = config(), concluir = false) {
@@ -71,7 +74,7 @@ describe("L. ContratoProducao", function () {
     await etapa(ctx, loteId, Etapa.Destilacao);
     if (cfg.maturacaoAplicavel) await etapa(ctx, loteId, Etapa.Maturacao);
     if (cfg.ajusteFinalAplicavel) await etapa(ctx, loteId, Etapa.AjusteFinal);
-    if (concluir) await ctx.producao.connect(ctx.produtor).concluirProducao(loteId, URI.d);
+    if (concluir) await ctx.producao.connect(ctx.produtor).concluirProducao(loteId, ctx.envasador.address, URI.d);
     return { loteId, agricola };
   }
 
@@ -122,7 +125,7 @@ describe("L. ContratoProducao", function () {
       await expect(criarLote(ctx, Bebida.NaoDefinido)).to.be.revertedWithCustomError(ctx.producao, "TipoBebidaInvalido");
       await expect(criarLote(ctx, Bebida.Cachaca, config(), ctx.produtor, "")).to.be.revertedWithCustomError(ctx.producao, "ReferenciaIPFSInvalida");
     });
-    it("cada bebida aceita suas flags e rejeita flags incompatíveis", async function () {
+    it("cada bebida aceita suas flags e rejeita flags incompatÃ­veis", async function () {
       const ctx = await loadFixture(implantar);
       await criarLote(ctx, Bebida.Cachaca, config(true, false, false, true));
       await criarLote(ctx, Bebida.Whisky, config(false, false, true, true));
@@ -167,7 +170,7 @@ describe("L. ContratoProducao", function () {
       const ctx = await loadFixture(implantar);
       const lote = await criarLote(ctx);
       await expect(ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(lote, 99)).to.be.revertedWithCustomError(ctx.producao, "InsumoInexistente");
-      await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(TipoInsumo.Agua, URI.a);
+      await ctx.insumos.connect(ctx.fornecedor).registrarLoteInsumo(TipoInsumo.Agua, 100n, ctx.produtor.address, URI.a);
       const id = await ctx.insumos.totalLotesInsumo();
       await expect(ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(lote, id)).to.be.revertedWithCustomError(ctx.producao, "InsumoNaoAprovado");
       await ctx.insumos.connect(ctx.produtor).avaliarInsumo(id, Resultado.Aprovado, URI.b);
@@ -202,7 +205,7 @@ describe("L. ContratoProducao", function () {
     it("rejeita metadata, periodo, repeticao, produtor diferente e papel revogado", async function () {
       const ctx = await loadFixture(implantar);
       const lote = await criarLote(ctx);
-      await expect(ctx.producao.connect(ctx.produtor).registrarEtapa(lote, Etapa.PreparacaoBase, [], 2, 1, URI.c)).to.be.revertedWithCustomError(ctx.producao, "PeriodoInformadoInvalido");
+      await expect(ctx.producao.connect(ctx.produtor).registrarEtapa(lote, Etapa.PreparacaoBase, [], [], 2, 1, URI.c)).to.be.revertedWithCustomError(ctx.producao, "PeriodoInformadoInvalido");
       await expect(etapa(ctx, lote, Etapa.PreparacaoBase, [], ctx.produtor, "")).to.be.revertedWithCustomError(ctx.producao, "ReferenciaIPFSInvalida");
       await etapa(ctx, lote, Etapa.PreparacaoBase);
       await expect(etapa(ctx, lote, Etapa.PreparacaoBase)).to.be.revertedWithCustomError(ctx.producao, "EtapaJaRegistrada");
@@ -297,15 +300,15 @@ describe("L. ContratoProducao", function () {
         const ag = await criarInsumo(ctx, TipoInsumo.MateriaPrimaAgricola); await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(lote, ag);
         await etapa(ctx, lote, Etapa.PreparacaoBase); await etapa(ctx, lote, Etapa.Fermentacao); await etapa(ctx, lote, Etapa.Destilacao);
         if (tipo === Bebida.Whisky) await etapa(ctx, lote, Etapa.Maturacao);
-        await expect(ctx.producao.connect(ctx.produtor).concluirProducao(lote, URI.d)).to.be.revertedWithCustomError(ctx.producao, "RequisitoDeInsumoNaoAtendido");
+        await expect(ctx.producao.connect(ctx.produtor).concluirProducao(lote, ctx.envasador.address, URI.d)).to.be.revertedWithCustomError(ctx.producao, "RequisitoDeInsumoNaoAtendido");
       }
     });
     it("vodca exige BaseAlcoolica usada e ao menos uma etapa", async function () {
       const ctx = await loadFixture(implantar); const lote = await criarLote(ctx, Bebida.Vodca);
-      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(lote, URI.d)).to.be.revertedWithCustomError(ctx.producao, "EstadoProducaoInvalido");
+      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(lote, ctx.envasador.address, URI.d)).to.be.revertedWithCustomError(ctx.producao, "EstadoProducaoInvalido");
       const base = await criarInsumo(ctx, TipoInsumo.BaseAlcoolica); await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(lote, base);
       await etapa(ctx, lote, Etapa.Filtragem, [base]);
-      await ctx.producao.connect(ctx.produtor).concluirProducao(lote, URI.d);
+      await ctx.producao.connect(ctx.produtor).concluirProducao(lote, ctx.envasador.address, URI.d);
       expect(await ctx.producao.loteProducaoConcluido(lote)).to.equal(true);
     });
     it("gin exige BaseAlcoolica e Zimbro usados", async function () {
@@ -313,18 +316,18 @@ describe("L. ContratoProducao", function () {
       const base = await criarInsumo(ctx, TipoInsumo.BaseAlcoolica); const zimbro = await criarInsumo(ctx, TipoInsumo.Zimbro);
       await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(lote, base); await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(lote, zimbro);
       await etapa(ctx, lote, Etapa.Aromatizacao, [base]);
-      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(lote, URI.d)).to.be.revertedWithCustomError(ctx.producao, "RequisitoDeInsumoNaoAtendido");
+      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(lote, ctx.envasador.address, URI.d)).to.be.revertedWithCustomError(ctx.producao, "RequisitoDeInsumoNaoAtendido");
       const lote2 = await criarLote(ctx, Bebida.Gin); await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(lote2, base); await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(lote2, zimbro);
-      await etapa(ctx, lote2, Etapa.Aromatizacao, [base, zimbro]); await ctx.producao.connect(ctx.produtor).concluirProducao(lote2, URI.d);
+      await etapa(ctx, lote2, Etapa.Aromatizacao, [base, zimbro]); await ctx.producao.connect(ctx.produtor).concluirProducao(lote2, ctx.envasador.address, URI.d);
     });
     it("exige etapas OBR e COND aplicaveis", async function () {
       const ctx = await loadFixture(implantar); const lote = await criarLote(ctx, Bebida.Cachaca, config(true));
       const ag = await criarInsumo(ctx, TipoInsumo.MateriaPrimaAgricola); await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(lote, ag);
       await etapa(ctx, lote, Etapa.PreparacaoBase, [ag]);
-      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(lote, URI.d)).to.be.revertedWithCustomError(ctx.producao, "RequisitoDeEtapaNaoAtendido");
+      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(lote, ctx.envasador.address, URI.d)).to.be.revertedWithCustomError(ctx.producao, "RequisitoDeEtapaNaoAtendido");
       await etapa(ctx, lote, Etapa.Fermentacao); await etapa(ctx, lote, Etapa.Destilacao);
-      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(lote, URI.d)).to.be.revertedWithCustomError(ctx.producao, "RequisitoDeEtapaNaoAtendido");
-      await etapa(ctx, lote, Etapa.Maturacao); await ctx.producao.connect(ctx.produtor).concluirProducao(lote, URI.d);
+      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(lote, ctx.envasador.address, URI.d)).to.be.revertedWithCustomError(ctx.producao, "RequisitoDeEtapaNaoAtendido");
+      await etapa(ctx, lote, Etapa.Maturacao); await ctx.producao.connect(ctx.produtor).concluirProducao(lote, ctx.envasador.address, URI.d);
     });
     it("exige Maturacao do whisky e condicionais configuradas de vodca e gin", async function () {
       const ctx = await loadFixture(implantar);
@@ -335,14 +338,14 @@ describe("L. ContratoProducao", function () {
       await etapa(ctx, whisky, Etapa.PreparacaoBase, [agricola]);
       await etapa(ctx, whisky, Etapa.Fermentacao);
       await etapa(ctx, whisky, Etapa.Destilacao);
-      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(whisky, URI.d))
+      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(whisky, ctx.envasador.address, URI.d))
         .to.be.revertedWithCustomError(ctx.producao, "RequisitoDeEtapaNaoAtendido");
 
       const vodca = await criarLote(ctx, Bebida.Vodca, config(false, true, false, true));
       const base = await criarInsumo(ctx, TipoInsumo.BaseAlcoolica);
       await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(vodca, base);
       await etapa(ctx, vodca, Etapa.Filtragem, [base]);
-      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(vodca, URI.d))
+      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(vodca, ctx.envasador.address, URI.d))
         .to.be.revertedWithCustomError(ctx.producao, "RequisitoDeEtapaNaoAtendido");
 
       const gin = await criarLote(ctx, Bebida.Gin, config(false, false, false, true));
@@ -350,32 +353,32 @@ describe("L. ContratoProducao", function () {
       await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(gin, base);
       await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(gin, zimbro);
       await etapa(ctx, gin, Etapa.Aromatizacao, [base, zimbro]);
-      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(gin, URI.d))
+      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(gin, ctx.envasador.address, URI.d))
         .to.be.revertedWithCustomError(ctx.producao, "RequisitoDeEtapaNaoAtendido");
     });
     it("somente responsavel com papel conclui e metadata e obrigatoria", async function () {
       const ctx = await loadFixture(implantar); const { loteId } = await prepararCachaca(ctx);
-      await expect(ctx.producao.connect(ctx.produtor2).concluirProducao(loteId, URI.d)).to.be.revertedWithCustomError(ctx.producao, "NaoEhProdutorResponsavel");
-      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(loteId, "")).to.be.revertedWithCustomError(ctx.producao, "ReferenciaIPFSInvalida");
+      await expect(ctx.producao.connect(ctx.produtor2).concluirProducao(loteId, ctx.envasador.address, URI.d)).to.be.revertedWithCustomError(ctx.producao, "NaoEhProdutorResponsavel");
+      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(loteId, ctx.envasador.address, "")).to.be.revertedWithCustomError(ctx.producao, "ReferenciaIPFSInvalida");
       await ctx.acesso.revokeRole(ctx.PRODUTOR, ctx.produtor.address);
-      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(loteId, URI.d)).to.be.revertedWithCustomError(ctx.producao, "SemPermissao");
+      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(loteId, ctx.envasador.address, URI.d)).to.be.revertedWithCustomError(ctx.producao, "SemPermissao");
     });
     it("revalida insumo invalidado ou rejeitado antes da conclusao", async function () {
       const ctx = await loadFixture(implantar); const a = await prepararCachaca(ctx);
       await ctx.insumos.connect(ctx.fornecedor).invalidarLoteInsumo(a.agricola, URI.d);
-      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(a.loteId, URI.d)).to.be.revertedWithCustomError(ctx.producao, "InsumoInvalido");
+      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(a.loteId, ctx.envasador.address, URI.d)).to.be.revertedWithCustomError(ctx.producao, "InsumoInvalido");
       const b = await prepararCachaca(ctx); await ctx.insumos.connect(ctx.produtor).avaliarInsumo(b.agricola, Resultado.Rejeitado, URI.d);
-      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(b.loteId, URI.d)).to.be.revertedWithCustomError(ctx.producao, "InsumoNaoAprovado");
+      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(b.loteId, ctx.envasador.address, URI.d)).to.be.revertedWithCustomError(ctx.producao, "InsumoNaoAprovado");
     });
     it("conclusao grava estado, timestamp e URI; alteracao posterior nao reabre lote", async function () {
       const ctx = await loadFixture(implantar); const { loteId, agricola } = await prepararCachaca(ctx);
-      const tx = await ctx.producao.connect(ctx.produtor).concluirProducao(loteId, URI.d);
-      await expect(tx).to.emit(ctx.producao, "ProducaoConcluida").withArgs(loteId, ctx.produtor.address, URI.d, anyValue);
+      const tx = await ctx.producao.connect(ctx.produtor).concluirProducao(loteId, ctx.envasador.address, URI.d);
+      await expect(tx).to.emit(ctx.producao, "ProducaoConcluida").withArgs(loteId, ctx.produtor.address, ctx.envasador.address, URI.d, anyValue);
       const lote = await ctx.producao.obterLoteProducao(loteId);
       expect(lote.estado).to.equal(Estado.Concluido); expect(lote.concluidoEm).to.be.greaterThan(0n); expect(lote.metadataURIConclusao).to.equal(URI.d);
       await ctx.insumos.connect(ctx.produtor).avaliarInsumo(agricola, Resultado.Rejeitado, URI.c);
       expect(await ctx.producao.loteProducaoConcluido(loteId)).to.equal(true);
-      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(loteId, URI.d)).to.be.revertedWithCustomError(ctx.producao, "EstadoProducaoInvalido");
+      await expect(ctx.producao.connect(ctx.produtor).concluirProducao(loteId, ctx.envasador.address, URI.d)).to.be.revertedWithCustomError(ctx.producao, "EstadoProducaoInvalido");
       await expect(etapa(ctx, loteId, Etapa.Maturacao)).to.be.revertedWithCustomError(ctx.producao, "EstadoProducaoInvalido");
     });
   });
@@ -418,3 +421,4 @@ describe("L. ContratoProducao", function () {
     });
   });
 });
+
