@@ -3,6 +3,7 @@ import {
   RETULO_RESULTADO_AVALIACAO,
   RETULO_TIPO_BEBIDA,
   RETULO_TIPO_INSUMO,
+  UNIDADE_INSUMO,
 } from "../lib/formatadores";
 import { EtapaProducao, ResultadoAvaliacao, TipoBebida, TipoInsumo } from "../lib/tipos";
 
@@ -25,6 +26,8 @@ interface MetadadosBase {
 export interface MetadadosInsumo extends MetadadosBase {
   tipo: "insumo";
   tipoInsumo: string;
+  quantidade: string;
+  unidade: string;
   descricao?: string;
   origem?: string;
 }
@@ -60,11 +63,18 @@ export interface MetadadosLoteProducao extends MetadadosBase {
   descricao?: string;
 }
 
+export interface InsumoConsumidoMetadados {
+  id: string;
+  quantidade: string;
+  unidade: string;
+}
+
 export interface MetadadosEtapaProducao extends MetadadosBase {
   tipo: "etapa-producao";
   loteProducaoId: string;
   etapa: string;
   insumosUtilizados: string[];
+  insumosConsumidos: InsumoConsumidoMetadados[];
   inicioInformado: string;
   fimInformado: string;
 }
@@ -72,6 +82,7 @@ export interface MetadadosEtapaProducao extends MetadadosBase {
 export interface MetadadosConclusaoProducao extends MetadadosBase {
   tipo: "conclusao-producao";
   loteProducaoId: string;
+  envasadorDesignado: string;
 }
 
 export interface MetadadosEnvasamento extends MetadadosBase {
@@ -98,6 +109,7 @@ function camposBase<T extends MetadadosBase["tipo"]>(
 
 export function montarMetadadosInsumo(params: {
   tipoInsumo: TipoInsumo;
+  quantidade: string;
   descricao?: string;
   origem?: string;
   documentos?: string[];
@@ -106,6 +118,8 @@ export function montarMetadadosInsumo(params: {
   return {
     ...camposBase("insumo", params),
     tipoInsumo: RETULO_TIPO_INSUMO[params.tipoInsumo],
+    quantidade: params.quantidade,
+    unidade: UNIDADE_INSUMO[params.tipoInsumo],
     descricao: params.descricao,
     origem: params.origem,
   };
@@ -166,7 +180,7 @@ export function montarMetadadosLoteProducao(params: {
 export function montarMetadadosEtapaProducao(params: {
   loteProducaoId: string;
   etapa: EtapaProducao;
-  insumosUtilizados: string[];
+  insumosConsumidos: InsumoConsumidoMetadados[];
   inicioInformado: string;
   fimInformado: string;
   documentos?: string[];
@@ -176,7 +190,8 @@ export function montarMetadadosEtapaProducao(params: {
     ...camposBase("etapa-producao", params),
     loteProducaoId: params.loteProducaoId,
     etapa: RETULO_ETAPA_PRODUCAO[params.etapa],
-    insumosUtilizados: params.insumosUtilizados,
+    insumosUtilizados: params.insumosConsumidos.map((i) => i.id),
+    insumosConsumidos: params.insumosConsumidos,
     inicioInformado: params.inicioInformado,
     fimInformado: params.fimInformado,
   };
@@ -184,12 +199,14 @@ export function montarMetadadosEtapaProducao(params: {
 
 export function montarMetadadosConclusaoProducao(params: {
   loteProducaoId: string;
+  envasadorDesignado: string;
   documentos?: string[];
   observacoes?: string;
 }): MetadadosConclusaoProducao {
   return {
     ...camposBase("conclusao-producao", params),
     loteProducaoId: params.loteProducaoId,
+    envasadorDesignado: params.envasadorDesignado,
   };
 }
 

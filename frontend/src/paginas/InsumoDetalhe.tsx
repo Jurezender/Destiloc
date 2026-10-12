@@ -4,7 +4,7 @@ import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
 import { feedbackDaTransacao, type FeedbackTx, mapearErroContrato } from "../lib/erros";
-import { formatarTimestamp, RETULO_RESULTADO_AVALIACAO, RETULO_TIPO_INSUMO } from "../lib/formatadores";
+import { encurtarEndereco, formatarTimestamp, RETULO_RESULTADO_AVALIACAO, RETULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
 import { ResultadoAvaliacao, TipoInsumo } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
 import { adicionarJSON } from "../ipfs/kubo";
@@ -22,6 +22,8 @@ interface LoteInsumoInfo {
   id: bigint;
   fornecedor: string;
   tipo: TipoInsumo;
+  quantidade: bigint;
+  produtorDestinatario: string;
   registradoEm: bigint;
   metadataURI: string;
 }
@@ -112,6 +114,8 @@ export function InsumoDetalhe() {
         id: BigInt(id),
         fornecedor: dadoLote.fornecedor as string,
         tipo: Number(dadoLote.tipo) as TipoInsumo,
+        quantidade: dadoLote.quantidade as bigint,
+        produtorDestinatario: dadoLote.produtorDestinatario as string,
         registradoEm: dadoLote.registradoEm as bigint,
         metadataURI: dadoLote.metadataURI as string,
       });
@@ -145,6 +149,7 @@ export function InsumoDetalhe() {
 
   const souFornecedorOriginal = conta?.toLowerCase() === lote.fornecedor.toLowerCase();
   const podeCorrigirOuInvalidar = papeis.fornecedor && souFornecedorOriginal;
+  const souProdutorDestinatario = papeis.produtor && conta?.toLowerCase() === lote.produtorDestinatario.toLowerCase();
 
   return (
     <section>
@@ -160,9 +165,20 @@ export function InsumoDetalhe() {
           <dt className="info-campo__rotulo">Registrado em</dt>
           <dd className="info-campo__valor">{formatarTimestamp(lote.registradoEm)}</dd>
         </div>
+        <div className="info-campo">
+          <dt className="info-campo__rotulo">Quantidade</dt>
+          <dd className="info-campo__valor">{lote.quantidade.toString()} {UNIDADE_INSUMO[lote.tipo]}</dd>
+        </div>
         <div className="info-campo info-campo--largo">
           <dt className="info-campo__rotulo">Fornecedor</dt>
           <dd className="info-campo__valor mono">{lote.fornecedor}</dd>
+        </div>
+        <div className="info-campo info-campo--largo">
+          <dt className="info-campo__rotulo">Produtor destinatário</dt>
+          <dd className="info-campo__valor mono">
+            {lote.produtorDestinatario}
+            {souProdutorDestinatario && <span className="badge badge--neutro" style={{ marginLeft: "0.5rem" }}>Você</span>}
+          </dd>
         </div>
         <div className="info-campo info-campo--largo">
           <dt className="info-campo__rotulo">Metadados</dt>
@@ -206,6 +222,10 @@ export function InsumoDetalhe() {
       {!papeis.produtor ? (
         <p className="dica">
           Sua conta não tem papel de Produtor, você não pode avaliar insumos.
+        </p>
+      ) : !souProdutorDestinatario ? (
+        <p className="dica">
+          Este insumo é destinado a {encurtarEndereco(lote.produtorDestinatario)}. Somente o produtor destinatário pode avaliá-lo.
         </p>
       ) : (
         <>

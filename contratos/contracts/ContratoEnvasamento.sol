@@ -36,6 +36,7 @@ contract ContratoEnvasamento is ERC721 {
     error EnvasamentoJaConcluido();
     error ReferenciaIPFSInvalida();
     error GarrafaInexistente();
+    error EnvasadorNaoAutorizado();
     error TokenNaoTransferivel();
     error AprovacaoNaoPermitida();
     error IndiceForaDosLimites();
@@ -92,6 +93,8 @@ contract ContratoEnvasamento is ERC721 {
         if (!contratoAcesso.ehEnvasador(msg.sender)) revert SemPermissao();
         if (!contratoProducao.loteProducaoExiste(loteProducaoId)) revert ProducaoInexistente();
         if (!contratoProducao.loteProducaoConcluido(loteProducaoId)) revert ProducaoNaoConcluida();
+        address designado = contratoProducao.envasadorDesignadoDaProducao(loteProducaoId);
+        if (designado != address(0) && msg.sender != designado) revert EnvasadorNaoAutorizado();
         if (quantidadeDeclarada == 0) revert QuantidadeInvalida();
         if (!metadataURI.ehValida()) revert ReferenciaIPFSInvalida();
 

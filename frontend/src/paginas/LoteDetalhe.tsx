@@ -11,6 +11,7 @@ import {
   RETULO_ETAPA_PRODUCAO,
   RETULO_TIPO_BEBIDA,
   RETULO_TIPO_INSUMO,
+  UNIDADE_INSUMO,
 } from "../lib/formatadores";
 import { EstadoProducao, EtapaProducao, TipoBebida, TipoInsumo } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
@@ -33,6 +34,7 @@ interface LoteProducaoInfo {
   produtor: string;
   tipoBebida: TipoBebida;
   estado: EstadoProducao;
+  envasadorDesignado: string;
   criadoEm: bigint;
   concluidoEm: bigint;
   metadataURI: string;
@@ -42,6 +44,8 @@ interface LoteProducaoInfo {
 interface InsumoVinculado {
   id: bigint;
   tipo: TipoInsumo;
+  quantidade: bigint;
+  produtorDestinatario: string;
   fornecedor: string;
 }
 
@@ -102,6 +106,8 @@ export function LoteDetalhe() {
           return {
             id: insumoId,
             tipo: Number(dadoInsumo.tipo) as TipoInsumo,
+            quantidade: dadoInsumo.quantidade as bigint,
+            produtorDestinatario: dadoInsumo.produtorDestinatario as string,
             fornecedor: dadoInsumo.fornecedor as string,
           } satisfies InsumoVinculado;
         })
@@ -135,6 +141,7 @@ export function LoteDetalhe() {
         produtor: dadoLote.produtor as string,
         tipoBebida: Number(dadoLote.tipoBebida) as TipoBebida,
         estado: Number(dadoLote.estado) as EstadoProducao,
+        envasadorDesignado: dadoLote.envasadorDesignado as string,
         criadoEm: dadoLote.criadoEm as bigint,
         concluidoEm: dadoLote.concluidoEm as bigint,
         metadataURI: dadoLote.metadataURI as string,
@@ -315,6 +322,8 @@ export function LoteDetalhe() {
           <br />
           Metadados de conclusão: <LinkMetadados uri={lote.metadataURIConclusao} />
           <br />
+          Envasador designado: <span className="mono">{lote.envasadorDesignado}</span>
+          <br />
           Produção concluída, apta para envasamento.{" "}
           <Link to={`/lotes/${lote.id.toString()}/emitir`}>Ir para envasamento e emissão</Link>
         </div>
@@ -426,6 +435,12 @@ function AtualizarConfiguracao({
   );
 }
 
+interface OpcaoInsumo {
+  id: bigint;
+  tipo: TipoInsumo;
+  quantidade: bigint;
+}
+
 function VincularInsumo({
   loteId,
   chainId,
@@ -437,14 +452,60 @@ function VincularInsumo({
   signer: Signer;
   aoVincular: () => void;
 }) {
+  const { conta } = useCarteira();
+  const [opcoes, setOpcoes] = useState<OpcaoInsumo[]>([]);
+  const [carregandoOpcoes, setCarregandoOpcoes] = useState(true);
   const [insumoId, setInsumoId] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
+  useEffect(() => {
+    if (!conta) return;
+    let cancelado = false;
+    setCarregandoOpcoes(true);
+    void (async () => {
+      try {
+        const insumosContrato = obterContrato("ContratoInsumos", chainId, signer);
+        const producaoContrato = obterContrato("ContratoProducao", chainId, signer);
+        const total = Number(await insumosContrato.totalInsumosDoProdutor(conta));
+        const ids = await Promise.all(
+          Array.from({ length: total }, (_, i) =>
+            insumosContrato.insumoDoProdutor(conta, i) as Promise<bigint>
+          )
+        );
+        const detalhes = await Promise.all(
+          ids.map(async (id) => {
+            const [dado, valido, aprovado, jaVinculado] = await Promise.all([
+              insumosContrato.obterLoteInsumo(id),
+              insumosContrato.loteInsumoValido(id) as Promise<boolean>,
+              insumosContrato.aprovadoPor(id, conta) as Promise<boolean>,
+              producaoContrato.insumoEstaVinculado(loteId, id) as Promise<boolean>,
+            ]);
+            return { id, dado, valido, aprovado, jaVinculado };
+          })
+        );
+        if (cancelado) return;
+        const disponiveis = detalhes
+          .filter((d) => d.valido && d.aprovado && !d.jaVinculado)
+          .map((d) => ({
+            id: d.id,
+            tipo: Number(d.dado.tipo) as TipoInsumo,
+            quantidade: d.dado.quantidade as bigint,
+          }));
+        setOpcoes(disponiveis);
+      } catch {
+        // carregamento de opções é melhor-esforço
+      } finally {
+        if (!cancelado) setCarregandoOpcoes(false);
+      }
+    })();
+    return () => { cancelado = true; };
+  }, [chainId, signer, conta, loteId]);
+
   async function enviar() {
-    if (!/^\d+$/.test(insumoId.trim())) {
-      setErro("Informe um ID de insumo válido (número inteiro).");
+    if (!insumoId) {
+      setErro("Selecione um insumo.");
       return;
     }
     setErro(null);
@@ -452,7 +513,7 @@ function VincularInsumo({
     setEnviando(true);
     try {
       const producao = obterContrato("ContratoProducao", chainId, signer);
-      const tx = await producao.vincularInsumoAoLote(loteId, insumoId.trim());
+      const tx = await producao.vincularInsumoAoLote(loteId, insumoId);
       await tx.wait();
       setInsumoId("");
       setFeedback({ tipo: "ok", texto: "Insumo vinculado com sucesso." });
@@ -467,11 +528,24 @@ function VincularInsumo({
   return (
     <fieldset disabled={enviando}>
       <legend>Vincular insumo ao lote</legend>
-      <label>
-        ID do lote de insumo
-        <input value={insumoId} onChange={(e) => setInsumoId(e.target.value.trim())} placeholder="Ex.: 1" />
-      </label>
-      <button type="button" onClick={() => void enviar()}>
+      {carregandoOpcoes ? (
+        <p className="dica">Carregando insumos disponíveis…</p>
+      ) : opcoes.length === 0 ? (
+        <p className="dica">Nenhum insumo aprovado e disponível para vincular. Certifique-se de que o insumo foi aprovado por você e ainda não está vinculado a este lote.</p>
+      ) : (
+        <label>
+          Insumo
+          <select value={insumoId} onChange={(e) => setInsumoId(e.target.value)}>
+            <option value="">Selecione…</option>
+            {opcoes.map((op) => (
+              <option key={op.id.toString()} value={op.id.toString()}>
+                #{op.id.toString()} — {RETULO_TIPO_INSUMO[op.tipo]} · {op.quantidade.toString()} {UNIDADE_INSUMO[op.tipo]}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      <button type="button" onClick={() => void enviar()} disabled={opcoes.length === 0 || carregandoOpcoes}>
         {enviando ? "Vinculando…" : "Vincular insumo"}
       </button>
       {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
@@ -503,6 +577,7 @@ function RegistrarEtapa({
 }) {
   const [etapaSelecionada, setEtapaSelecionada] = useState("");
   const [insumosSelecionados, setInsumosSelecionados] = useState<Set<string>>(new Set());
+  const [quantidadesConsumidas, setQuantidadesConsumidas] = useState<Map<string, string>>(new Map());
   const [inicio, setInicio] = useState("");
   const [fim, setFim] = useState("");
   const [documentosCids, setDocumentosCids] = useState<string[]>([]);
@@ -523,11 +598,26 @@ function RegistrarEtapa({
   function alternarInsumo(id: string) {
     setInsumosSelecionados((atual) => {
       const copia = new Set(atual);
-      if (copia.has(id)) copia.delete(id);
-      else copia.add(id);
+      if (copia.has(id)) {
+        copia.delete(id);
+        setQuantidadesConsumidas((q) => { const m = new Map(q); m.delete(id); return m; });
+      } else {
+        copia.add(id);
+        setQuantidadesConsumidas((q) => new Map(q).set(id, ""));
+      }
       return copia;
     });
   }
+
+  function atualizarQuantidade(id: string, valor: string) {
+    setQuantidadesConsumidas((q) => new Map(q).set(id, valor));
+  }
+
+  const insumosArray = Array.from(insumosSelecionados);
+  const todasQuantidadesValidas = insumosArray.every((id) => {
+    const v = quantidadesConsumidas.get(id) ?? "";
+    return /^\d+$/.test(v.trim()) && BigInt(v.trim()) > 0n;
+  });
 
   const erroValidacao =
     etapaSelecionada === ""
@@ -548,6 +638,10 @@ function RegistrarEtapa({
       setErroIpfs("Informe o início e o fim informados antes de gerar os metadados.");
       return;
     }
+    if (insumosArray.length > 0 && !todasQuantidadesValidas) {
+      setErroIpfs("Informe a quantidade consumida de cada insumo selecionado antes de gerar os metadados.");
+      return;
+    }
     if (arquivosSubindo) {
       setErroIpfs("Aguarde o envio dos arquivos antes de gerar a referência.");
       return;
@@ -555,10 +649,14 @@ function RegistrarEtapa({
     setErroIpfs(null);
     setEnviandoIpfs(true);
     try {
+      const insumosConsumidos = insumosArray.map((id) => {
+        const insumo = insumosVinculados.find((i) => i.id.toString() === id)!;
+        return { id, quantidade: (quantidadesConsumidas.get(id) ?? "0").trim(), unidade: UNIDADE_INSUMO[insumo.tipo] };
+      });
       const metadados = montarMetadadosEtapaProducao({
         loteProducaoId: loteId.toString(),
         etapa: Number(etapaSelecionada) as EtapaProducao,
-        insumosUtilizados: Array.from(insumosSelecionados),
+        insumosConsumidos,
         inicioInformado: String(segundosDoDatetimeLocal(inicio)),
         fimInformado: String(segundosDoDatetimeLocal(fim)),
         documentos: documentosCids.length > 0 ? documentosCids : undefined,
@@ -590,6 +688,10 @@ function RegistrarEtapa({
       setErro("O início informado não pode ser posterior ao fim informado.");
       return;
     }
+    if (insumosArray.length > 0 && !todasQuantidadesValidas) {
+      setErro("Informe a quantidade consumida (número inteiro maior que zero) de cada insumo selecionado.");
+      return;
+    }
     if (erroReferencia) {
       setErro(erroReferencia);
       return;
@@ -599,10 +701,12 @@ function RegistrarEtapa({
     setEnviando(true);
     try {
       const producao = obterContrato("ContratoProducao", chainId, signer);
+      const qtds = insumosArray.map((id) => BigInt((quantidadesConsumidas.get(id) ?? "0").trim()));
       const tx = await producao.registrarEtapa(
         loteId,
         Number(etapaSelecionada) as EtapaProducao,
-        Array.from(insumosSelecionados),
+        insumosArray,
+        qtds,
         inicioSegundos,
         fimSegundos,
         metadataURI.trim()
@@ -610,6 +714,7 @@ function RegistrarEtapa({
       await tx.wait();
       setEtapaSelecionada("");
       setInsumosSelecionados(new Set());
+      setQuantidadesConsumidas(new Map());
       setInicio("");
       setFim("");
       setDocumentosCids([]);
@@ -645,16 +750,37 @@ function RegistrarEtapa({
       <fieldset>
         <legend>Insumos utilizados nesta etapa (dentre os vinculados ao lote)</legend>
         {insumosVinculados.length === 0 && <p className="dica">Nenhum insumo vinculado ao lote ainda.</p>}
-        {insumosVinculados.map((insumo) => (
-          <label key={insumo.id.toString()}>
-            <input
-              type="checkbox"
-              checked={insumosSelecionados.has(insumo.id.toString())}
-              onChange={() => alternarInsumo(insumo.id.toString())}
-            />
-            #{insumo.id.toString()} - {RETULO_TIPO_INSUMO[insumo.tipo]}
-          </label>
-        ))}
+        {insumosVinculados.map((insumo) => {
+          const idStr = insumo.id.toString();
+          const selecionado = insumosSelecionados.has(idStr);
+          return (
+            <div key={idStr} style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                <input
+                  type="checkbox"
+                  checked={selecionado}
+                  onChange={() => alternarInsumo(idStr)}
+                />
+                #{idStr} - {RETULO_TIPO_INSUMO[insumo.tipo]}
+              </label>
+              {selecionado && (
+                <label style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                  Qtd:
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    style={{ width: "90px" }}
+                    value={quantidadesConsumidas.get(idStr) ?? ""}
+                    onChange={(e) => atualizarQuantidade(idStr, e.target.value)}
+                    placeholder="0"
+                  />
+                  <span>{UNIDADE_INSUMO[insumo.tipo]}</span>
+                </label>
+              )}
+            </div>
+          );
+        })}
       </fieldset>
 
       <label>
@@ -690,6 +816,10 @@ function RegistrarEtapa({
   );
 }
 
+function ehEnderecoValido(valor: string): boolean {
+  return /^0x[0-9a-fA-F]{40}$/.test(valor.trim());
+}
+
 function ConcluirProducao({
   loteId,
   chainId,
@@ -701,6 +831,7 @@ function ConcluirProducao({
   signer: Signer;
   aoConcluir: () => void;
 }) {
+  const [envasadorDesignado, setEnvasadorDesignado] = useState("");
   const [documentosCids, setDocumentosCids] = useState<string[]>([]);
   const [arquivosSubindo, setArquivosSubindo] = useState(false);
   const [chaveAnexos, setChaveAnexos] = useState(0);
@@ -716,7 +847,13 @@ function ConcluirProducao({
     setArquivosSubindo(subindo);
   }, []);
 
+  const envasadorValido = ehEnderecoValido(envasadorDesignado);
+
   async function gerarViaIpfs() {
+    if (!envasadorValido) {
+      setErroIpfs("Informe um endereço válido para o envasador designado antes de gerar os metadados.");
+      return;
+    }
     if (arquivosSubindo) {
       setErroIpfs("Aguarde o envio dos arquivos antes de gerar a referência.");
       return;
@@ -726,6 +863,7 @@ function ConcluirProducao({
     try {
       const metadados = montarMetadadosConclusaoProducao({
         loteProducaoId: loteId.toString(),
+        envasadorDesignado: envasadorDesignado.trim(),
         documentos: documentosCids.length > 0 ? documentosCids : undefined,
       });
       const referencia = await adicionarJSON(metadados);
@@ -741,6 +879,10 @@ function ConcluirProducao({
     motivoReferenciaInvalida(metadataURI) ?? (metadataURI.trim() === "" ? "Informe a referência ipfs://." : null);
 
   async function enviar() {
+    if (!envasadorValido) {
+      setErro("Informe um endereço Ethereum válido para o envasador designado.");
+      return;
+    }
     if (erroReferencia) {
       setErro(erroReferencia);
       return;
@@ -750,8 +892,9 @@ function ConcluirProducao({
     setEnviando(true);
     try {
       const producao = obterContrato("ContratoProducao", chainId, signer);
-      const tx = await producao.concluirProducao(loteId, metadataURI.trim());
+      const tx = await producao.concluirProducao(loteId, envasadorDesignado.trim(), metadataURI.trim());
       await tx.wait();
+      setEnvasadorDesignado("");
       setDocumentosCids([]);
       setArquivosSubindo(false);
       setChaveAnexos((k) => k + 1);
@@ -768,6 +911,17 @@ function ConcluirProducao({
   return (
     <fieldset disabled={enviando}>
       <legend>Concluir produção</legend>
+      <label>
+        Envasador designado (endereço Ethereum)
+        <input
+          value={envasadorDesignado}
+          onChange={(e) => setEnvasadorDesignado(e.target.value.trim())}
+          placeholder="0x…"
+        />
+        {envasadorDesignado && !envasadorValido && (
+          <span className="erro">Endereço inválido.</span>
+        )}
+      </label>
       <AnexosIpfs
         key={chaveAnexos}
         rotulo="Documentos da conclusão (PDF, JPG, PNG - opcional)"

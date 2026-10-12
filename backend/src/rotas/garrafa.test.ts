@@ -34,6 +34,7 @@ const RESPOSTA_EXEMPLO: consultaModulo.RespostaGarrafa = {
     produtor: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
     tipoBebida: 0,
     estado: 2,
+    envasadorDesignado: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
     criadoEm: "1699900000",
     concluidoEm: "1699990000",
     metadataURI: "ipfs://QmLote",
@@ -49,6 +50,8 @@ const RESPOSTA_EXEMPLO: consultaModulo.RespostaGarrafa = {
     {
       id: "1",
       tipo: 0,
+      quantidade: "1000",
+      produtorDestinatario: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
       fornecedor: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
       metadataURI: "ipfs://QmInsumo1",
     },

@@ -27,6 +27,8 @@ contract ContratoInsumos {
     struct LoteInsumo {
         address fornecedor;
         TipoInsumo tipo;
+        uint256 quantidade;
+        address produtorDestinatario;
         uint64 registradoEm;
         string metadataURI;
     }
@@ -58,12 +60,15 @@ contract ContratoInsumos {
     error LoteInsumoEstaInvalidado();
     error LoteInsumoJaInvalidado();
     error IndiceForaDosLimites();
+    error QuantidadeInvalida();
+    error ProdutorDestinatarioInvalido();
 
     IContratoAcesso public immutable contratoAcesso;
 
     uint256 private _proximoInsumoId = 1;
     mapping(uint256 => LoteInsumo) private _lotes;
     mapping(address => uint256[]) private _insumosPorFornecedor;
+    mapping(address => uint256[]) private _insumosPorProdutorDestinatario;
     mapping(uint256 => mapping(address => AvaliacaoInsumo[])) private _avaliacoes;
     mapping(uint256 => CorrecaoDocumental[]) private _correcoes;
     mapping(uint256 => InvalidacaoInsumo) private _invalidacoes;
@@ -72,6 +77,8 @@ contract ContratoInsumos {
         uint256 indexed insumoId,
         address indexed fornecedor,
         TipoInsumo indexed tipo,
+        uint256 quantidade,
+        address produtorDestinatario,
         string metadataURI,
         uint64 registradoEm
     );
@@ -104,20 +111,25 @@ contract ContratoInsumos {
         contratoAcesso = IContratoAcesso(enderecoContratoAcesso);
     }
 
-    function registrarLoteInsumo(TipoInsumo tipo, string calldata metadataURI)
-        external
-        returns (uint256 insumoId)
-    {
+    function registrarLoteInsumo(
+        TipoInsumo tipo,
+        uint256 quantidade,
+        address produtorDestinatario,
+        string calldata metadataURI
+    ) external returns (uint256 insumoId) {
         if (!contratoAcesso.ehFornecedor(msg.sender)) revert SemPermissao();
         if (tipo == TipoInsumo.NaoDefinido) revert TipoInsumoInvalido();
+        if (quantidade == 0) revert QuantidadeInvalida();
+        if (!contratoAcesso.ehProdutor(produtorDestinatario)) revert ProdutorDestinatarioInvalido();
         _validarReferencia(metadataURI);
 
         insumoId = _proximoInsumoId++;
         uint64 agora = uint64(block.timestamp);
-        _lotes[insumoId] = LoteInsumo(msg.sender, tipo, agora, metadataURI);
+        _lotes[insumoId] = LoteInsumo(msg.sender, tipo, quantidade, produtorDestinatario, agora, metadataURI);
         _insumosPorFornecedor[msg.sender].push(insumoId);
+        _insumosPorProdutorDestinatario[produtorDestinatario].push(insumoId);
 
-        emit LoteInsumoRegistrado(insumoId, msg.sender, tipo, metadataURI, agora);
+        emit LoteInsumoRegistrado(insumoId, msg.sender, tipo, quantidade, produtorDestinatario, metadataURI, agora);
     }
 
     function avaliarInsumo(
@@ -126,7 +138,8 @@ contract ContratoInsumos {
         string calldata metadataURI
     ) external {
         if (!contratoAcesso.ehProdutor(msg.sender)) revert SemPermissao();
-        _exigirLote(insumoId);
+        LoteInsumo storage lote = _exigirLote(insumoId);
+        if (msg.sender != lote.produtorDestinatario) revert SemPermissao();
         if (_invalidacoes[insumoId].invalidado) revert LoteInsumoEstaInvalidado();
         if (resultado == ResultadoAvaliacao.NaoAvaliado) revert ResultadoAvaliacaoInvalido();
         _validarReferencia(metadataURI);
@@ -191,6 +204,19 @@ contract ContratoInsumos {
     {
         if (indice >= _insumosPorFornecedor[fornecedor].length) revert IndiceForaDosLimites();
         return _insumosPorFornecedor[fornecedor][indice];
+    }
+
+    function totalInsumosDoProdutor(address produtor) external view returns (uint256) {
+        return _insumosPorProdutorDestinatario[produtor].length;
+    }
+
+    function insumoDoProdutor(address produtor, uint256 indice)
+        external
+        view
+        returns (uint256)
+    {
+        if (indice >= _insumosPorProdutorDestinatario[produtor].length) revert IndiceForaDosLimites();
+        return _insumosPorProdutorDestinatario[produtor][indice];
     }
 
     function totalAvaliacoes(uint256 insumoId, address produtor) external view returns (uint256) {

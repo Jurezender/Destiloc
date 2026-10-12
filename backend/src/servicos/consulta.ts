@@ -29,6 +29,7 @@ export interface RespostaGarrafa {
     produtor: string;
     tipoBebida: number;
     estado: number;
+    envasadorDesignado: string;
     criadoEm: string;
     concluidoEm: string;
     metadataURI: string;
@@ -43,6 +44,8 @@ export interface RespostaGarrafa {
   insumosVinculados: Array<{
     id: string;
     tipo: number;
+    quantidade: string;
+    produtorDestinatario: string;
     fornecedor: string;
     metadataURI: string;
   }>;
@@ -244,6 +247,8 @@ export async function consultarGarrafa(
         return {
           id: insumoId.toString(),
           tipo: Number((dado as { tipo: bigint }).tipo),
+          quantidade: ((dado as { quantidade: bigint }).quantidade).toString(),
+          produtorDestinatario: (dado as { produtorDestinatario: string }).produtorDestinatario,
           fornecedor: (dado as { fornecedor: string }).fornecedor,
           metadataURI: (dado as { metadataURI: string }).metadataURI,
         };
@@ -320,6 +325,7 @@ export async function consultarGarrafa(
       produtor: dadoLote.produtor as string,
       tipoBebida: Number(dadoLote.tipoBebida),
       estado: Number(dadoLote.estado),
+      envasadorDesignado: dadoLote.envasadorDesignado as string,
       criadoEm: (dadoLote.criadoEm as bigint).toString(),
       concluidoEm: (dadoLote.concluidoEm as bigint).toString(),
       metadataURI: dadoLote.metadataURI as string,

@@ -23,6 +23,7 @@ const RESPOSTA_CACHE: RespostaGarrafa = {
   },
   lote: {
     id: "1", produtor: ADDR_PRODUTOR, tipoBebida: 1, estado: 2,
+    envasadorDesignado: ADDR_ENVASADOR,
     criadoEm: "1", concluidoEm: "2", metadataURI: "ipfs://lote",
     metadataURIConclusao: "ipfs://conclusao",
   },
@@ -47,6 +48,7 @@ function criarContratosFake() {
     loteProducaoExiste:       vi.fn().mockResolvedValue(true),
     obterLoteProducao:        vi.fn().mockResolvedValue({
       produtor: ADDR_PRODUTOR, tipoBebida: 1n, estado: 2n,
+      envasadorDesignado: ADDR_ENVASADOR,
       criadoEm: 1n, concluidoEm: 2n,
       metadataURI: "ipfs://lote", metadataURIConclusao: "ipfs://conclusao",
     }),

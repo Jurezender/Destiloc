@@ -56,6 +56,17 @@ export function formatarTimestamp(timestamp: bigint | number): string {
   return new Date(segundos * 1000).toLocaleString("pt-BR");
 }
 
+export const UNIDADE_INSUMO: Record<TipoInsumo, string> = {
+  [TipoInsumo.NaoDefinido]: "unid.",
+  [TipoInsumo.MateriaPrimaAgricola]: "kg",
+  [TipoInsumo.BaseAlcoolica]: "L",
+  [TipoInsumo.Agua]: "L",
+  [TipoInsumo.Levedura]: "g",
+  [TipoInsumo.Zimbro]: "g",
+  [TipoInsumo.Botanico]: "g",
+  [TipoInsumo.Outro]: "unid.",
+};
+
 export function encurtarEndereco(endereco: string): string {
   if (endereco.length <= 12) return endereco;
   return `${endereco.slice(0, 6)}…${endereco.slice(-4)}`;

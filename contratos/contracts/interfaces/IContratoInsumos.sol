@@ -16,6 +16,8 @@ interface IContratoInsumos {
     struct LoteInsumo {
         address fornecedor;
         TipoInsumo tipo;
+        uint256 quantidade;
+        address produtorDestinatario;
         uint64 registradoEm;
         string metadataURI;
     }

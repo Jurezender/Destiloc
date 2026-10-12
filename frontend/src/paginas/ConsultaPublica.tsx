@@ -35,6 +35,7 @@ interface DadosConsulta {
     produtor: string;
     tipoBebida: TipoBebida;
     estado: EstadoProducao;
+    envasadorDesignado: string;
     criadoEm: string;
     concluidoEm: string;
     metadataURI: string;
@@ -49,6 +50,8 @@ interface DadosConsulta {
   insumosVinculados: Array<{
     id: string;
     tipo: TipoInsumo;
+    quantidade: string;
+    produtorDestinatario: string;
     fornecedor: string;
     metadataURI: string;
   }>;

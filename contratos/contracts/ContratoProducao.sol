@@ -33,6 +33,7 @@ contract ContratoProducao {
         address produtor;
         TipoBebida tipoBebida;
         EstadoProducao estado;
+        address envasadorDesignado;
         uint64 criadoEm;
         uint64 concluidoEm;
         string metadataURI;
@@ -71,6 +72,10 @@ contract ContratoProducao {
     error RequisitoDeEtapaNaoAtendido();
     error RequisitoDeInsumoNaoAtendido();
     error IndiceForaDosLimites();
+    error ArraysDeComprimentosDiferentes();
+    error QuantidadeInvalida();
+    error QuantidadeInsuficienteNoLote();
+    error EnvasadorDesignadoInvalido();
 
     IContratoAcesso public immutable contratoAcesso;
     IContratoInsumos public immutable contratoInsumos;
@@ -87,6 +92,7 @@ contract ContratoProducao {
     mapping(uint256 => uint256[]) private _insumosUtilizados;
     mapping(uint256 => mapping(uint256 => bool)) private _insumoUtilizado;
     mapping(uint256 => uint256[]) private _lotesPorInsumoUtilizado;
+    mapping(uint256 => uint256) private _quantidadeConsumida;
 
     event LoteProducaoCriado(
         uint256 indexed loteId,
@@ -107,6 +113,7 @@ contract ContratoProducao {
     event ProducaoConcluida(
         uint256 indexed loteId,
         address indexed produtor,
+        address envasadorDesignado,
         string metadataURI,
         uint64 concluidoEm
     );
@@ -138,6 +145,7 @@ contract ContratoProducao {
             produtor: msg.sender,
             tipoBebida: tipoBebida,
             estado: EstadoProducao.Criado,
+            envasadorDesignado: address(0),
             criadoEm: agora,
             concluidoEm: 0,
             metadataURI: metadataURI,
@@ -172,6 +180,7 @@ contract ContratoProducao {
         uint256 loteId,
         EtapaProducao etapa,
         uint256[] calldata insumosUtilizados,
+        uint256[] calldata quantidadesConsumidas,
         uint256 inicioInformado,
         uint256 fimInformado,
         string calldata metadataURI
@@ -183,8 +192,10 @@ contract ContratoProducao {
         _validarAplicabilidade(lote.tipoBebida, _configuracoes[loteId], etapa);
         _validarPrecedencia(loteId, lote.tipoBebida, _configuracoes[loteId], etapa);
         if (inicioInformado > fimInformado) revert PeriodoInformadoInvalido();
+        if (insumosUtilizados.length != quantidadesConsumidas.length) revert ArraysDeComprimentosDiferentes();
         _validarReferencia(metadataURI);
         _validarInsumosDaEtapa(loteId, lote.produtor, insumosUtilizados);
+        _validarQuantidades(insumosUtilizados, quantidadesConsumidas);
 
         uint64 agora = uint64(block.timestamp);
         uint256 indiceEtapa = _etapas[loteId].length;
@@ -194,6 +205,7 @@ contract ContratoProducao {
         for (uint256 i = 0; i < insumosUtilizados.length; i++) {
             uint256 insumoId = insumosUtilizados[i];
             _insumosPorIndiceEtapa[loteId][indiceEtapa].push(insumoId);
+            _quantidadeConsumida[insumoId] += quantidadesConsumidas[i];
             if (!_insumoUtilizado[loteId][insumoId]) {
                 _insumoUtilizado[loteId][insumoId] = true;
                 _insumosUtilizados[loteId].push(insumoId);
@@ -205,18 +217,22 @@ contract ContratoProducao {
         emit EtapaProducaoRegistrada(loteId, etapa, msg.sender, indiceEtapa, agora);
     }
 
-    function concluirProducao(uint256 loteId, string calldata metadataURI) external {
+    function concluirProducao(uint256 loteId, address envasadorDesignado, string calldata metadataURI) external {
         LoteProducao storage lote = _exigirLote(loteId);
         _exigirProdutorResponsavel(lote);
         if (lote.estado != EstadoProducao.EmProducao) revert EstadoProducaoInvalido();
+        if (envasadorDesignado == address(0) || !contratoAcesso.ehEnvasador(envasadorDesignado)) {
+            revert EnvasadorDesignadoInvalido();
+        }
         _validarReferencia(metadataURI);
         _validarEtapasParaConclusao(loteId, lote.tipoBebida, _configuracoes[loteId]);
         _validarInsumosParaConclusao(loteId, lote.produtor, lote.tipoBebida);
 
         lote.estado = EstadoProducao.Concluido;
+        lote.envasadorDesignado = envasadorDesignado;
         lote.concluidoEm = uint64(block.timestamp);
         lote.metadataURIConclusao = metadataURI;
-        emit ProducaoConcluida(loteId, msg.sender, metadataURI, lote.concluidoEm);
+        emit ProducaoConcluida(loteId, msg.sender, envasadorDesignado, metadataURI, lote.concluidoEm);
     }
 
     function loteProducaoExiste(uint256 loteId) public view returns (bool) {
@@ -230,6 +246,14 @@ contract ContratoProducao {
     function obterConfiguracao(uint256 loteId) external view returns (ConfiguracaoProducao memory) {
         _exigirLote(loteId);
         return _configuracoes[loteId];
+    }
+
+    function envasadorDesignadoDaProducao(uint256 loteId) external view returns (address) {
+        return _exigirLote(loteId).envasadorDesignado;
+    }
+
+    function quantidadeConsumidaDoInsumo(uint256 insumoId) external view returns (uint256) {
+        return _quantidadeConsumida[insumoId];
     }
 
     function totalLotesProducao() external view returns (uint256) { return _proximoLoteId - 1; }
@@ -329,6 +353,18 @@ contract ContratoProducao {
             if (!_insumoVinculado[loteId][insumoId]) revert InsumoNaoVinculado();
             _exigirInsumoAprovado(insumoId, produtor);
             for (uint256 j = 0; j < i; j++) if (insumos[j] == insumoId) revert InsumoDuplicadoNaEtapa();
+        }
+    }
+    function _validarQuantidades(
+        uint256[] calldata insumos,
+        uint256[] calldata quantidades
+    ) private view {
+        for (uint256 i = 0; i < insumos.length; i++) {
+            if (quantidades[i] == 0) revert QuantidadeInvalida();
+            uint256 disponivel = contratoInsumos.obterLoteInsumo(insumos[i]).quantidade;
+            if (_quantidadeConsumida[insumos[i]] + quantidades[i] > disponivel) {
+                revert QuantidadeInsuficienteNoLote();
+            }
         }
     }
 
