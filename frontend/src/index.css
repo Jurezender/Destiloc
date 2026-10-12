@@ -1326,10 +1326,11 @@ details[open] .cp-tecnico__chevron {
   line-height: 1.4;
 }
 
-.badge--ok     { background-color: var(--cor-fundo-ok);      color: var(--cor-ok);    }
-.badge--erro   { background-color: var(--cor-fundo-erro);    color: var(--cor-erro);  }
-.badge--neutro { background-color: rgba(136, 144, 99, 0.14); color: var(--moss-green); }
-.badge--aviso  { background-color: rgba(207, 187, 153, 0.22); color: #6B4E1A;         }
+.badge--ok      { background-color: var(--cor-fundo-ok);       color: var(--cor-ok);    }
+.badge--erro    { background-color: var(--cor-fundo-erro);     color: var(--cor-erro);  }
+.badge--neutro  { background-color: rgba(136, 144, 99, 0.14);  color: var(--moss-green); }
+.badge--aviso   { background-color: rgba(207, 187, 153, 0.22); color: #6B4E1A;          }
+.badge--inativo { background-color: rgba(107, 98, 88, 0.1);    color: var(--cor-texto-secundario); }
 
 /* Classe utilitária para endereços e hashes */
 .mono {
@@ -1999,6 +2000,266 @@ details[open] .cp-tecnico__chevron {
   display: flex;
   justify-content: flex-end;
   margin-top: var(--s-lg);
+}
+
+/* ─── Abas de filtro ─────────────────────────────────────────────────────────── */
+.abas {
+  display: flex;
+  gap: var(--s-xs);
+  flex-wrap: wrap;
+  margin-block: var(--s-lg);
+  border-bottom: 1px solid var(--cor-borda);
+  padding-bottom: var(--s-sm);
+}
+
+.aba {
+  background-color: transparent;
+  color: var(--cor-texto-secundario);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-sm);
+  padding: 0.3125rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-xs);
+}
+
+.aba:hover:not(:disabled) {
+  background-color: var(--cor-fundo-card);
+  color: var(--cor-texto-primario);
+  box-shadow: none;
+}
+
+.aba--ativa {
+  background-color: var(--cafe-noir);
+  color: #fff;
+  border-color: var(--cafe-noir);
+}
+
+.aba--ativa:hover:not(:disabled) {
+  background-color: var(--cor-primaria-hover);
+  color: #fff;
+}
+
+.aba__contador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.22);
+  color: inherit;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  min-width: 1.125rem;
+  height: 1.125rem;
+  padding-inline: 0.25rem;
+}
+
+.aba:not(.aba--ativa) .aba__contador {
+  background-color: rgba(76, 61, 25, 0.12);
+  color: var(--cafe-noir);
+}
+
+/* ─── Cards de denúncia ──────────────────────────────────────────────────────── */
+.lista-denuncias {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-md);
+  margin-block: var(--s-md);
+}
+
+.denuncia-card {
+  background-color: var(--cor-fundo-card);
+  border: 1px solid var(--cor-borda);
+  border-left: 3px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  padding: var(--s-lg);
+  box-shadow: var(--sombra-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-md);
+}
+
+.denuncia-card--pendente   { border-left-color: var(--avela); }
+.denuncia-card--em_analise { border-left-color: #D49A22; }
+.denuncia-card--confirmada { border-left-color: var(--cor-erro); }
+.denuncia-card--descartada { border-left-color: var(--cor-borda); opacity: 0.65; }
+
+.denuncia-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--s-sm);
+  flex-wrap: wrap;
+}
+
+.denuncia-card__id {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--cor-texto-secundario);
+  background-color: var(--cor-fundo-pagina);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-sm);
+  padding: 0.125rem 0.375rem;
+  white-space: nowrap;
+}
+
+.denuncia-card__meta {
+  font-size: 0.8125rem;
+  color: var(--cor-texto-secundario);
+  margin-left: auto;
+}
+
+.denuncia-card__corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-xs);
+}
+
+.denuncia-card__motivo {
+  font-size: 0.9375rem;
+  color: var(--cor-texto-primario);
+  line-height: 1.55;
+}
+
+.denuncia-card__detalhes {
+  display: flex;
+  gap: var(--s-md);
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  color: var(--cor-texto-secundario);
+}
+
+.denuncia-card__acoes {
+  display: flex;
+  gap: var(--s-sm);
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.denuncia-card__confirmacao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-sm);
+  width: 100%;
+}
+
+.denuncia-card__confirmacao label {
+  margin-block: 0;
+}
+
+.denuncia-card__confirmacao input {
+  max-width: 28rem;
+}
+
+/* ─── Alertas de adulteração (ConsultaPublica) ───────────────────────────────── */
+.cp-alerta {
+  border-radius: var(--raio-md);
+  padding: var(--s-lg) var(--s-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-xs);
+}
+
+.cp-alerta strong {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.cp-alerta p {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.cp-alerta--critico {
+  background-color: var(--cor-fundo-erro);
+  border: 1px solid rgba(155, 53, 53, 0.25);
+  border-left: 4px solid var(--cor-erro);
+  color: var(--cor-erro);
+}
+
+.cp-alerta--aviso {
+  background-color: #FDF8EE;
+  border: 1px solid rgba(212, 154, 34, 0.25);
+  border-left: 4px solid #D49A22;
+  color: #6B4000;
+}
+
+/* ─── Seção de denúncia (ConsultaPublica) ────────────────────────────────────── */
+.cp-denuncia {
+  background: var(--branco);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-lg);
+  padding: var(--s-xl);
+  box-shadow: var(--sombra-card);
+}
+
+.cp-denuncia__botao {
+  background-color: transparent;
+  color: var(--cor-texto-secundario);
+  border: 1px solid var(--cor-borda);
+  font-size: 0.875rem;
+}
+
+.cp-denuncia__botao:hover:not(:disabled) {
+  background-color: var(--cor-fundo-pagina);
+  color: var(--cor-texto-primario);
+  box-shadow: none;
+}
+
+.cp-denuncia__form {
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.cp-denuncia__aviso {
+  font-size: 0.8125rem;
+  color: var(--cor-texto-secundario);
+  line-height: 1.55;
+  margin-bottom: var(--s-md);
+}
+
+.cp-denuncia__opcional {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--cor-texto-secundario);
+  margin-left: 0.25rem;
+}
+
+.cp-denuncia__acoes {
+  display: flex;
+  gap: var(--s-sm);
+  flex-wrap: wrap;
+  margin-top: var(--s-md);
+}
+
+.cp-denuncia__feedback {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem var(--s-md);
+  border-radius: var(--raio-sm);
+  margin-bottom: var(--s-md);
+  line-height: 1.5;
+}
+
+.cp-denuncia__feedback--ok {
+  background-color: var(--cor-fundo-ok);
+  border-left: 3px solid var(--cor-ok);
+  color: var(--cor-ok);
+}
+
+.cp-denuncia__feedback--erro {
+  background-color: var(--cor-fundo-erro);
+  border-left: 3px solid var(--cor-erro);
+  color: var(--cor-erro);
 }
 
 /* ─── Tabela: grupo de ações por linha ───────────────────────────────────────── */

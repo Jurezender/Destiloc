@@ -1,44 +1,44 @@
 {
   "rede": "sepolia",
   "implantador": "0xCf1C265f662567c499A2CF046Ab555488c2Df399",
-  "momento": "2026-09-13T23:03:32.438Z",
+  "momento": "2026-10-12T03:28:27.395Z",
   "contratos": {
     "ContratoAcesso": {
-      "endereco": "0x3f1c9F542AF7D5a7Bfd386F4b645d396bea69766",
-      "hashDaTransacao": "0x51bd4402c7c98a01bd523b5713e6b8a835c16cae7c048e513a3e6022755d0bad",
-      "bloco": 11698993,
-      "gasUtilizado": "731871",
+      "endereco": "0x093e2a0b496a608BEB734958F5E6A50F8671384F",
+      "hashDaTransacao": "0x60a18a72f24f368c1ceb6dc5f8317f217d8263c282b6b7f2e787a0f33566e2e3",
+      "bloco": 11896201,
+      "gasUtilizado": "4687273",
       "argumentos": [
         "0xCf1C265f662567c499A2CF046Ab555488c2Df399"
       ]
     },
     "ContratoInsumos": {
-      "endereco": "0x95173eDFc3606826242fb9cd9e30a3D8C4005390",
-      "hashDaTransacao": "0xf9fb896f3aaf0c6aab09022851425dabad96cca2258e6108b6447edc187fc424",
-      "bloco": 11698995,
-      "gasUtilizado": "1518856",
+      "endereco": "0x436cdF816baA1AF7435F6F20Df3C4fF1d7d81cEe",
+      "hashDaTransacao": "0x9703c065066db8532f4418478e14d5b1abe48d6d88296bd9e33d8011171a4dc7",
+      "bloco": 11896203,
+      "gasUtilizado": "10499878",
       "argumentos": [
-        "0x3f1c9F542AF7D5a7Bfd386F4b645d396bea69766"
+        "0x093e2a0b496a608BEB734958F5E6A50F8671384F"
       ]
     },
     "ContratoProducao": {
-      "endereco": "0xb73b6a9A06E3EE3c81D1F3A383f8586017137Da3",
-      "hashDaTransacao": "0x6551c5dfeb660d90109a286865691eb278b5b8204d360656c23df2c92d3662f2",
-      "bloco": 11698996,
-      "gasUtilizado": "2772402",
+      "endereco": "0xe418Ea6A624335bE0bF11861C4F922789ec684A3",
+      "hashDaTransacao": "0x7c211761e81367244f76777a5a156a8f9325ee0a5816e2e8de36c7aff35b8a33",
+      "bloco": 11896204,
+      "gasUtilizado": "19117942",
       "argumentos": [
-        "0x3f1c9F542AF7D5a7Bfd386F4b645d396bea69766",
-        "0x95173eDFc3606826242fb9cd9e30a3D8C4005390"
+        "0x093e2a0b496a608BEB734958F5E6A50F8671384F",
+        "0x436cdF816baA1AF7435F6F20Df3C4fF1d7d81cEe"
       ]
     },
     "ContratoEnvasamento": {
-      "endereco": "0xE8C40B72A80E960405AbDCb555046A9ec1EE45CC",
-      "hashDaTransacao": "0xc7e042b9c7951da93d7236929784f0c44cd7e4bae3ca2dcee81cd3044e1908eb",
-      "bloco": 11698997,
-      "gasUtilizado": "1692661",
+      "endereco": "0xB55AA5Cd4309C76676bddDD3300714268C0d60f1",
+      "hashDaTransacao": "0x4475b6cb802c7e48000fb60ab10672b405e8fa8dfe4cab3e031c8afe3ee4ec5d",
+      "bloco": 11896205,
+      "gasUtilizado": "9857122",
       "argumentos": [
-        "0x3f1c9F542AF7D5a7Bfd386F4b645d396bea69766",
-        "0xb73b6a9A06E3EE3c81D1F3A383f8586017137Da3"
+        "0x093e2a0b496a608BEB734958F5E6A50F8671384F",
+        "0xe418Ea6A624335bE0bF11861C4F922789ec684A3"
       ]
     }
   }

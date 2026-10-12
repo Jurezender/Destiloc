@@ -1,10 +1,10 @@
 {
   "rede": "sepolia",
-  "momento": "2026-09-13T23:03:32.438Z",
+  "momento": "2026-10-12T03:28:27.395Z",
   "enderecos": {
-    "ContratoAcesso": "0x3f1c9F542AF7D5a7Bfd386F4b645d396bea69766",
-    "ContratoInsumos": "0x95173eDFc3606826242fb9cd9e30a3D8C4005390",
-    "ContratoProducao": "0xb73b6a9A06E3EE3c81D1F3A383f8586017137Da3",
-    "ContratoEnvasamento": "0xE8C40B72A80E960405AbDCb555046A9ec1EE45CC"
+    "ContratoAcesso": "0x093e2a0b496a608BEB734958F5E6A50F8671384F",
+    "ContratoInsumos": "0x436cdF816baA1AF7435F6F20Df3C4fF1d7d81cEe",
+    "ContratoProducao": "0xe418Ea6A624335bE0bF11861C4F922789ec684A3",
+    "ContratoEnvasamento": "0xB55AA5Cd4309C76676bddDD3300714268C0d60f1"
   }
 }
