@@ -16,7 +16,7 @@ interface Props {
 }
 
 export function RotaProtegida({ children, exigirPapel, mensagemPapel }: Props) {
-  const { token, carteira, carregando: carregandoAuth } = useAuth();
+  const { token, carteira, carregando: carregandoAuth, logout } = useAuth();
   const { disponivel, conta, conectando, erro, conectar } = useCarteira();
   const papeis = usePapeis();
 
@@ -85,6 +85,21 @@ export function RotaProtegida({ children, exigirPapel, mensagemPapel }: Props) {
 
   if (papeis.carregando) {
     return <p>Carregando papéis desta conta…</p>;
+  }
+
+  const temAlgumPapel = papeis.admin || papeis.fornecedor || papeis.produtor || papeis.envasador;
+
+  if (!temAlgumPapel) {
+    return (
+      <div className="aviso-acesso">
+        <h2>Sem papéis atribuídos</h2>
+        <p>
+          Sua conta não possui nenhum papel ativo no sistema. Entre em contato com um
+          administrador para solicitar acesso.
+        </p>
+        <button onClick={logout}>Sair</button>
+      </div>
+    );
   }
 
   if (exigirPapel && !exigirPapel(papeis)) {
