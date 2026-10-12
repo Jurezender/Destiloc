@@ -1,1116 +1,1138 @@
-﻿[
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ContratoProducao",
+  "sourceName": "contracts/ContratoProducao.sol",
+  "abi": [
     {
-        "inputs":  [
-                       {
-                           "internalType":  "address",
-                           "name":  "enderecoContratoAcesso",
-                           "type":  "address"
-                       },
-                       {
-                           "internalType":  "address",
-                           "name":  "enderecoContratoInsumos",
-                           "type":  "address"
-                       }
-                   ],
-        "stateMutability":  "nonpayable",
-        "type":  "constructor"
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "enderecoContratoAcesso",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "enderecoContratoInsumos",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "ArraysDeComprimentosDiferentes",
-        "type":  "error"
+      "inputs": [],
+      "name": "ArraysDeComprimentosDiferentes",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "ConfiguracaoCongelada",
-        "type":  "error"
+      "inputs": [],
+      "name": "ConfiguracaoCongelada",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "ConfiguracaoInvalida",
-        "type":  "error"
+      "inputs": [],
+      "name": "ConfiguracaoInvalida",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "ContratoAcessoInvalido",
-        "type":  "error"
+      "inputs": [],
+      "name": "ContratoAcessoInvalido",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "ContratoInsumosInvalido",
-        "type":  "error"
+      "inputs": [],
+      "name": "ContratoInsumosInvalido",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "EnvasadorDesignadoInvalido",
-        "type":  "error"
+      "inputs": [],
+      "name": "EnvasadorDesignadoInvalido",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "EstadoProducaoInvalido",
-        "type":  "error"
+      "inputs": [],
+      "name": "EstadoProducaoInvalido",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "EtapaJaRegistrada",
-        "type":  "error"
+      "inputs": [],
+      "name": "EtapaJaRegistrada",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "EtapaNaoAplicavel",
-        "type":  "error"
+      "inputs": [],
+      "name": "EtapaNaoAplicavel",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "IndiceForaDosLimites",
-        "type":  "error"
+      "inputs": [],
+      "name": "IndiceForaDosLimites",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "InsumoDuplicadoNaEtapa",
-        "type":  "error"
+      "inputs": [],
+      "name": "InsumoDuplicadoNaEtapa",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "InsumoInexistente",
-        "type":  "error"
+      "inputs": [],
+      "name": "InsumoInexistente",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "InsumoInvalido",
-        "type":  "error"
+      "inputs": [],
+      "name": "InsumoInvalido",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "InsumoJaVinculado",
-        "type":  "error"
+      "inputs": [],
+      "name": "InsumoJaVinculado",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "InsumoNaoAprovado",
-        "type":  "error"
+      "inputs": [],
+      "name": "InsumoNaoAprovado",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "InsumoNaoVinculado",
-        "type":  "error"
+      "inputs": [],
+      "name": "InsumoNaoVinculado",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "LoteProducaoInexistente",
-        "type":  "error"
+      "inputs": [],
+      "name": "LoteProducaoInexistente",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "NaoEhProdutorResponsavel",
-        "type":  "error"
+      "inputs": [],
+      "name": "NaoEhProdutorResponsavel",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "PeriodoInformadoInvalido",
-        "type":  "error"
+      "inputs": [],
+      "name": "PeriodoInformadoInvalido",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "PrecedenciaInvalida",
-        "type":  "error"
+      "inputs": [],
+      "name": "PrecedenciaInvalida",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "QuantidadeInsuficienteNoLote",
-        "type":  "error"
+      "inputs": [],
+      "name": "QuantidadeInsuficienteNoLote",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "QuantidadeInvalida",
-        "type":  "error"
+      "inputs": [],
+      "name": "QuantidadeInvalida",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "ReferenciaIPFSInvalida",
-        "type":  "error"
+      "inputs": [],
+      "name": "ReferenciaIPFSInvalida",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "RequisitoDeEtapaNaoAtendido",
-        "type":  "error"
+      "inputs": [],
+      "name": "RequisitoDeEtapaNaoAtendido",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "RequisitoDeInsumoNaoAtendido",
-        "type":  "error"
+      "inputs": [],
+      "name": "RequisitoDeInsumoNaoAtendido",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "SemPermissao",
-        "type":  "error"
+      "inputs": [],
+      "name": "SemPermissao",
+      "type": "error"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "TipoBebidaInvalido",
-        "type":  "error"
+      "inputs": [],
+      "name": "TipoBebidaInvalido",
+      "type": "error"
     },
     {
-        "anonymous":  false,
-        "inputs":  [
-                       {
-                           "indexed":  true,
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "indexed":  true,
-                           "internalType":  "address",
-                           "name":  "produtor",
-                           "type":  "address"
-                       }
-                   ],
-        "name":  "ConfiguracaoProducaoAtualizada",
-        "type":  "event"
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "produtor",
+          "type": "address"
+        }
+      ],
+      "name": "ConfiguracaoProducaoAtualizada",
+      "type": "event"
     },
     {
-        "anonymous":  false,
-        "inputs":  [
-                       {
-                           "indexed":  true,
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "indexed":  true,
-                           "internalType":  "enum ContratoProducao.EtapaProducao",
-                           "name":  "etapa",
-                           "type":  "uint8"
-                       },
-                       {
-                           "indexed":  true,
-                           "internalType":  "address",
-                           "name":  "executadoPor",
-                           "type":  "address"
-                       },
-                       {
-                           "indexed":  false,
-                           "internalType":  "uint256",
-                           "name":  "indice",
-                           "type":  "uint256"
-                       },
-                       {
-                           "indexed":  false,
-                           "internalType":  "uint64",
-                           "name":  "registradoEm",
-                           "type":  "uint64"
-                       }
-                   ],
-        "name":  "EtapaProducaoRegistrada",
-        "type":  "event"
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "enum ContratoProducao.EtapaProducao",
+          "name": "etapa",
+          "type": "uint8"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "executadoPor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "indice",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "registradoEm",
+          "type": "uint64"
+        }
+      ],
+      "name": "EtapaProducaoRegistrada",
+      "type": "event"
     },
     {
-        "anonymous":  false,
-        "inputs":  [
-                       {
-                           "indexed":  true,
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "indexed":  true,
-                           "internalType":  "uint256",
-                           "name":  "insumoId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "indexed":  true,
-                           "internalType":  "address",
-                           "name":  "produtor",
-                           "type":  "address"
-                       }
-                   ],
-        "name":  "InsumoVinculadoAoLote",
-        "type":  "event"
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "insumoId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "produtor",
+          "type": "address"
+        }
+      ],
+      "name": "InsumoVinculadoAoLote",
+      "type": "event"
     },
     {
-        "anonymous":  false,
-        "inputs":  [
-                       {
-                           "indexed":  true,
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "indexed":  true,
-                           "internalType":  "address",
-                           "name":  "produtor",
-                           "type":  "address"
-                       },
-                       {
-                           "indexed":  true,
-                           "internalType":  "enum ContratoProducao.TipoBebida",
-                           "name":  "tipoBebida",
-                           "type":  "uint8"
-                       },
-                       {
-                           "indexed":  false,
-                           "internalType":  "string",
-                           "name":  "metadataURI",
-                           "type":  "string"
-                       },
-                       {
-                           "indexed":  false,
-                           "internalType":  "uint64",
-                           "name":  "criadoEm",
-                           "type":  "uint64"
-                       }
-                   ],
-        "name":  "LoteProducaoCriado",
-        "type":  "event"
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "marcadoPor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "motivo",
+          "type": "string"
+        }
+      ],
+      "name": "LoteMarcadoComoAdulterado",
+      "type": "event"
     },
     {
-        "anonymous":  false,
-        "inputs":  [
-                       {
-                           "indexed":  true,
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "indexed":  true,
-                           "internalType":  "address",
-                           "name":  "produtor",
-                           "type":  "address"
-                       },
-                       {
-                           "indexed":  false,
-                           "internalType":  "address",
-                           "name":  "envasadorDesignado",
-                           "type":  "address"
-                       },
-                       {
-                           "indexed":  false,
-                           "internalType":  "string",
-                           "name":  "metadataURI",
-                           "type":  "string"
-                       },
-                       {
-                           "indexed":  false,
-                           "internalType":  "uint64",
-                           "name":  "concluidoEm",
-                           "type":  "uint64"
-                       }
-                   ],
-        "name":  "ProducaoConcluida",
-        "type":  "event"
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "produtor",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "enum ContratoProducao.TipoBebida",
+          "name": "tipoBebida",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "metadataURI",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "criadoEm",
+          "type": "uint64"
+        }
+      ],
+      "name": "LoteProducaoCriado",
+      "type": "event"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "components":  [
-                                              {
-                                                  "internalType":  "bool",
-                                                  "name":  "maturacaoAplicavel",
-                                                  "type":  "bool"
-                                              },
-                                              {
-                                                  "internalType":  "bool",
-                                                  "name":  "retificacaoAplicavel",
-                                                  "type":  "bool"
-                                              },
-                                              {
-                                                  "internalType":  "bool",
-                                                  "name":  "blendagemAplicavel",
-                                                  "type":  "bool"
-                                              },
-                                              {
-                                                  "internalType":  "bool",
-                                                  "name":  "ajusteFinalAplicavel",
-                                                  "type":  "bool"
-                                              }
-                                          ],
-                           "internalType":  "struct ContratoProducao.ConfiguracaoProducao",
-                           "name":  "configuracao",
-                           "type":  "tuple"
-                       }
-                   ],
-        "name":  "atualizarConfiguracao",
-        "outputs":  [
-
-                    ],
-        "stateMutability":  "nonpayable",
-        "type":  "function"
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "produtor",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "envasadorDesignado",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "metadataURI",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "concluidoEm",
+          "type": "uint64"
+        }
+      ],
+      "name": "ProducaoConcluida",
+      "type": "event"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "address",
-                           "name":  "envasadorDesignado",
-                           "type":  "address"
-                       },
-                       {
-                           "internalType":  "string",
-                           "name":  "metadataURI",
-                           "type":  "string"
-                       }
-                   ],
-        "name":  "concluirProducao",
-        "outputs":  [
-
-                    ],
-        "stateMutability":  "nonpayable",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bool",
+              "name": "maturacaoAplicavel",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "retificacaoAplicavel",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "blendagemAplicavel",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "ajusteFinalAplicavel",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct ContratoProducao.ConfiguracaoProducao",
+          "name": "configuracao",
+          "type": "tuple"
+        }
+      ],
+      "name": "atualizarConfiguracao",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "contratoAcesso",
-        "outputs":  [
-                        {
-                            "internalType":  "contract IContratoAcesso",
-                            "name":  "",
-                            "type":  "address"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "envasadorDesignado",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "metadataURI",
+          "type": "string"
+        }
+      ],
+      "name": "concluirProducao",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "contratoInsumos",
-        "outputs":  [
-                        {
-                            "internalType":  "contract IContratoInsumos",
-                            "name":  "",
-                            "type":  "address"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [],
+      "name": "contratoAcesso",
+      "outputs": [
+        {
+          "internalType": "contract IContratoAcesso",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "enum ContratoProducao.TipoBebida",
-                           "name":  "tipoBebida",
-                           "type":  "uint8"
-                       },
-                       {
-                           "components":  [
-                                              {
-                                                  "internalType":  "bool",
-                                                  "name":  "maturacaoAplicavel",
-                                                  "type":  "bool"
-                                              },
-                                              {
-                                                  "internalType":  "bool",
-                                                  "name":  "retificacaoAplicavel",
-                                                  "type":  "bool"
-                                              },
-                                              {
-                                                  "internalType":  "bool",
-                                                  "name":  "blendagemAplicavel",
-                                                  "type":  "bool"
-                                              },
-                                              {
-                                                  "internalType":  "bool",
-                                                  "name":  "ajusteFinalAplicavel",
-                                                  "type":  "bool"
-                                              }
-                                          ],
-                           "internalType":  "struct ContratoProducao.ConfiguracaoProducao",
-                           "name":  "configuracao",
-                           "type":  "tuple"
-                       },
-                       {
-                           "internalType":  "string",
-                           "name":  "metadataURI",
-                           "type":  "string"
-                       }
-                   ],
-        "name":  "criarLoteProducao",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "loteId",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "nonpayable",
-        "type":  "function"
+      "inputs": [],
+      "name": "contratoInsumos",
+      "outputs": [
+        {
+          "internalType": "contract IContratoInsumos",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "envasadorDesignadoDaProducao",
-        "outputs":  [
-                        {
-                            "internalType":  "address",
-                            "name":  "",
-                            "type":  "address"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "enum ContratoProducao.TipoBebida",
+          "name": "tipoBebida",
+          "type": "uint8"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bool",
+              "name": "maturacaoAplicavel",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "retificacaoAplicavel",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "blendagemAplicavel",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "ajusteFinalAplicavel",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct ContratoProducao.ConfiguracaoProducao",
+          "name": "configuracao",
+          "type": "tuple"
+        },
+        {
+          "internalType": "string",
+          "name": "metadataURI",
+          "type": "string"
+        }
+      ],
+      "name": "criarLoteProducao",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "enum ContratoProducao.EtapaProducao",
-                           "name":  "etapa",
-                           "type":  "uint8"
-                       }
-                   ],
-        "name":  "etapaFoiRegistrada",
-        "outputs":  [
-                        {
-                            "internalType":  "bool",
-                            "name":  "",
-                            "type":  "bool"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        }
+      ],
+      "name": "envasadorDesignadoDaProducao",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "uint256",
-                           "name":  "indice",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "etapaPorIndice",
-        "outputs":  [
-                        {
-                            "components":  [
-                                               {
-                                                   "internalType":  "enum ContratoProducao.EtapaProducao",
-                                                   "name":  "etapa",
-                                                   "type":  "uint8"
-                                               },
-                                               {
-                                                   "internalType":  "address",
-                                                   "name":  "executadoPor",
-                                                   "type":  "address"
-                                               },
-                                               {
-                                                   "internalType":  "uint256",
-                                                   "name":  "inicioInformado",
-                                                   "type":  "uint256"
-                                               },
-                                               {
-                                                   "internalType":  "uint256",
-                                                   "name":  "fimInformado",
-                                                   "type":  "uint256"
-                                               },
-                                               {
-                                                   "internalType":  "uint64",
-                                                   "name":  "registradoEm",
-                                                   "type":  "uint64"
-                                               },
-                                               {
-                                                   "internalType":  "string",
-                                                   "name":  "metadataURI",
-                                                   "type":  "string"
-                                               }
-                                           ],
-                            "internalType":  "struct ContratoProducao.RegistroEtapa",
-                            "name":  "",
-                            "type":  "tuple"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum ContratoProducao.EtapaProducao",
+          "name": "etapa",
+          "type": "uint8"
+        }
+      ],
+      "name": "etapaFoiRegistrada",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "uint256",
-                           "name":  "indiceEtapa",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "uint256",
-                           "name":  "indiceInsumo",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "insumoDaEtapaPorIndice",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "indice",
+          "type": "uint256"
+        }
+      ],
+      "name": "etapaPorIndice",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "enum ContratoProducao.EtapaProducao",
+              "name": "etapa",
+              "type": "uint8"
+            },
+            {
+              "internalType": "address",
+              "name": "executadoPor",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "inicioInformado",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "fimInformado",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint64",
+              "name": "registradoEm",
+              "type": "uint64"
+            },
+            {
+              "internalType": "string",
+              "name": "metadataURI",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct ContratoProducao.RegistroEtapa",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "uint256",
-                           "name":  "insumoId",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "insumoEstaVinculado",
-        "outputs":  [
-                        {
-                            "internalType":  "bool",
-                            "name":  "",
-                            "type":  "bool"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "indiceEtapa",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "indiceInsumo",
+          "type": "uint256"
+        }
+      ],
+      "name": "insumoDaEtapaPorIndice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "uint256",
-                           "name":  "indice",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "insumoUtilizadoPorIndice",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "insumoId",
+          "type": "uint256"
+        }
+      ],
+      "name": "insumoEstaVinculado",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "uint256",
-                           "name":  "indice",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "insumoVinculadoPorIndice",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "indice",
+          "type": "uint256"
+        }
+      ],
+      "name": "insumoUtilizadoPorIndice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "address",
-                           "name":  "produtor",
-                           "type":  "address"
-                       },
-                       {
-                           "internalType":  "uint256",
-                           "name":  "indice",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "loteDoProdutorPorIndice",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "indice",
+          "type": "uint256"
+        }
+      ],
+      "name": "insumoVinculadoPorIndice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "loteProducaoConcluido",
-        "outputs":  [
-                        {
-                            "internalType":  "bool",
-                            "name":  "",
-                            "type":  "bool"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        }
+      ],
+      "name": "loteAdulterado",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "loteProducaoExiste",
-        "outputs":  [
-                        {
-                            "internalType":  "bool",
-                            "name":  "",
-                            "type":  "bool"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "produtor",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "indice",
+          "type": "uint256"
+        }
+      ],
+      "name": "loteDoProdutorPorIndice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "insumoId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "uint256",
-                           "name":  "indice",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "loteQueUtilizouInsumoPorIndice",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        }
+      ],
+      "name": "loteProducaoConcluido",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "obterConfiguracao",
-        "outputs":  [
-                        {
-                            "components":  [
-                                               {
-                                                   "internalType":  "bool",
-                                                   "name":  "maturacaoAplicavel",
-                                                   "type":  "bool"
-                                               },
-                                               {
-                                                   "internalType":  "bool",
-                                                   "name":  "retificacaoAplicavel",
-                                                   "type":  "bool"
-                                               },
-                                               {
-                                                   "internalType":  "bool",
-                                                   "name":  "blendagemAplicavel",
-                                                   "type":  "bool"
-                                               },
-                                               {
-                                                   "internalType":  "bool",
-                                                   "name":  "ajusteFinalAplicavel",
-                                                   "type":  "bool"
-                                               }
-                                           ],
-                            "internalType":  "struct ContratoProducao.ConfiguracaoProducao",
-                            "name":  "",
-                            "type":  "tuple"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        }
+      ],
+      "name": "loteProducaoExiste",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "obterLoteProducao",
-        "outputs":  [
-                        {
-                            "components":  [
-                                               {
-                                                   "internalType":  "address",
-                                                   "name":  "produtor",
-                                                   "type":  "address"
-                                               },
-                                               {
-                                                   "internalType":  "enum ContratoProducao.TipoBebida",
-                                                   "name":  "tipoBebida",
-                                                   "type":  "uint8"
-                                               },
-                                               {
-                                                   "internalType":  "enum ContratoProducao.EstadoProducao",
-                                                   "name":  "estado",
-                                                   "type":  "uint8"
-                                               },
-                                               {
-                                                   "internalType":  "address",
-                                                   "name":  "envasadorDesignado",
-                                                   "type":  "address"
-                                               },
-                                               {
-                                                   "internalType":  "uint64",
-                                                   "name":  "criadoEm",
-                                                   "type":  "uint64"
-                                               },
-                                               {
-                                                   "internalType":  "uint64",
-                                                   "name":  "concluidoEm",
-                                                   "type":  "uint64"
-                                               },
-                                               {
-                                                   "internalType":  "string",
-                                                   "name":  "metadataURI",
-                                                   "type":  "string"
-                                               },
-                                               {
-                                                   "internalType":  "string",
-                                                   "name":  "metadataURIConclusao",
-                                                   "type":  "string"
-                                               }
-                                           ],
-                            "internalType":  "struct ContratoProducao.LoteProducao",
-                            "name":  "",
-                            "type":  "tuple"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "insumoId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "indice",
+          "type": "uint256"
+        }
+      ],
+      "name": "loteQueUtilizouInsumoPorIndice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "insumoId",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "quantidadeConsumidaDoInsumo",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "motivo",
+          "type": "string"
+        }
+      ],
+      "name": "marcarComoAdulterado",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "enum ContratoProducao.EtapaProducao",
-                           "name":  "etapa",
-                           "type":  "uint8"
-                       },
-                       {
-                           "internalType":  "uint256[]",
-                           "name":  "insumosUtilizados",
-                           "type":  "uint256[]"
-                       },
-                       {
-                           "internalType":  "uint256[]",
-                           "name":  "quantidadesConsumidas",
-                           "type":  "uint256[]"
-                       },
-                       {
-                           "internalType":  "uint256",
-                           "name":  "inicioInformado",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "uint256",
-                           "name":  "fimInformado",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "string",
-                           "name":  "metadataURI",
-                           "type":  "string"
-                       }
-                   ],
-        "name":  "registrarEtapa",
-        "outputs":  [
-
-                    ],
-        "stateMutability":  "nonpayable",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        }
+      ],
+      "name": "motivoAdulteracao",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "totalEtapas",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        }
+      ],
+      "name": "obterConfiguracao",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bool",
+              "name": "maturacaoAplicavel",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "retificacaoAplicavel",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "blendagemAplicavel",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "ajusteFinalAplicavel",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct ContratoProducao.ConfiguracaoProducao",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "uint256",
-                           "name":  "indiceEtapa",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "totalInsumosDaEtapa",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        }
+      ],
+      "name": "obterLoteProducao",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "produtor",
+              "type": "address"
+            },
+            {
+              "internalType": "enum ContratoProducao.TipoBebida",
+              "name": "tipoBebida",
+              "type": "uint8"
+            },
+            {
+              "internalType": "enum ContratoProducao.EstadoProducao",
+              "name": "estado",
+              "type": "uint8"
+            },
+            {
+              "internalType": "address",
+              "name": "envasadorDesignado",
+              "type": "address"
+            },
+            {
+              "internalType": "uint64",
+              "name": "criadoEm",
+              "type": "uint64"
+            },
+            {
+              "internalType": "uint64",
+              "name": "concluidoEm",
+              "type": "uint64"
+            },
+            {
+              "internalType": "string",
+              "name": "metadataURI",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "metadataURIConclusao",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct ContratoProducao.LoteProducao",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "totalInsumosUtilizados",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "insumoId",
+          "type": "uint256"
+        }
+      ],
+      "name": "quantidadeConsumidaDoInsumo",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "totalInsumosVinculados",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum ContratoProducao.EtapaProducao",
+          "name": "etapa",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "insumosUtilizados",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "quantidadesConsumidas",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint256",
+          "name": "inicioInformado",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fimInformado",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "metadataURI",
+          "type": "string"
+        }
+      ],
+      "name": "registrarEtapa",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "address",
-                           "name":  "produtor",
-                           "type":  "address"
-                       }
-                   ],
-        "name":  "totalLotesDoProdutor",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        }
+      ],
+      "name": "totalEtapas",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-
-                   ],
-        "name":  "totalLotesProducao",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "indiceEtapa",
+          "type": "uint256"
+        }
+      ],
+      "name": "totalInsumosDaEtapa",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "insumoId",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "totalLotesQueUtilizaramInsumo",
-        "outputs":  [
-                        {
-                            "internalType":  "uint256",
-                            "name":  "",
-                            "type":  "uint256"
-                        }
-                    ],
-        "stateMutability":  "view",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        }
+      ],
+      "name": "totalInsumosUtilizados",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
-        "inputs":  [
-                       {
-                           "internalType":  "uint256",
-                           "name":  "loteId",
-                           "type":  "uint256"
-                       },
-                       {
-                           "internalType":  "uint256",
-                           "name":  "insumoId",
-                           "type":  "uint256"
-                       }
-                   ],
-        "name":  "vincularInsumoAoLote",
-        "outputs":  [
-
-                    ],
-        "stateMutability":  "nonpayable",
-        "type":  "function"
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        }
+      ],
+      "name": "totalInsumosVinculados",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "produtor",
+          "type": "address"
+        }
+      ],
+      "name": "totalLotesDoProdutor",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalLotesProducao",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "insumoId",
+          "type": "uint256"
+        }
+      ],
+      "name": "totalLotesQueUtilizaramInsumo",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "loteId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "insumoId",
+          "type": "uint256"
+        }
+      ],
+      "name": "vincularInsumoAoLote",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
-]
+  ],
+  "bytecode": "0x60c0346200011c57601f620030c138819003918201601f19168301916001600160401b03831184841017620001205780849260409485528339810103126200011c576200005a6020620000528362000134565b920162000134565b60015f55906001600160a01b0380821691821590811562000111575b50620000ff578216918215908115620000f4575b50620000e25760805260a052604051612f7790816200014a823960805181818161060801528181610f37015281816113e20152612beb015260a05181818161046d01528181610b5a01528181611d690152612d6d0152f35b604051634013a4eb60e01b8152600490fd5b90503b155f6200008a565b6040516311a99db360e31b8152600490fd5b90503b155f62000076565b5f80fd5b634e487b7160e01b5f52604160045260245ffd5b51906001600160a01b03821682036200011c5756fe60806040526004361015610011575f80fd5b5f3560e01c8062e2fcc0146122c95780630392ff0514612295578063084336ad1461216c5780631576cf871461211e5780631c6d57291461184c5780631f8ae10a1461141157806321761b6c146113cd57806321d04706146113995780633241223d146113385780633c135ead146112895780635032f5fd1461124d578063594b55f7146111745780635f4ed7a014611113578063646848ed146110e05780636d60bfa0146110a757806378f800b014611069578063878b92f8146110315780638a6d36e314610ff857806394a3a64614610fc9578063a812f25a14610f9f578063b18248a8146107e9578063b67b531e146105b4578063c9179aec14610576578063d0ca87d314610542578063d76ebfe6146104ff578063da07f63b1461049c578063e72c562714610458578063e748f11b14610358578063ebec3177146101cf578063ef867577146101a55763fbb918071461016d575f80fd5b346101a15760203660031901126101a15760043561018a816126f4565b505f526009602052602060405f2054604051908152f35b5f80fd5b346101a15760203660031901126101a1576004355f52600c602052602060405f2054604051908152f35b346101a15760203660031901126101a157606060e06040516101f0816123ed565b5f81525f60208201525f60408201525f838201525f60808201525f60a08201528260c082015201526102236004356126f4565b60405190610230826123ed565b80546001600160a01b0380821684529190602084019060ff9061025960a082901c831684612674565b60a81c1691604085019260038110156103445783526001810154606086019385821685526001600160401b039182608089019160a01c168152826002850154169160a089019283526102c060046102b2600388016124b6565b9660c08c01978852016124b6565b9560e08a01968752886040519a60208c52511660208b01525160058110156103445760408a01525190600382101561034457889761034097859360608b015251166080890152511660a0870152511660c08501525161032d610100918260e087015261012086019061233a565b915190601f19858403019085015261233a565b0390f35b634e487b7160e01b5f52602160045260245ffd5b346101a15760a03660031901126101a15760043560803660231901126101a157610381816126f4565b61038a81612723565b5460ff8160a81c166003811015610344576104465760ff6103ae9160a01c16612c4a565b805f52600260205260405f206103d76103c5612680565b829060ff801983541691151516179055565b6103df61268f565b1515815462ff00006103ef61269e565b151560101b169061ff0063ff0000006104066126ad565b151560181b169360081b169063ffffff001916171717905533907f1d438badb165a4cadcacb8fd584213b5362cc76158d6a6bf7f65ac98fdc63f0d5f80a3005b604051634a84dc9f60e11b8152600490fd5b346101a1575f3660031901126101a1576040517f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03168152602090f35b346101a1576104aa36612303565b906104b4816126f4565b50805f52600960205260405f20548210156104ed576020916104df915f526009835260405f2061261e565b90546040519160031b1c8152f35b60405163e71072f560e01b8152600490fd5b346101a15761050d36612303565b90610517816126f4565b50805f52600460205260405f20548210156104ed576020916104df915f526004835260405f2061261e565b346101a15760203660031901126101a15760043561055f816126f4565b505f526004602052602060405f2054604051908152f35b346101a15761058436612303565b9061058e816126f4565b505f52600560205260405f20905f52602052602060ff60405f2054166040519015158152f35b346101a15760403660031901126101a1576004356001600160401b036024358181116101a1576105e890369060040161238f565b60405163130b97ad60e01b815233600482015260209492919085816024817f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03165afa9081156107de575f916107b1575b501561079f5761064f836126f4565b50825f52600d855260405f2093600194600160ff19825416179055600e865260405f2090821161078b5761068d82610687835461247e565b836125bf565b5f94601f831160011461070657506106dd82807fff599533da9a5f586fc1a8e8b8348605ce630d75a5d1e1316d832925c686e9c996975f916106fb575b508160011b915f199060031b1c19161790565b90555b6106f660405192839287845233978401916126bc565b0390a3005b9050850135896106ca565b601f19831695825f52875f20915f905b8989831061077357505050837fff599533da9a5f586fc1a8e8b8348605ce630d75a5d1e1316d832925c686e9c996971061075a575b5050600182811b0190556106e0565b8401355f19600385901b60f8161c19169055868061074b565b87840135855593810193928301929190910190610716565b634e487b7160e01b5f52604160045260245ffd5b604051633ed8c34160e21b8152600490fd5b6107d19150863d88116107d7575b6107c98183612424565b8101906126dc565b86610640565b503d6107bf565b6040513d5f823e3d90fd5b346101a15760603660031901126101a1576024356001600160a01b03811681036101a1576044356001600160401b0381116101a15761082c90369060040161238f565b906108386004356126f4565b61084181612723565b805460ff8160a81c16600381101561034457600103610f8d576001600160a01b038516158015610f0d575b610efb5761087a8484612ab9565b6004355f52600260205260405f20600660205260405f205415610c0c575f90600560ff8460a01c161015918261034457600160ff8560a01c16145f14610cda57506004355f52600760205260405f205f805260205260ff60405f2054169081610cb5575b81610c90575b81610c58575b81610c1e575b505b15610c0c575f905f905f906004355f52600960205260405f205f908054905b818310610b1557505050806103445760a085901c60ff1660018114905f1901610b03575b15610ad1575050505b15610abf5760ff60a81b1916600160a91b1781556001810180546001600160a01b0319166001600160a01b03861617905560028101805467ffffffffffffffff1916426001600160401b03908116919091178255909160040190841161078b576109ac84610687835461247e565b835f601f8211600114610a4957916109e682610a0b9695936001600160401b03955f91610a3e57508160011b915f199060031b1c19161790565b90555b5416926040519460018060a01b031685526060602086015260608501916126bc565b9060408301527ffff8884f3d1d88a8b7facef5b54156dec14c5a4f416aa94d97cc5fee9c85a742339280600435930390a3005b90508601358a6106ca565b5f8381526020812092508690601f198216905b818110610aa4575091610a0b969593916001600160401b03959310610a8b575b5050600186811b0190556109e9565b8501355f19600389901b60f8161c191690558780610a7c565b87840135855560019094019360209384019389935001610a5c565b60405163572ad6fb60e01b8152600490fd5b9091925061034457600360ff8460a01c16145f14610aef575061093e565b81610afb575b5061093e565b905086610af5565b50505f600260ff8660a01c1614610935565b909195610b22878361261e565b905460039190911b1c610b3e6001600160a01b038a1682612d43565b604051638874a76d60e01b815260048101919091525f816024817f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03165afa80156107de576020915f91610bea575b50015160088110156103445760018103610bb7575050600180965b019190610911565b9096959060028103610bce57505060018095610baf565b909590600514610be1575b600190610baf565b60019450610bd9565b610c0691503d805f833e610bfe8183612424565b810190612afa565b8e610b94565b6040516306a1515b60e51b8152600490fd5b60ff91505460181c16158015610c35575b876108f0565b506004355f52600760205260405f2060085f5260205260ff60405f205416610c2f565b905060ff815416158015610c6d575b906108ea565b506004355f52600760205260405f2060045f5260205260ff60405f205416610c67565b90506004355f52600760205260405f2060025f5260205260ff60405f205416906108e4565b90506004355f52600760205260405f2060015f5260205260ff60405f205416906108de565b5f925060a084901c60ff16600203610e1257506004355f52600760205260405f205f805260205260ff60405f2054169081610ded575b81610dc8575b81610da3575b81610d68575b81610d2e575b506108f2565b60ff91505460181c16158015610d45575b87610d28565b506004355f52600760205260405f2060085f5260205260ff60405f205416610d3f565b905060ff815460101c16158015610d80575b90610d22565b506004355f52600760205260405f2060065f5260205260ff60405f205416610d7a565b90506004355f52600760205260405f2060045f5260205260ff60405f20541690610d1c565b90506004355f52600760205260405f2060025f5260205260ff60405f20541690610d16565b90506004355f52600760205260405f2060015f5260205260ff60405f20541690610d10565b5f925060a084901c60ff16600303610e7b57505460ff8160081c1615908115610e56575b81610e4157506108f2565b60ff915060181c16158015610d455787610d28565b90506004355f52600760205260405f2060035f5260205260ff60405f20541690610e36565b9091505f91600460ff8560a01c1614610e9457506108f2565b90506004355f52600760205260405f2060075f5260205260ff60405f2054169081610ec1575b5087610d28565b60ff91505460181c16158015610ed8575b87610eba565b506004355f52600760205260405f2060085f5260205260ff60405f205416610ed2565b60405163ec1f7d5960e01b8152600490fd5b506040516310fe1e4560e31b81526001600160a01b038681166004830152602090829060249082907f0000000000000000000000000000000000000000000000000000000000000000165afa9081156107de575f91610f6e575b501561086c565b610f87915060203d6020116107d7576107c98183612424565b86610f67565b604051630908494760e01b8152600490fd5b346101a15760203660031901126101a1576004355f52600b602052602060405f2054604051908152f35b346101a15760203660031901126101a1576004355f52600d602052602060ff60405f2054166040519015158152f35b346101a15761100636612303565b90805f52600b60205260405f20548210156104ed576020916104df915f52600b835260405f2061261e565b346101a15760203660031901126101a1576001600160a01b036110526123bc565b165f526003602052602060405f2054604051908152f35b346101a15760203660031901126101a1576004355f52600e60205261034061109360405f206124b6565b60405191829160208352602083019061233a565b346101a1576110b536612303565b906110c08282612ead565b5f52600860205260405f20905f52602052602060405f2054604051908152f35b346101a15760203660031901126101a15760206001600160a01b0360016111086004356126f4565b015416604051908152f35b346101a15760603660031901126101a1576024356004356044356111378383612ead565b815f52600860205260405f20835f5260205260405f20548110156104ed576020926104df925f526008845260405f20905f52835260405f2061261e565b346101a15761118236612303565b61118b826126f4565b61119481612723565b5460ff8160a81c16600381101561034457600214610f8d57825f52600560205260405f20825f5260205260ff60405f20541661123b576111dd906001600160a01b031682612d43565b815f52600560205260405f20815f5260205260405f20600160ff19825416179055815f5260046020526112138160405f20612633565b33917fe561283669a6d5d8b2bddd31b98e5005fc185ab9799638a8b16b60f13790bd3f5f80a4005b60405163c395e1f760e01b8152600490fd5b346101a1575f3660031901126101a1575f545f19810190811161127557602090604051908152f35b634e487b7160e01b5f52601160045260245ffd5b346101a15760203660031901126101a1576004355f60606040516112ac81612409565b82815282602082015282604082015201526112c6816126f4565b505f526002602052608060405f20604051906112e182612409565b5460ff81161515918281526020810160ff8360081c161515815260ff60606040840193828660101c1615158552019360181c1615158352604051938452511515602084015251151560408301525115156060820152f35b346101a15760403660031901126101a1576113516123bc565b6001600160a01b03165f8181526003602052604090205460243591908210156104ed5760209161138a915f526003835260405f2061261e565b90549060031b1c604051908152f35b346101a15760203660031901126101a1576004355f526001602052602060018060a01b0360405f2054161515604051908152f35b346101a1575f3660031901126101a1576040517f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03168152602090f35b346101a15760c03660031901126101a157600560043510156101a15760803660231901126101a15760a4356001600160401b0381116101a15761145890369060040161238f565b611460612bd0565b6004351561183a57611473600435612c4a565b61147d8183612ab9565b5f54905f19821461127557600182015f556040519261149b846123ed565b3384526114ad60043560208601612674565b5f60408501525f60608501526001600160401b03421660808501525f60a08501526114d9368383612589565b60c08501526040518060208101106001600160401b0360208301111761078b57602081016040525f815260e0850152825f52600160205260405f2060018060a01b0380865116825490602088015190600582101561034457604089015160038110156103445760ff60a81b9060a81b169269ffffffffffffffffffff60b01b16179060ff60a01b9060a01b161717825560018201906060870151168154906001600160401b0360a01b608089015160a01b169163ffffffff60e01b1617179055600281016001600160401b0360a0870151166001600160401b031982541617905560c08501518051906001600160401b03821161078b576115ea826115e1600386015461247e565b600386016125bf565b602090601f83116001146117c9578260049360e0959361161f935f926117be575b50508160011b915f199060031b1c19161790565b60038201555b019401519384516001600160401b03811161078b576020956116518261164b855461247e565b856125bf565b8690601f83116001146117575791806116849261170a9695945f9261174c5750508160011b915f199060031b1c19161790565b90555b835f526002855260405f2061169d6103c5612680565b6116a561268f565b1515815462ff00006116b561269e565b151560101b169061ff0063ff0000006116cc6126ad565b151560181b169360081b169063ffffff0019161717179055335f52600385526116f88460405f20612633565b604051926040845260408401916126bc565b6001600160401b03421684830152827fc42b2fedf723ff3733188ef0a4d75404a43c5e27c0798133684223f25f95b968600435938033940390a4604051908152f35b01519050898061160b565b90601f19831691845f52885f20925f5b8181106117a7575091600193918561170a989796941061178f575b505050811b019055611687565b01515f1960f88460031b161c19169055888080611782565b92938a600181928786015181550195019301611767565b015190508a8061160b565b90600384015f5260205f20915f5b601f198516811061182257509260e0949260019260049583601f1981161061180a575b505050811b016003820155611625565b01515f1960f88460031b161c191690558980806117fa565b919260206001819286850151815501940192016117d7565b604051632946ce7160e21b8152600490fd5b346101a15760e03660031901126101a15760096024351015806101a1576044356001600160401b0381116101a15761188890369060040161235f565b91906064356001600160401b0381116101a1576118a990369060040161235f565b60c4929192356001600160401b0381116101a1576118cb90369060040161238f565b9390956118d96004356126f4565b946118e386612723565b8554600360ff8260a81c16101561034457600260ff8260a81c1614610f8d576004355f52600760205260ff61191d60243560405f20612558565b541661210c576004355f52600260205260405f205f600560ff8460a01c161015610344578990600160ff8560a01c16145f14611f5957506103445760243515908115611f49575b898215611f35575b8215611f10575b8215611ee5575b50505b15611ed3576004355f5260026020526119a560243560405f2060ff8460a01c1660043561274f565b60a43560843511611ec157848303611eaf576119c1828a612ab9565b5f5b838110611e1e5750505f5b828110611d3257506004355f52600660205260405f20611a2f815499604051936119f7856123d2565b611a0360243586612472565b336020860152608435604086015260a43560608601526001600160401b03421660808601523691612589565b60a0830152600160401b89101561078b5788611a5091600182018155612445565b919091611d1f5780519060098210156103445782546020820151610100600160a81b0360089190911b1660ff939093166001600160a81b031990911617919091178255604081015160018301556060810151600283015560808101516003830180546001600160401b0392831667ffffffffffffffff1990911617905560a090910151805191821161078b57611af682611aed600486015461247e565b600486016125bf565b602090601f8311600114611cb3579180611b27926004945f92611ca85750508160011b915f199060031b1c19161790565b9101555b6004355f526007602052611b4460243560405f20612558565b805460ff191660011790555f5b818110611bd457878787805460ff8160a81c1660038110156103445715611bbe575b5050610344576040519081526001600160401b03421660208201523390602435907f446880169a1aa5f5629b27753d29b4784e9b3486db6c8bb481efc33a7d1f85fb604060043592a4005b60ff60a81b1916600160a81b1790558280611b73565b80611be2600192848861260e565b356004355f52600860205260405f208a5f52602052611c048160405f20612633565b611c0f82878761260e565b35815f52600c602052611c2760405f20918254612667565b90556004355f52600a8060205260405f20825f5260205260ff60405f20541615611c54575b505001611b51565b6004355f5260205260405f20815f5260205260405f208360ff198254161790556004355f526009602052611c8b8160405f20612633565b5f52600b602052611ca160043560405f20612633565b8980611c4c565b015190508c8061160b565b90600484015f5260205f20915f5b601f1985168110611d075750918391600193600495601f19811610611cef575b505050811b01910155611b2b565b01515f1960f88460031b161c191690558b8080611ce1565b91926020600181928685015181550194019201611cc1565b634e487b7160e01b5f525f60045260245ffd5b611d3d81868661260e565b3515611e0c57611d4e81848861260e565b604051638874a76d60e01b8152903560048201525f816024817f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03165afa80156107de576040915f91611df2575b500151611db182858961260e565b355f52600c602052611dd360405f2054611dcc84898961260e565b3590612667565b11611de0576001016119ce565b604051630a6c07d160e31b8152600490fd5b611e0691503d805f833e610bfe8183612424565b8b611da3565b604051636b7f949360e11b8152600490fd5b611e2981858961260e565b356004355f52600560205260405f20815f5260205260ff60405f20541615611e9d57611e5e6001600160a01b03841682612d43565b5f5b828110611e715750506001016119c3565b81611e7d82888c61260e565b3514611e8b57600101611e60565b60405163c1c1c04b60e01b8152600490fd5b604051633c26bba560e01b8152600490fd5b6040516304cfc80560e51b8152600490fd5b604051633bb6e0f560e21b8152600490fd5b6040516302e5429360e31b8152600490fd5b909150610344576008602435149081611f01575b508a8961197a565b60ff91505460181c168a611ef9565b9091506103445760046024351480611f2a575b9089611973565b5060ff815416611f23565b90915061034457600260243514908961196c565b5f99506024356001149150611964565b600260ff8560a01c16145f1461202957506103445760243515908115612019575b898215612005575b8215611ff1575b8215611fc9575b8215611f9e575b505061197d565b909150610344576008602435149081611fba575b508a89611f97565b60ff91505460181c168a611fb2565b9091506103445760066024351480611fe3575b9089611f90565b5060ff815460101c16611fdc565b909150610344576004602435149089611f89565b909150610344576002602435149089611f82565b5f99506024356001149150611f7a565b600360ff8560a01c16145f146120b457506103445760036024351490816120a5575b8115612095575b898215612081575b821561206d578215611f9e57505061197d565b909150610344576007602435149089611f90565b90915061034457600660243514908961205a565b5f99506024356005149150612052565b805460081c60ff16915061204b565b919050600460ff8460a01c16146120cc575b5061197d565b5f9950602435600714915081156120e5575b508a6120c6565b5f99506024356008149150816120fd575b508a6120de565b60ff91505460181c168a6120f6565b604051632c73cc5560e01b8152600490fd5b346101a15760403660031901126101a15760043560243560098110156101a15761216060ff91836121506020956126f4565b505f526007845260405f20612558565b54166040519015158152f35b346101a15761217a36612303565b9060405191612188836123d2565b5f8352606060a06020945f868201525f60408201525f838201525f608082015201526121b3826126f4565b50815f526006835260405f20548110156104ed576121da915f526006835260405f20612445565b50604051916121e8836123d2565b8154916121f860ff841685612472565b60018060a01b0390818386019460081c168452600181015490604086019182526002810154606087019081526001600160401b03926122476004856003860154169460808b01958652016124b6565b9460a0890195865260405198878a5251976009891015610344578998610340988a015251166040880152516060870152516080860152511660a08401525160c08084015260e083019061233a565b346101a15760203660031901126101a1576004356122b2816126f4565b505f526006602052602060405f2054604051908152f35b346101a15760203660031901126101a15760ff6122e76004356126f4565b5460a81c16600381101561034457602090600260405191148152f35b60409060031901126101a1576004359060243590565b5f5b83811061232a5750505f910152565b818101518382015260200161231b565b9060209161235381518092818552858086019101612319565b601f01601f1916010190565b9181601f840112156101a1578235916001600160401b0383116101a1576020808501948460051b0101116101a157565b9181601f840112156101a1578235916001600160401b0383116101a157602083818601950101116101a157565b600435906001600160a01b03821682036101a157565b60c081019081106001600160401b0382111761078b57604052565b61010081019081106001600160401b0382111761078b57604052565b608081019081106001600160401b0382111761078b57604052565b90601f801991011681019081106001600160401b0382111761078b57604052565b805482101561245e575f52600560205f20910201905f90565b634e487b7160e01b5f52603260045260245ffd5b60098210156103445752565b90600182811c921680156124ac575b602083101461249857565b634e487b7160e01b5f52602260045260245ffd5b91607f169161248d565b9060405191825f82546124c88161247e565b908184526020946001916001811690815f1461253657506001146124f8575b5050506124f692500383612424565b565b5f90815285812095935091905b81831061251e5750506124f693508201015f80806124e7565b85548884018501529485019487945091830191612505565b925050506124f694925060ff191682840152151560051b8201015f80806124e7565b906009811015610344575f5260205260405f2090565b6001600160401b03811161078b57601f01601f191660200190565b9291926125958261256e565b916125a36040519384612424565b8294818452818301116101a1578281602093845f960137010152565b601f82116125cc57505050565b5f5260205f20906020601f840160051c83019310612604575b601f0160051c01905b8181106125f9575050565b5f81556001016125ee565b90915081906125e5565b919081101561245e5760051b0190565b805482101561245e575f5260205f2001905f90565b8054600160401b81101561078b576126509160018201815561261e565b819291549060031b91821b915f19901b1916179055565b9190820180921161127557565b60058210156103445752565b60243580151581036101a15790565b60443580151581036101a15790565b60643580151581036101a15790565b60843580151581036101a15790565b908060209392818452848401375f828201840152601f01601f1916010190565b908160209103126101a1575180151581036101a15790565b5f52600160205260405f209060018060a01b038254161561271157565b604051638023c6df60e01b8152600490fd5b61272b612bd0565b546001600160a01b0316330361273d57565b604051631a671a4360e11b8152600490fd5b9192906005811015610344576001810361288957506009811015610344578015612822576001811480612869575b612822576002811480612848575b612822576004811480612827575b6128225760081491826127ff575b826127c7575b50506124f657505b6040516326b82aa360e21b8152600490fd5b5460ff1615915081156127dd575b505f806127ad565b90505f52600760205260405f2060045f5260205260ff60405f2054165f6127d5565b9150805f52600760205260405f2060025f5260205260ff60405f205416916127a7565b505050565b50815f52600760205260405f2060025f5260205260ff60405f205416612799565b50815f52600760205260405f2060015f5260205260ff60405f20541661278b565b50815f52600760205260405f205f805260205260ff60405f20541661277d565b600281036129d6575060098110156103445780156128225760018114806129b6575b612822576002811480612995575b612822576004811480612974575b612822576006811480612953575b612822576008149182612930575b826128f5575b50506124f657506127b5565b5460101c60ff16159150811561290e575b505f806128e9565b90505f52600760205260405f2060065f5260205260ff60405f2054165f612906565b9150805f52600760205260405f2060045f5260205260ff60405f205416916128e3565b50815f52600760205260405f2060045f5260205260ff60405f2054166128d5565b50815f52600760205260405f2060025f5260205260ff60405f2054166128c7565b50815f52600760205260405f2060015f5260205260ff60405f2054166128b9565b50815f52600760205260405f205f805260205260ff60405f2054166128ab565b60038103612a585750815f52600760205260405f2060085f5260205260ff60405f2054166127b55760098110156103445760081491821592612a48575b508115612a26575b506124f657506127b5565b90505f52600760205260405f2060035f5260205260ff60405f2054165f612a1b565b5460081c60ff161591505f612a13565b60049192935014612a6c575b5050506127b5565b60098110156103445760078114612ab5576008149081612a93575b506124f6578080612a64565b90505f52600760205260405f2060075f5260205260ff60405f2054165f612a87565b5050565b612ac890612acd923691612589565b612ecb565b15612ad457565b6040516358072cc760e11b8152600490fd5b51906001600160a01b03821682036101a157565b90602080838303126101a15782516001600160401b03938482116101a157019260c0848403126101a15760405193612b31856123d2565b612b3a81612ae6565b85528281015160088110156101a1578386015260408101516040860152612b6360608201612ae6565b6060860152608081015182811681036101a157608086015260a08101519182116101a1570182601f820112156101a157805190612b9f8261256e565b93612bad6040519586612424565b8285528383830101116101a15782612bc89385019101612319565b60a082015290565b604051632655778f60e21b81523360048201526020816024817f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03165afa9081156107de575f91612c2b575b501561079f57565b612c44915060203d6020116107d7576107c98183612424565b5f612c23565b60058110156103445760018103612c995750604435801590811581036101a15790612c88575b612c7657565b604051636ca7a06b60e11b8152600490fd5b506064358015158114612c70575f80fd5b60028103612ccc5750602435801590811581036101a15790612cbb575b612c70565b506044358015158114612cb6575f80fd5b60038103612cfa5750602435801590811581036101a1579015612c7057506064358015158114612cb6575f80fd5b600403612d3c57602435801590811581036101a15790612d2b575b80612c7057506064358015158114612cb6575f80fd5b506044358015158114612d15575f80fd5b6001612c70565b60408051632e62102160e11b815260048082018490529391926020926001600160a01b03929091907f00000000000000000000000000000000000000000000000000000000000000008416908581602481855afa908115612e76575f91612e90575b5015612e80578551636397f4b560e01b81528781018390528581602481855afa908115612e76575f91612e59575b5015612e49578492916044918751958694859363167bf93f60e11b85528b8501521660248301525afa918215612e3f575f92612e22575b505015612e15575050565b51633b48d31360e01b8152fd5b612e389250803d106107d7576107c98183612424565b5f80612e0a565b83513d5f823e3d90fd5b8551630623870d60e41b81528790fd5b612e709150863d88116107d7576107c98183612424565b5f612dd3565b87513d5f823e3d90fd5b8551630b871fd960e21b81528790fd5b612ea79150863d88116107d7576107c98183612424565b5f612da5565b612eb6816126f4565b505f52600660205260405f205411156104ed57565b805160358110908115612f36575b50612f31575f5b60078110612eef575050600190565b815181101561245e57818101602001516001600160f81b031990811666697066733a2f2f60c81b831a60f81b90911603612f2b57600101612ee0565b50505f90565b505f90565b60789150115f612ed956fea2646970667358221220660803d274d19d461692df8ae5a8010239faa9d2b96b82f0c6da71d2d7d0b98064736f6c63430008180033",
+  "deployedBytecode": "0x60806040526004361015610011575f80fd5b5f3560e01c8062e2fcc0146122c95780630392ff0514612295578063084336ad1461216c5780631576cf871461211e5780631c6d57291461184c5780631f8ae10a1461141157806321761b6c146113cd57806321d04706146113995780633241223d146113385780633c135ead146112895780635032f5fd1461124d578063594b55f7146111745780635f4ed7a014611113578063646848ed146110e05780636d60bfa0146110a757806378f800b014611069578063878b92f8146110315780638a6d36e314610ff857806394a3a64614610fc9578063a812f25a14610f9f578063b18248a8146107e9578063b67b531e146105b4578063c9179aec14610576578063d0ca87d314610542578063d76ebfe6146104ff578063da07f63b1461049c578063e72c562714610458578063e748f11b14610358578063ebec3177146101cf578063ef867577146101a55763fbb918071461016d575f80fd5b346101a15760203660031901126101a15760043561018a816126f4565b505f526009602052602060405f2054604051908152f35b5f80fd5b346101a15760203660031901126101a1576004355f52600c602052602060405f2054604051908152f35b346101a15760203660031901126101a157606060e06040516101f0816123ed565b5f81525f60208201525f60408201525f838201525f60808201525f60a08201528260c082015201526102236004356126f4565b60405190610230826123ed565b80546001600160a01b0380821684529190602084019060ff9061025960a082901c831684612674565b60a81c1691604085019260038110156103445783526001810154606086019385821685526001600160401b039182608089019160a01c168152826002850154169160a089019283526102c060046102b2600388016124b6565b9660c08c01978852016124b6565b9560e08a01968752886040519a60208c52511660208b01525160058110156103445760408a01525190600382101561034457889761034097859360608b015251166080890152511660a0870152511660c08501525161032d610100918260e087015261012086019061233a565b915190601f19858403019085015261233a565b0390f35b634e487b7160e01b5f52602160045260245ffd5b346101a15760a03660031901126101a15760043560803660231901126101a157610381816126f4565b61038a81612723565b5460ff8160a81c166003811015610344576104465760ff6103ae9160a01c16612c4a565b805f52600260205260405f206103d76103c5612680565b829060ff801983541691151516179055565b6103df61268f565b1515815462ff00006103ef61269e565b151560101b169061ff0063ff0000006104066126ad565b151560181b169360081b169063ffffff001916171717905533907f1d438badb165a4cadcacb8fd584213b5362cc76158d6a6bf7f65ac98fdc63f0d5f80a3005b604051634a84dc9f60e11b8152600490fd5b346101a1575f3660031901126101a1576040517f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03168152602090f35b346101a1576104aa36612303565b906104b4816126f4565b50805f52600960205260405f20548210156104ed576020916104df915f526009835260405f2061261e565b90546040519160031b1c8152f35b60405163e71072f560e01b8152600490fd5b346101a15761050d36612303565b90610517816126f4565b50805f52600460205260405f20548210156104ed576020916104df915f526004835260405f2061261e565b346101a15760203660031901126101a15760043561055f816126f4565b505f526004602052602060405f2054604051908152f35b346101a15761058436612303565b9061058e816126f4565b505f52600560205260405f20905f52602052602060ff60405f2054166040519015158152f35b346101a15760403660031901126101a1576004356001600160401b036024358181116101a1576105e890369060040161238f565b60405163130b97ad60e01b815233600482015260209492919085816024817f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03165afa9081156107de575f916107b1575b501561079f5761064f836126f4565b50825f52600d855260405f2093600194600160ff19825416179055600e865260405f2090821161078b5761068d82610687835461247e565b836125bf565b5f94601f831160011461070657506106dd82807fff599533da9a5f586fc1a8e8b8348605ce630d75a5d1e1316d832925c686e9c996975f916106fb575b508160011b915f199060031b1c19161790565b90555b6106f660405192839287845233978401916126bc565b0390a3005b9050850135896106ca565b601f19831695825f52875f20915f905b8989831061077357505050837fff599533da9a5f586fc1a8e8b8348605ce630d75a5d1e1316d832925c686e9c996971061075a575b5050600182811b0190556106e0565b8401355f19600385901b60f8161c19169055868061074b565b87840135855593810193928301929190910190610716565b634e487b7160e01b5f52604160045260245ffd5b604051633ed8c34160e21b8152600490fd5b6107d19150863d88116107d7575b6107c98183612424565b8101906126dc565b86610640565b503d6107bf565b6040513d5f823e3d90fd5b346101a15760603660031901126101a1576024356001600160a01b03811681036101a1576044356001600160401b0381116101a15761082c90369060040161238f565b906108386004356126f4565b61084181612723565b805460ff8160a81c16600381101561034457600103610f8d576001600160a01b038516158015610f0d575b610efb5761087a8484612ab9565b6004355f52600260205260405f20600660205260405f205415610c0c575f90600560ff8460a01c161015918261034457600160ff8560a01c16145f14610cda57506004355f52600760205260405f205f805260205260ff60405f2054169081610cb5575b81610c90575b81610c58575b81610c1e575b505b15610c0c575f905f905f906004355f52600960205260405f205f908054905b818310610b1557505050806103445760a085901c60ff1660018114905f1901610b03575b15610ad1575050505b15610abf5760ff60a81b1916600160a91b1781556001810180546001600160a01b0319166001600160a01b03861617905560028101805467ffffffffffffffff1916426001600160401b03908116919091178255909160040190841161078b576109ac84610687835461247e565b835f601f8211600114610a4957916109e682610a0b9695936001600160401b03955f91610a3e57508160011b915f199060031b1c19161790565b90555b5416926040519460018060a01b031685526060602086015260608501916126bc565b9060408301527ffff8884f3d1d88a8b7facef5b54156dec14c5a4f416aa94d97cc5fee9c85a742339280600435930390a3005b90508601358a6106ca565b5f8381526020812092508690601f198216905b818110610aa4575091610a0b969593916001600160401b03959310610a8b575b5050600186811b0190556109e9565b8501355f19600389901b60f8161c191690558780610a7c565b87840135855560019094019360209384019389935001610a5c565b60405163572ad6fb60e01b8152600490fd5b9091925061034457600360ff8460a01c16145f14610aef575061093e565b81610afb575b5061093e565b905086610af5565b50505f600260ff8660a01c1614610935565b909195610b22878361261e565b905460039190911b1c610b3e6001600160a01b038a1682612d43565b604051638874a76d60e01b815260048101919091525f816024817f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03165afa80156107de576020915f91610bea575b50015160088110156103445760018103610bb7575050600180965b019190610911565b9096959060028103610bce57505060018095610baf565b909590600514610be1575b600190610baf565b60019450610bd9565b610c0691503d805f833e610bfe8183612424565b810190612afa565b8e610b94565b6040516306a1515b60e51b8152600490fd5b60ff91505460181c16158015610c35575b876108f0565b506004355f52600760205260405f2060085f5260205260ff60405f205416610c2f565b905060ff815416158015610c6d575b906108ea565b506004355f52600760205260405f2060045f5260205260ff60405f205416610c67565b90506004355f52600760205260405f2060025f5260205260ff60405f205416906108e4565b90506004355f52600760205260405f2060015f5260205260ff60405f205416906108de565b5f925060a084901c60ff16600203610e1257506004355f52600760205260405f205f805260205260ff60405f2054169081610ded575b81610dc8575b81610da3575b81610d68575b81610d2e575b506108f2565b60ff91505460181c16158015610d45575b87610d28565b506004355f52600760205260405f2060085f5260205260ff60405f205416610d3f565b905060ff815460101c16158015610d80575b90610d22565b506004355f52600760205260405f2060065f5260205260ff60405f205416610d7a565b90506004355f52600760205260405f2060045f5260205260ff60405f20541690610d1c565b90506004355f52600760205260405f2060025f5260205260ff60405f20541690610d16565b90506004355f52600760205260405f2060015f5260205260ff60405f20541690610d10565b5f925060a084901c60ff16600303610e7b57505460ff8160081c1615908115610e56575b81610e4157506108f2565b60ff915060181c16158015610d455787610d28565b90506004355f52600760205260405f2060035f5260205260ff60405f20541690610e36565b9091505f91600460ff8560a01c1614610e9457506108f2565b90506004355f52600760205260405f2060075f5260205260ff60405f2054169081610ec1575b5087610d28565b60ff91505460181c16158015610ed8575b87610eba565b506004355f52600760205260405f2060085f5260205260ff60405f205416610ed2565b60405163ec1f7d5960e01b8152600490fd5b506040516310fe1e4560e31b81526001600160a01b038681166004830152602090829060249082907f0000000000000000000000000000000000000000000000000000000000000000165afa9081156107de575f91610f6e575b501561086c565b610f87915060203d6020116107d7576107c98183612424565b86610f67565b604051630908494760e01b8152600490fd5b346101a15760203660031901126101a1576004355f52600b602052602060405f2054604051908152f35b346101a15760203660031901126101a1576004355f52600d602052602060ff60405f2054166040519015158152f35b346101a15761100636612303565b90805f52600b60205260405f20548210156104ed576020916104df915f52600b835260405f2061261e565b346101a15760203660031901126101a1576001600160a01b036110526123bc565b165f526003602052602060405f2054604051908152f35b346101a15760203660031901126101a1576004355f52600e60205261034061109360405f206124b6565b60405191829160208352602083019061233a565b346101a1576110b536612303565b906110c08282612ead565b5f52600860205260405f20905f52602052602060405f2054604051908152f35b346101a15760203660031901126101a15760206001600160a01b0360016111086004356126f4565b015416604051908152f35b346101a15760603660031901126101a1576024356004356044356111378383612ead565b815f52600860205260405f20835f5260205260405f20548110156104ed576020926104df925f526008845260405f20905f52835260405f2061261e565b346101a15761118236612303565b61118b826126f4565b61119481612723565b5460ff8160a81c16600381101561034457600214610f8d57825f52600560205260405f20825f5260205260ff60405f20541661123b576111dd906001600160a01b031682612d43565b815f52600560205260405f20815f5260205260405f20600160ff19825416179055815f5260046020526112138160405f20612633565b33917fe561283669a6d5d8b2bddd31b98e5005fc185ab9799638a8b16b60f13790bd3f5f80a4005b60405163c395e1f760e01b8152600490fd5b346101a1575f3660031901126101a1575f545f19810190811161127557602090604051908152f35b634e487b7160e01b5f52601160045260245ffd5b346101a15760203660031901126101a1576004355f60606040516112ac81612409565b82815282602082015282604082015201526112c6816126f4565b505f526002602052608060405f20604051906112e182612409565b5460ff81161515918281526020810160ff8360081c161515815260ff60606040840193828660101c1615158552019360181c1615158352604051938452511515602084015251151560408301525115156060820152f35b346101a15760403660031901126101a1576113516123bc565b6001600160a01b03165f8181526003602052604090205460243591908210156104ed5760209161138a915f526003835260405f2061261e565b90549060031b1c604051908152f35b346101a15760203660031901126101a1576004355f526001602052602060018060a01b0360405f2054161515604051908152f35b346101a1575f3660031901126101a1576040517f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03168152602090f35b346101a15760c03660031901126101a157600560043510156101a15760803660231901126101a15760a4356001600160401b0381116101a15761145890369060040161238f565b611460612bd0565b6004351561183a57611473600435612c4a565b61147d8183612ab9565b5f54905f19821461127557600182015f556040519261149b846123ed565b3384526114ad60043560208601612674565b5f60408501525f60608501526001600160401b03421660808501525f60a08501526114d9368383612589565b60c08501526040518060208101106001600160401b0360208301111761078b57602081016040525f815260e0850152825f52600160205260405f2060018060a01b0380865116825490602088015190600582101561034457604089015160038110156103445760ff60a81b9060a81b169269ffffffffffffffffffff60b01b16179060ff60a01b9060a01b161717825560018201906060870151168154906001600160401b0360a01b608089015160a01b169163ffffffff60e01b1617179055600281016001600160401b0360a0870151166001600160401b031982541617905560c08501518051906001600160401b03821161078b576115ea826115e1600386015461247e565b600386016125bf565b602090601f83116001146117c9578260049360e0959361161f935f926117be575b50508160011b915f199060031b1c19161790565b60038201555b019401519384516001600160401b03811161078b576020956116518261164b855461247e565b856125bf565b8690601f83116001146117575791806116849261170a9695945f9261174c5750508160011b915f199060031b1c19161790565b90555b835f526002855260405f2061169d6103c5612680565b6116a561268f565b1515815462ff00006116b561269e565b151560101b169061ff0063ff0000006116cc6126ad565b151560181b169360081b169063ffffff0019161717179055335f52600385526116f88460405f20612633565b604051926040845260408401916126bc565b6001600160401b03421684830152827fc42b2fedf723ff3733188ef0a4d75404a43c5e27c0798133684223f25f95b968600435938033940390a4604051908152f35b01519050898061160b565b90601f19831691845f52885f20925f5b8181106117a7575091600193918561170a989796941061178f575b505050811b019055611687565b01515f1960f88460031b161c19169055888080611782565b92938a600181928786015181550195019301611767565b015190508a8061160b565b90600384015f5260205f20915f5b601f198516811061182257509260e0949260019260049583601f1981161061180a575b505050811b016003820155611625565b01515f1960f88460031b161c191690558980806117fa565b919260206001819286850151815501940192016117d7565b604051632946ce7160e21b8152600490fd5b346101a15760e03660031901126101a15760096024351015806101a1576044356001600160401b0381116101a15761188890369060040161235f565b91906064356001600160401b0381116101a1576118a990369060040161235f565b60c4929192356001600160401b0381116101a1576118cb90369060040161238f565b9390956118d96004356126f4565b946118e386612723565b8554600360ff8260a81c16101561034457600260ff8260a81c1614610f8d576004355f52600760205260ff61191d60243560405f20612558565b541661210c576004355f52600260205260405f205f600560ff8460a01c161015610344578990600160ff8560a01c16145f14611f5957506103445760243515908115611f49575b898215611f35575b8215611f10575b8215611ee5575b50505b15611ed3576004355f5260026020526119a560243560405f2060ff8460a01c1660043561274f565b60a43560843511611ec157848303611eaf576119c1828a612ab9565b5f5b838110611e1e5750505f5b828110611d3257506004355f52600660205260405f20611a2f815499604051936119f7856123d2565b611a0360243586612472565b336020860152608435604086015260a43560608601526001600160401b03421660808601523691612589565b60a0830152600160401b89101561078b5788611a5091600182018155612445565b919091611d1f5780519060098210156103445782546020820151610100600160a81b0360089190911b1660ff939093166001600160a81b031990911617919091178255604081015160018301556060810151600283015560808101516003830180546001600160401b0392831667ffffffffffffffff1990911617905560a090910151805191821161078b57611af682611aed600486015461247e565b600486016125bf565b602090601f8311600114611cb3579180611b27926004945f92611ca85750508160011b915f199060031b1c19161790565b9101555b6004355f526007602052611b4460243560405f20612558565b805460ff191660011790555f5b818110611bd457878787805460ff8160a81c1660038110156103445715611bbe575b5050610344576040519081526001600160401b03421660208201523390602435907f446880169a1aa5f5629b27753d29b4784e9b3486db6c8bb481efc33a7d1f85fb604060043592a4005b60ff60a81b1916600160a81b1790558280611b73565b80611be2600192848861260e565b356004355f52600860205260405f208a5f52602052611c048160405f20612633565b611c0f82878761260e565b35815f52600c602052611c2760405f20918254612667565b90556004355f52600a8060205260405f20825f5260205260ff60405f20541615611c54575b505001611b51565b6004355f5260205260405f20815f5260205260405f208360ff198254161790556004355f526009602052611c8b8160405f20612633565b5f52600b602052611ca160043560405f20612633565b8980611c4c565b015190508c8061160b565b90600484015f5260205f20915f5b601f1985168110611d075750918391600193600495601f19811610611cef575b505050811b01910155611b2b565b01515f1960f88460031b161c191690558b8080611ce1565b91926020600181928685015181550194019201611cc1565b634e487b7160e01b5f525f60045260245ffd5b611d3d81868661260e565b3515611e0c57611d4e81848861260e565b604051638874a76d60e01b8152903560048201525f816024817f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03165afa80156107de576040915f91611df2575b500151611db182858961260e565b355f52600c602052611dd360405f2054611dcc84898961260e565b3590612667565b11611de0576001016119ce565b604051630a6c07d160e31b8152600490fd5b611e0691503d805f833e610bfe8183612424565b8b611da3565b604051636b7f949360e11b8152600490fd5b611e2981858961260e565b356004355f52600560205260405f20815f5260205260ff60405f20541615611e9d57611e5e6001600160a01b03841682612d43565b5f5b828110611e715750506001016119c3565b81611e7d82888c61260e565b3514611e8b57600101611e60565b60405163c1c1c04b60e01b8152600490fd5b604051633c26bba560e01b8152600490fd5b6040516304cfc80560e51b8152600490fd5b604051633bb6e0f560e21b8152600490fd5b6040516302e5429360e31b8152600490fd5b909150610344576008602435149081611f01575b508a8961197a565b60ff91505460181c168a611ef9565b9091506103445760046024351480611f2a575b9089611973565b5060ff815416611f23565b90915061034457600260243514908961196c565b5f99506024356001149150611964565b600260ff8560a01c16145f1461202957506103445760243515908115612019575b898215612005575b8215611ff1575b8215611fc9575b8215611f9e575b505061197d565b909150610344576008602435149081611fba575b508a89611f97565b60ff91505460181c168a611fb2565b9091506103445760066024351480611fe3575b9089611f90565b5060ff815460101c16611fdc565b909150610344576004602435149089611f89565b909150610344576002602435149089611f82565b5f99506024356001149150611f7a565b600360ff8560a01c16145f146120b457506103445760036024351490816120a5575b8115612095575b898215612081575b821561206d578215611f9e57505061197d565b909150610344576007602435149089611f90565b90915061034457600660243514908961205a565b5f99506024356005149150612052565b805460081c60ff16915061204b565b919050600460ff8460a01c16146120cc575b5061197d565b5f9950602435600714915081156120e5575b508a6120c6565b5f99506024356008149150816120fd575b508a6120de565b60ff91505460181c168a6120f6565b604051632c73cc5560e01b8152600490fd5b346101a15760403660031901126101a15760043560243560098110156101a15761216060ff91836121506020956126f4565b505f526007845260405f20612558565b54166040519015158152f35b346101a15761217a36612303565b9060405191612188836123d2565b5f8352606060a06020945f868201525f60408201525f838201525f608082015201526121b3826126f4565b50815f526006835260405f20548110156104ed576121da915f526006835260405f20612445565b50604051916121e8836123d2565b8154916121f860ff841685612472565b60018060a01b0390818386019460081c168452600181015490604086019182526002810154606087019081526001600160401b03926122476004856003860154169460808b01958652016124b6565b9460a0890195865260405198878a5251976009891015610344578998610340988a015251166040880152516060870152516080860152511660a08401525160c08084015260e083019061233a565b346101a15760203660031901126101a1576004356122b2816126f4565b505f526006602052602060405f2054604051908152f35b346101a15760203660031901126101a15760ff6122e76004356126f4565b5460a81c16600381101561034457602090600260405191148152f35b60409060031901126101a1576004359060243590565b5f5b83811061232a5750505f910152565b818101518382015260200161231b565b9060209161235381518092818552858086019101612319565b601f01601f1916010190565b9181601f840112156101a1578235916001600160401b0383116101a1576020808501948460051b0101116101a157565b9181601f840112156101a1578235916001600160401b0383116101a157602083818601950101116101a157565b600435906001600160a01b03821682036101a157565b60c081019081106001600160401b0382111761078b57604052565b61010081019081106001600160401b0382111761078b57604052565b608081019081106001600160401b0382111761078b57604052565b90601f801991011681019081106001600160401b0382111761078b57604052565b805482101561245e575f52600560205f20910201905f90565b634e487b7160e01b5f52603260045260245ffd5b60098210156103445752565b90600182811c921680156124ac575b602083101461249857565b634e487b7160e01b5f52602260045260245ffd5b91607f169161248d565b9060405191825f82546124c88161247e565b908184526020946001916001811690815f1461253657506001146124f8575b5050506124f692500383612424565b565b5f90815285812095935091905b81831061251e5750506124f693508201015f80806124e7565b85548884018501529485019487945091830191612505565b925050506124f694925060ff191682840152151560051b8201015f80806124e7565b906009811015610344575f5260205260405f2090565b6001600160401b03811161078b57601f01601f191660200190565b9291926125958261256e565b916125a36040519384612424565b8294818452818301116101a1578281602093845f960137010152565b601f82116125cc57505050565b5f5260205f20906020601f840160051c83019310612604575b601f0160051c01905b8181106125f9575050565b5f81556001016125ee565b90915081906125e5565b919081101561245e5760051b0190565b805482101561245e575f5260205f2001905f90565b8054600160401b81101561078b576126509160018201815561261e565b819291549060031b91821b915f19901b1916179055565b9190820180921161127557565b60058210156103445752565b60243580151581036101a15790565b60443580151581036101a15790565b60643580151581036101a15790565b60843580151581036101a15790565b908060209392818452848401375f828201840152601f01601f1916010190565b908160209103126101a1575180151581036101a15790565b5f52600160205260405f209060018060a01b038254161561271157565b604051638023c6df60e01b8152600490fd5b61272b612bd0565b546001600160a01b0316330361273d57565b604051631a671a4360e11b8152600490fd5b9192906005811015610344576001810361288957506009811015610344578015612822576001811480612869575b612822576002811480612848575b612822576004811480612827575b6128225760081491826127ff575b826127c7575b50506124f657505b6040516326b82aa360e21b8152600490fd5b5460ff1615915081156127dd575b505f806127ad565b90505f52600760205260405f2060045f5260205260ff60405f2054165f6127d5565b9150805f52600760205260405f2060025f5260205260ff60405f205416916127a7565b505050565b50815f52600760205260405f2060025f5260205260ff60405f205416612799565b50815f52600760205260405f2060015f5260205260ff60405f20541661278b565b50815f52600760205260405f205f805260205260ff60405f20541661277d565b600281036129d6575060098110156103445780156128225760018114806129b6575b612822576002811480612995575b612822576004811480612974575b612822576006811480612953575b612822576008149182612930575b826128f5575b50506124f657506127b5565b5460101c60ff16159150811561290e575b505f806128e9565b90505f52600760205260405f2060065f5260205260ff60405f2054165f612906565b9150805f52600760205260405f2060045f5260205260ff60405f205416916128e3565b50815f52600760205260405f2060045f5260205260ff60405f2054166128d5565b50815f52600760205260405f2060025f5260205260ff60405f2054166128c7565b50815f52600760205260405f2060015f5260205260ff60405f2054166128b9565b50815f52600760205260405f205f805260205260ff60405f2054166128ab565b60038103612a585750815f52600760205260405f2060085f5260205260ff60405f2054166127b55760098110156103445760081491821592612a48575b508115612a26575b506124f657506127b5565b90505f52600760205260405f2060035f5260205260ff60405f2054165f612a1b565b5460081c60ff161591505f612a13565b60049192935014612a6c575b5050506127b5565b60098110156103445760078114612ab5576008149081612a93575b506124f6578080612a64565b90505f52600760205260405f2060075f5260205260ff60405f2054165f612a87565b5050565b612ac890612acd923691612589565b612ecb565b15612ad457565b6040516358072cc760e11b8152600490fd5b51906001600160a01b03821682036101a157565b90602080838303126101a15782516001600160401b03938482116101a157019260c0848403126101a15760405193612b31856123d2565b612b3a81612ae6565b85528281015160088110156101a1578386015260408101516040860152612b6360608201612ae6565b6060860152608081015182811681036101a157608086015260a08101519182116101a1570182601f820112156101a157805190612b9f8261256e565b93612bad6040519586612424565b8285528383830101116101a15782612bc89385019101612319565b60a082015290565b604051632655778f60e21b81523360048201526020816024817f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03165afa9081156107de575f91612c2b575b501561079f57565b612c44915060203d6020116107d7576107c98183612424565b5f612c23565b60058110156103445760018103612c995750604435801590811581036101a15790612c88575b612c7657565b604051636ca7a06b60e11b8152600490fd5b506064358015158114612c70575f80fd5b60028103612ccc5750602435801590811581036101a15790612cbb575b612c70565b506044358015158114612cb6575f80fd5b60038103612cfa5750602435801590811581036101a1579015612c7057506064358015158114612cb6575f80fd5b600403612d3c57602435801590811581036101a15790612d2b575b80612c7057506064358015158114612cb6575f80fd5b506044358015158114612d15575f80fd5b6001612c70565b60408051632e62102160e11b815260048082018490529391926020926001600160a01b03929091907f00000000000000000000000000000000000000000000000000000000000000008416908581602481855afa908115612e76575f91612e90575b5015612e80578551636397f4b560e01b81528781018390528581602481855afa908115612e76575f91612e59575b5015612e49578492916044918751958694859363167bf93f60e11b85528b8501521660248301525afa918215612e3f575f92612e22575b505015612e15575050565b51633b48d31360e01b8152fd5b612e389250803d106107d7576107c98183612424565b5f80612e0a565b83513d5f823e3d90fd5b8551630623870d60e41b81528790fd5b612e709150863d88116107d7576107c98183612424565b5f612dd3565b87513d5f823e3d90fd5b8551630b871fd960e21b81528790fd5b612ea79150863d88116107d7576107c98183612424565b5f612da5565b612eb6816126f4565b505f52600660205260405f205411156104ed57565b805160358110908115612f36575b50612f31575f5b60078110612eef575050600190565b815181101561245e57818101602001516001600160f81b031990811666697066733a2f2f60c81b831a60f81b90911603612f2b57600101612ee0565b50505f90565b505f90565b60789150115f612ed956fea2646970667358221220660803d274d19d461692df8ae5a8010239faa9d2b96b82f0c6da71d2d7d0b98064736f6c63430008180033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

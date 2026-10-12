@@ -5,6 +5,8 @@ import { getAddress } from 'ethers';
 
 const REGEX_ENDERECO = /^0x[0-9a-fA-F]{40}$/;
 
+type StatusDenuncia = 'pendente' | 'em_analise' | 'descartada' | 'confirmada';
+
 const admin: FastifyPluginAsync = async (app) => {
   app.get(
     '/admin/carteiras',
@@ -98,6 +100,70 @@ const admin: FastifyPluginAsync = async (app) => {
         return reply.status(404).send({ erro: 'Carteira não encontrada.' });
       }
 
+      return reply.send(res.rows[0]);
+    },
+  );
+
+  app.get(
+    '/admin/denuncias',
+    { preHandler: [exigirAdmin] },
+    async (_req, reply) => {
+      const res = await obterPool().query<{
+        id: number;
+        chain_id: number;
+        lote_id: string;
+        token_id: string;
+        motivo: string;
+        local_consumo: string | null;
+        data_consumo: string | null;
+        status: StatusDenuncia;
+        criado_em: Date;
+        atualizado_em: Date;
+      }>(
+        `SELECT id, chain_id, lote_id, token_id, motivo, local_consumo, data_consumo,
+                status, criado_em, atualizado_em
+         FROM denuncias
+         ORDER BY
+           CASE status WHEN 'em_analise' THEN 1 WHEN 'pendente' THEN 2
+                       WHEN 'confirmada' THEN 3 ELSE 4 END,
+           criado_em DESC`,
+      );
+      return reply.send({ denuncias: res.rows });
+    },
+  );
+
+  app.patch<{
+    Params: { id: string };
+    Body: { status: StatusDenuncia };
+  }>(
+    '/admin/denuncia/:id',
+    {
+      preHandler: [exigirAdmin],
+      schema: {
+        body: {
+          type: 'object',
+          required: ['status'],
+          properties: {
+            status: { type: 'string', enum: ['pendente', 'em_analise', 'descartada', 'confirmada'] },
+          },
+          additionalProperties: false,
+        },
+      },
+    },
+    async (req, reply) => {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id <= 0) {
+        return reply.status(400).send({ erro: 'ID inválido.' });
+      }
+      const { status } = req.body;
+      const res = await obterPool().query<{ id: number; status: string }>(
+        `UPDATE denuncias SET status = $1, atualizado_em = now()
+         WHERE id = $2 RETURNING id, status`,
+        [status, id],
+      );
+      if (res.rows.length === 0) {
+        return reply.status(404).send({ erro: 'Denúncia não encontrada.' });
+      }
       return reply.send(res.rows[0]);
     },
   );

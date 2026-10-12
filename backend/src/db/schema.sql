@@ -40,6 +40,27 @@ CREATE TABLE IF NOT EXISTS scan_garrafa (
 CREATE INDEX IF NOT EXISTS scan_garrafa_garrafa_idx
   ON scan_garrafa (chain_id, token_id, escaneado_em DESC);
 
+-- Denúncias de lotes suspeitos enviadas por consumidores.
+-- status: pendente (aguarda revisão) → em_analise (admin confirmou investigação)
+--                                    → descartada (admin descartou)
+--                                    → confirmada (adulteração confirmada, registrada on-chain)
+CREATE TABLE IF NOT EXISTS denuncias (
+  id            BIGSERIAL    PRIMARY KEY,
+  chain_id      INTEGER      NOT NULL,
+  lote_id       TEXT         NOT NULL,
+  token_id      TEXT         NOT NULL,
+  motivo        TEXT         NOT NULL,
+  local_consumo TEXT,
+  data_consumo  DATE,
+  status        TEXT         NOT NULL DEFAULT 'pendente'
+                CHECK (status IN ('pendente', 'em_analise', 'descartada', 'confirmada')),
+  criado_em     TIMESTAMPTZ  NOT NULL DEFAULT now(),
+  atualizado_em TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS denuncias_lote_idx
+  ON denuncias (chain_id, lote_id, status);
+
 -- Cache de uploads ao Pinata — evita pinagens duplicadas para o mesmo conteúdo
 CREATE TABLE IF NOT EXISTS ipfs_cache (
   hash_conteudo TEXT        PRIMARY KEY,

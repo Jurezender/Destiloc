@@ -31,6 +31,7 @@ const RESPOSTA_CACHE: RespostaGarrafa = {
   insumosVinculados: [],
   etapas: [],
   nomesCarteiras: { [ADDR_PRODUTOR]: "Fazenda Exemplo" },
+  alerta: null,
 };
 
 // Fake contract que responde com dados mínimos para lote sem insumos/etapas.

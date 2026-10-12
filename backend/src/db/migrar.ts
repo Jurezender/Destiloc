@@ -13,6 +13,9 @@ const MIGRATIONS = [
   '002_carteiras_vinculadas.sql',
   '003_auth_challenges.sql',
   '004_usuarios_perfil.sql',
+  '005_usuarios_cnpj_admin.sql',
+  '006_reset_senha.sql',
+  '007_denuncias.sql',
 ];
 
 async function migrar() {

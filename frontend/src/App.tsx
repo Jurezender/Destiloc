@@ -5,6 +5,7 @@ import { AreaOperacional } from "./componentes/AreaOperacional";
 import { RotaAutenticada } from "./componentes/RotaAutenticada";
 import { RotaProtegida } from "./componentes/RotaProtegida";
 import { AdminCarteiras } from "./paginas/AdminCarteiras";
+import { AdminDenuncias } from "./paginas/AdminDenuncias";
 import { ConsultaPublica } from "./paginas/ConsultaPublica";
 import { Emitir } from "./paginas/Emitir";
 import { Garrafas } from "./paginas/Garrafas";
@@ -48,6 +49,14 @@ export function App() {
             element={
               <RotaAutenticada>
                 <AdminCarteiras />
+              </RotaAutenticada>
+            }
+          />
+          <Route
+            path="admin/denuncias"
+            element={
+              <RotaAutenticada>
+                <AdminDenuncias />
               </RotaAutenticada>
             }
           />

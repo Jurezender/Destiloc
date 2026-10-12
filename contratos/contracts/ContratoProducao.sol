@@ -93,6 +93,8 @@ contract ContratoProducao {
     mapping(uint256 => mapping(uint256 => bool)) private _insumoUtilizado;
     mapping(uint256 => uint256[]) private _lotesPorInsumoUtilizado;
     mapping(uint256 => uint256) private _quantidadeConsumida;
+    mapping(uint256 => bool) private _adulterado;
+    mapping(uint256 => string) private _motivoAdulteracao;
 
     event LoteProducaoCriado(
         uint256 indexed loteId,
@@ -116,6 +118,11 @@ contract ContratoProducao {
         address envasadorDesignado,
         string metadataURI,
         uint64 concluidoEm
+    );
+    event LoteMarcadoComoAdulterado(
+        uint256 indexed loteId,
+        address indexed marcadoPor,
+        string motivo
     );
 
     constructor(address enderecoContratoAcesso, address enderecoContratoInsumos) {
@@ -313,6 +320,19 @@ contract ContratoProducao {
     }
     function loteProducaoConcluido(uint256 loteId) external view returns (bool) {
         LoteProducao storage lote = _exigirLote(loteId); return lote.estado == EstadoProducao.Concluido;
+    }
+    function loteAdulterado(uint256 loteId) external view returns (bool) {
+        return _adulterado[loteId];
+    }
+    function motivoAdulteracao(uint256 loteId) external view returns (string memory) {
+        return _motivoAdulteracao[loteId];
+    }
+    function marcarComoAdulterado(uint256 loteId, string calldata motivo) external {
+        if (!contratoAcesso.ehAdministrador(msg.sender)) revert SemPermissao();
+        _exigirLote(loteId);
+        _adulterado[loteId] = true;
+        _motivoAdulteracao[loteId] = motivo;
+        emit LoteMarcadoComoAdulterado(loteId, msg.sender, motivo);
     }
 
     function _exigirProdutor() private view {

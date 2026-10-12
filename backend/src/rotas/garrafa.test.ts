@@ -71,6 +71,7 @@ const RESPOSTA_EXEMPLO: consultaModulo.RespostaGarrafa = {
   nomesCarteiras: {
     "0x5FbDB2315678afecb367f032d93F642f64180aa3": "Destilaria Exemplo",
   },
+  alerta: null,
 };
 
 async function montarApp(): Promise<FastifyInstance> {

@@ -66,6 +66,7 @@ interface DadosConsulta {
     insumosUtilizados: string[];
   }>;
   nomesCarteiras: Record<string, string>;
+  alerta: { status: "em_analise" | "confirmada" } | null;
 }
 
 interface ItemHistorico {
@@ -124,6 +125,12 @@ function mensagemErroGeo(codigo: number): string {
  * + GET /garrafa em paralelo → exibir consulta e histórico.
  * Não usa CarteiraContexto, window.ethereum nem chamadas diretas à blockchain.
  */
+interface FormularioDenuncia {
+  motivo: string;
+  localConsumo: string;
+  dataConsumo: string;
+}
+
 export function ConsultaPublica() {
   const { chainId: chainIdParam, tokenId } = useParams<{
     chainId: string;
@@ -133,6 +140,10 @@ export function ConsultaPublica() {
   const [dados, setDados] = useState<DadosConsulta | null>(null);
   const [historico, setHistorico] = useState<HistoricoScans | null>(null);
   const [mensagemErro, setMensagemErro] = useState<string | null>(null);
+  const [mostrarFormDenuncia, setMostrarFormDenuncia] = useState(false);
+  const [formDenuncia, setFormDenuncia] = useState<FormularioDenuncia>({ motivo: "", localConsumo: "", dataConsumo: "" });
+  const [enviandoDenuncia, setEnviandoDenuncia] = useState(false);
+  const [feedbackDenuncia, setFeedbackDenuncia] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
 
   const chainId = chainIdParam ? Number(chainIdParam) : NaN;
   const rede = REDES[chainId];
@@ -227,6 +238,41 @@ export function ConsultaPublica() {
           : "Ocorreu um erro ao buscar as informações. Tente novamente em instantes."
       );
       setEstado("erro-consulta");
+    }
+  }
+
+  async function enviarDenuncia() {
+    if (!dados || !tokenId || Number.isNaN(chainId)) return;
+    if (formDenuncia.motivo.trim().length < 10) {
+      setFeedbackDenuncia({ tipo: "erro", texto: "Descreva o motivo com pelo menos 10 caracteres." });
+      return;
+    }
+    setEnviandoDenuncia(true);
+    setFeedbackDenuncia(null);
+    try {
+      const res = await fetch(`${API_URL}/denuncia`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chainId,
+          loteId: dados.lote.id,
+          tokenId,
+          motivo: formDenuncia.motivo.trim(),
+          localConsumo: formDenuncia.localConsumo.trim() || undefined,
+          dataConsumo: formDenuncia.dataConsumo || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const corpo = await res.json().catch(() => ({})) as { mensagem?: string };
+        throw new Error(corpo.mensagem ?? "Erro ao enviar denúncia.");
+      }
+      setFeedbackDenuncia({ tipo: "ok", texto: "Denúncia enviada. Nossa equipe irá analisá-la em breve." });
+      setFormDenuncia({ motivo: "", localConsumo: "", dataConsumo: "" });
+      setMostrarFormDenuncia(false);
+    } catch {
+      setFeedbackDenuncia({ tipo: "erro", texto: "Não foi possível enviar a denúncia. Tente novamente." });
+    } finally {
+      setEnviandoDenuncia(false);
     }
   }
 
@@ -328,6 +374,20 @@ export function ConsultaPublica() {
 
       {estado === "carregado" && dados && (
         <div className="cp-conteudo">
+
+          {/* Banner de alerta */}
+          {dados.alerta?.status === "confirmada" && (
+            <div className="cp-alerta cp-alerta--critico" role="alert">
+              <strong>Adulteração confirmada</strong>
+              <p>Este lote foi identificado como adulterado e registrado permanentemente na blockchain. Não consuma este produto.</p>
+            </div>
+          )}
+          {dados.alerta?.status === "em_analise" && (
+            <div className="cp-alerta cp-alerta--aviso" role="alert">
+              <strong>Lote sob investigação</strong>
+              <p>Este lote está sendo investigado por suspeita de irregularidade. Aguarde a conclusão da análise antes de consumir.</p>
+            </div>
+          )}
 
           {/* Identidade da garrafa */}
           <div className="cp-identidade">
@@ -470,6 +530,72 @@ export function ConsultaPublica() {
 
           {/* Mapa das consultas (seção 5) */}
           {historico && <MapaScans scans={historico.scans} />}
+
+          {/* Denunciar lote */}
+          <div className="cp-denuncia">
+            {feedbackDenuncia && (
+              <p className={`cp-denuncia__feedback cp-denuncia__feedback--${feedbackDenuncia.tipo}`}>
+                {feedbackDenuncia.texto}
+              </p>
+            )}
+            {!mostrarFormDenuncia ? (
+              <button
+                type="button"
+                className="cp-denuncia__botao"
+                onClick={() => setMostrarFormDenuncia(true)}
+              >
+                Denunciar lote suspeito
+              </button>
+            ) : (
+              <fieldset className="cp-denuncia__form" disabled={enviandoDenuncia}>
+                <legend>Denunciar suspeita de irregularidade</legend>
+                <p className="cp-denuncia__aviso">
+                  Sua denúncia será analisada pela nossa equipe antes de qualquer ação. Informações falsas podem ser descartadas.
+                </p>
+                <label>
+                  Descreva o que observou <span aria-hidden="true">*</span>
+                  <textarea
+                    rows={3}
+                    maxLength={1000}
+                    placeholder="Ex.: sabor estranho, rótulo diferente, embalagem suspeita…"
+                    value={formDenuncia.motivo}
+                    onChange={(e) => setFormDenuncia((f) => ({ ...f, motivo: e.target.value }))}
+                  />
+                </label>
+                <label>
+                  Onde consumiu <span className="cp-denuncia__opcional">(opcional)</span>
+                  <input
+                    type="text"
+                    maxLength={200}
+                    placeholder="Ex.: Bar do João, São Paulo – SP"
+                    value={formDenuncia.localConsumo}
+                    onChange={(e) => setFormDenuncia((f) => ({ ...f, localConsumo: e.target.value }))}
+                  />
+                </label>
+                <label>
+                  Data do consumo <span className="cp-denuncia__opcional">(opcional)</span>
+                  <input
+                    type="date"
+                    max={new Date().toISOString().slice(0, 10)}
+                    value={formDenuncia.dataConsumo}
+                    onChange={(e) => setFormDenuncia((f) => ({ ...f, dataConsumo: e.target.value }))}
+                  />
+                </label>
+                <div className="cp-denuncia__acoes">
+                  <button type="button" onClick={() => void enviarDenuncia()}>
+                    {enviandoDenuncia ? "Enviando…" : "Enviar denúncia"}
+                  </button>
+                  <button
+                    type="button"
+                    className="cp-botao--neutro"
+                    onClick={() => { setMostrarFormDenuncia(false); setFeedbackDenuncia(null); }}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </fieldset>
+            )}
+          </div>
 
           {/* Verificação técnica */}
           <details className="cp-tecnico">

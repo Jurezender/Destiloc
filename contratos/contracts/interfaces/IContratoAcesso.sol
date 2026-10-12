@@ -5,4 +5,5 @@ interface IContratoAcesso {
     function ehFornecedor(address conta) external view returns (bool);
     function ehProdutor(address conta) external view returns (bool);
     function ehEnvasador(address conta) external view returns (bool);
+    function ehAdministrador(address conta) external view returns (bool);
 }

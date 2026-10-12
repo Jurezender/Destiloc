@@ -1,4 +1,4 @@
-import { BottleWine, ClipboardList, FlaskConical, Home, Leaf, Users } from "lucide-react";
+import { BottleWine, ClipboardList, FlaskConical, Home, Leaf, ShieldAlert, Users } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../contexto/AuthContexto";
 import { useCarteira } from "../contexto/CarteiraContexto";
@@ -12,6 +12,7 @@ const TODOS_LINKS = [
   { para: "/lotes",           rotulo: "Lotes",         Icone: FlaskConical, apenasAdmin: false },
   { para: "/garrafas",        rotulo: "Garrafas",      Icone: BottleWine,   apenasAdmin: false },
   { para: "/admin/carteiras", rotulo: "Solicitações",  Icone: ClipboardList, apenasAdmin: true  },
+  { para: "/admin/denuncias", rotulo: "Denúncias",     Icone: ShieldAlert,   apenasAdmin: true  },
 ];
 
 function PopupCarteiraTrocada() {

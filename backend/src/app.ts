@@ -8,6 +8,7 @@ import garrafa from './rotas/garrafa.js';
 import scans from './rotas/scans.js';
 import auth from './rotas/auth.js';
 import admin from './rotas/admin.js';
+import denuncia from './rotas/denuncia.js';
 
 declare module '@fastify/jwt' {
   interface FastifyJWT {
@@ -41,6 +42,7 @@ export async function construirApp() {
 
   await app.register(auth);
   await app.register(admin);
+  await app.register(denuncia);
   await app.register(carteiras);
   await app.register(ipfs);
   await app.register(garrafa);

@@ -60,6 +60,7 @@ export interface RespostaGarrafa {
     insumosUtilizados: string[];
   }>;
   nomesCarteiras: Record<string, string>;
+  alerta: { status: 'em_analise' | 'confirmada' } | null;
 }
 
 // ─── Helpers RPC ────────────────────────────────────────────────────────────
@@ -111,6 +112,28 @@ function criarSemaforo(max: number) {
 const _semaforo = criarSemaforo(4);
 const rpc = <T>(fn: () => Promise<T>): Promise<T> =>
   _semaforo(() => rpcComRetry(fn));
+
+// ─── Alerta de denúncia ─────────────────────────────────────────────────────
+
+async function buscarAlerta(
+  chainId: number,
+  loteId: string
+): Promise<{ status: 'em_analise' | 'confirmada' } | null> {
+  try {
+    const pool = obterPool();
+    const res = await pool.query<{ status: string }>(
+      `SELECT status FROM denuncias
+       WHERE chain_id = $1 AND lote_id = $2 AND status IN ('em_analise', 'confirmada')
+       ORDER BY CASE status WHEN 'confirmada' THEN 1 ELSE 2 END
+       LIMIT 1`,
+      [chainId, loteId]
+    );
+    if (res.rows.length === 0) return null;
+    return { status: res.rows[0].status as 'em_analise' | 'confirmada' };
+  } catch {
+    return null;
+  }
+}
 
 // ─── Cache ──────────────────────────────────────────────────────────────────
 
@@ -165,7 +188,10 @@ export async function consultarGarrafa(
   tokenId: string
 ): Promise<RespostaGarrafa> {
   const cached = await buscarCache(chainId, tokenId);
-  if (cached) return cached;
+  if (cached) {
+    cached.alerta = await buscarAlerta(chainId, cached.lote.id);
+    return cached;
+  }
 
   const envasamentoContrato = obterContrato("ContratoEnvasamento", chainId);
 
@@ -340,9 +366,12 @@ export async function consultarGarrafa(
     insumosVinculados,
     etapas,
     nomesCarteiras,
+    alerta: null,
   };
 
   await salvarCache(chainId, tokenId, resposta);
+
+  resposta.alerta = await buscarAlerta(chainId, loteProducaoId.toString());
 
   return resposta;
 }
