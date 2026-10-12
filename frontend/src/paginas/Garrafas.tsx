@@ -12,6 +12,7 @@ interface LinhaGarrafa {
   emitidaEm: bigint;
 }
 
+// Lista todas as garrafas emitidas na blockchain.
 export function Garrafas() {
   const { chainId, signer } = useCarteira();
   const [linhas, setLinhas] = useState<LinhaGarrafa[]>([]);

@@ -23,6 +23,7 @@ const PADRAO: Omit<EstadoPapeis, "recarregar"> = {
 
 const PapeisContexto = createContext<EstadoPapeis | null>(null);
 
+// Provedor de papéis: consulta o ContratoAcesso na blockchain e expõe se a conta é admin/fornecedor/produtor/envasador.
 export function PapeisProvedor({ children }: { children: ReactNode }) {
   const { conta, chainId, signer } = useCarteira();
   const [estado, setEstado] = useState<Omit<EstadoPapeis, "recarregar">>(PADRAO);

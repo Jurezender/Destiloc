@@ -23,6 +23,7 @@ function obterAdminWallets(): string[] {
     .filter(Boolean);
 }
 
+// Vincula uma carteira Ethereum a um usuário (status inicial: pendente, exceto admin wallets).
 export async function vincularCarteira(
   usuarioId: number,
   address: string,
@@ -69,6 +70,7 @@ export async function vincularCarteira(
   };
 }
 
+// Retorna a carteira vinculada ao usuário (endereço + status).
 export async function buscarCarteiraVinculada(
   usuarioId: number,
 ): Promise<{ address: string; status: StatusCarteira } | null> {

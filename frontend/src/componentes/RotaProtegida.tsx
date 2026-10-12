@@ -15,6 +15,7 @@ interface Props {
   mensagemPapel?: string;
 }
 
+// Guarda de rota completa: exige login + carteira autorizada + MetaMask + papel (opcional).
 export function RotaProtegida({ children, exigirPapel, mensagemPapel }: Props) {
   const { token, carteira, carregando: carregandoAuth, logout } = useAuth();
   const { disponivel, conta, conectando, erro, conectar } = useCarteira();

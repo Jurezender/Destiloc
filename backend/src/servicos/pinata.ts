@@ -8,6 +8,7 @@ function obterJwt(): string {
   return jwt;
 }
 
+// Envia um objeto JSON ao IPFS via Pinata e retorna o CID no formato ipfs://.
 export async function fixarJsonNoPinata(
   conteudo: Record<string, unknown>,
   tipo: string,
@@ -37,6 +38,7 @@ export async function fixarJsonNoPinata(
   return `ipfs://${IpfsHash}`;
 }
 
+// Envia um arquivo binário ao IPFS via Pinata e retorna o CID no formato ipfs://.
 export async function fixarArquivoNoPinata(
   buffer: Buffer,
   nome: string,

@@ -8,6 +8,7 @@ const REGEX_ENDERECO = /^0x[0-9a-fA-F]{40}$/;
 type StatusDenuncia = 'pendente' | 'em_analise' | 'descartada' | 'confirmada';
 
 const admin: FastifyPluginAsync = async (app) => {
+  // Lista carteiras aguardando aprovação do admin.
   app.get(
     '/admin/carteiras',
     { preHandler: [exigirAdmin] },
@@ -33,6 +34,7 @@ const admin: FastifyPluginAsync = async (app) => {
     },
   );
 
+  // Lista todos os participantes com carteira autorizada.
   app.get(
     '/admin/participantes',
     { preHandler: [exigirAdmin] },
@@ -53,6 +55,7 @@ const admin: FastifyPluginAsync = async (app) => {
     },
   );
 
+  // Aprova ou revoga uma carteira específica.
   app.patch<{
     Params: { address: string };
     Body: { status: 'autorizada' | 'revogada' };
@@ -104,6 +107,7 @@ const admin: FastifyPluginAsync = async (app) => {
     },
   );
 
+  // Lista todas as denúncias, ordenadas por urgência (em_analise > pendente > confirmada > descartada).
   app.get(
     '/admin/denuncias',
     { preHandler: [exigirAdmin] },
@@ -132,6 +136,7 @@ const admin: FastifyPluginAsync = async (app) => {
     },
   );
 
+  // Atualiza o status de uma denúncia (pendente → em_analise → confirmada/descartada).
   app.patch<{
     Params: { id: string };
     Body: { status: StatusDenuncia };

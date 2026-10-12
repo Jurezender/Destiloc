@@ -45,6 +45,7 @@ function PopupCarteiraTrocada() {
   );
 }
 
+// Estrutura visual principal: barra lateral com navegação e área de conteúdo.
 export function Layout() {
   const { admin } = usePapeis();
   const { usuario, logout } = useAuth();

@@ -22,6 +22,7 @@ import { Participantes } from "./paginas/Participantes";
 import { Registrar } from "./paginas/Registrar";
 import { VincularCarteira } from "./paginas/VincularCarteira";
 
+// Define todas as rotas do app: quais são públicas, quais exigem login e quais exigem MetaMask.
 export function App() {
   return (
     <AuthProvedor>

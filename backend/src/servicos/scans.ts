@@ -31,6 +31,7 @@ export interface HistoricoScans {
   scans: ItemHistorico[];
 }
 
+// Calcula a distância em km entre dois pontos geográficos (fórmula de Haversine).
 export function haversine(
   lat1: number,
   lon1: number,
@@ -53,6 +54,7 @@ interface RegistroAnterior {
   escaneadoEm: Date;
 }
 
+// Detecta velocidade de deslocamento implausível (>500 km/h) comparando com o scan anterior.
 export function detectarComportamentoIncomum(
   lat: number,
   lon: number,
@@ -81,6 +83,7 @@ export function detectarComportamentoIncomum(
   return { suspeito: false, motivo: null };
 }
 
+// Classifica o dispositivo do consumidor (mobile, tablet ou desktop) pelo User-Agent.
 export function detectarTipoDispositivo(
   userAgent: string
 ): "mobile" | "tablet" | "desktop" {
@@ -96,6 +99,7 @@ interface DadosGeo {
   pais?: string;
 }
 
+// Converte coordenadas em cidade/estado/país via Nominatim (OpenStreetMap); falha silenciosamente.
 async function geocodificarReverso(lat: number, lon: number): Promise<DadosGeo> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 3_000);
@@ -143,6 +147,7 @@ function truncarPrefixoIp(ip: string): string | null {
   return null;
 }
 
+// Salva um scan no banco: verifica existência da garrafa, geocodifica, detecta comportamento suspeito.
 export async function registrarScan(entrada: EntradaScan): Promise<void> {
   const pool = obterPool();
 
@@ -220,6 +225,7 @@ export async function registrarScan(entrada: EntradaScan): Promise<void> {
   );
 }
 
+// Retorna os últimos 50 scans de uma garrafa com dados de localização e suspeita.
 export async function listarScans(
   chainId: number,
   tokenId: string

@@ -1,3 +1,4 @@
+// Monta o servidor Fastify: registra plugins (CORS, JWT, multipart) e conecta todas as rotas.
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';

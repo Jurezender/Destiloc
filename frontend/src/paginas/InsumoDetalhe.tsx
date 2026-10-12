@@ -49,6 +49,7 @@ interface AvaliacaoInfo {
 
 const OPCOES_RESULTADO_AVALIACAO = [ResultadoAvaliacao.Aprovado, ResultadoAvaliacao.Rejeitado];
 
+// Detalhe de um insumo: exibe dados, avaliações do produtor, correções documentais e opção de invalidação.
 export function InsumoDetalhe() {
   const { id } = useParams<{ id: string }>();
   const { conta, chainId, signer } = useCarteira();

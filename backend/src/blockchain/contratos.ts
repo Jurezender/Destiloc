@@ -40,6 +40,7 @@ export class ContratosIndisponiveisError extends Error {
   }
 }
 
+// Cria um provedor RPC (somente leitura) para a rede informada.
 export function obterProvider(chainId: number): JsonRpcProvider {
   const config = obterConfiguracaoRede(chainId);
   if (!config || !config.urlRpc) {
@@ -50,6 +51,7 @@ export function obterProvider(chainId: number): JsonRpcProvider {
   return new JsonRpcProvider(config.urlRpc);
 }
 
+// Instancia um contrato Ethereum com ABI e endereço correspondentes à rede.
 export function obterContrato(nome: NomeContrato, chainId: number): Contract {
   const config = obterConfiguracaoRede(chainId);
   const registro = config ? registros[config.nome] : undefined;

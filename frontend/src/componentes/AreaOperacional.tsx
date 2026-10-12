@@ -8,6 +8,7 @@ import { Layout } from "./Layout";
  * de propósito, para nunca instanciar `CarteiraProvedor` nem tocar
  * `window.ethereum`.
  */
+// Envolve as rotas operacionais com os provedores de MetaMask e papéis (fora da /consulta pública).
 export function AreaOperacional() {
   return (
     <CarteiraProvedor>

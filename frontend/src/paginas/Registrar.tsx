@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexto/AuthContexto";
 import { API_URL, fetchApi } from "../lib/api";
 
+// Página de cadastro de nova conta (nome, empresa, papel, CNPJ, email, senha).
 export function Registrar() {
   const { token } = useAuth();
   const navegar = useNavigate();

@@ -19,6 +19,7 @@ const TIPOS_VALIDOS = [
 const MIME_TYPES_VALIDOS = ['application/pdf', 'image/jpeg', 'image/png'] as const;
 
 const ipfs: FastifyPluginAsync = async (app) => {
+  // Envia um JSON de metadados ao IPFS via Pinata (com cache no banco para evitar uploads duplicados).
   app.post<{ Body: { conteudo: Record<string, unknown>; tipo: string } }>(
     '/ipfs/upload',
     {
@@ -69,6 +70,7 @@ const ipfs: FastifyPluginAsync = async (app) => {
     },
   );
 
+  // Envia um arquivo binário (PDF, JPG, PNG) ao IPFS via Pinata.
   app.post(
     '/ipfs/upload-arquivo',
     { preHandler: [exigirCarteiraAutorizada] },

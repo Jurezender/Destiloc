@@ -16,6 +16,7 @@ interface ParamsScans {
 }
 
 const scans: FastifyPluginAsync = async (app) => {
+  // Registra uma nova consulta (scan) com localização do consumidor.
   app.post<{ Body: BodyPostScan }>("/scans", async (req, reply) => {
     const corpo = req.body ?? ({} as Partial<BodyPostScan>);
     const { chainId, tokenId, latitude, longitude, precisao } = corpo;
@@ -63,6 +64,7 @@ const scans: FastifyPluginAsync = async (app) => {
     }
   });
 
+  // Retorna o histórico de consultas de uma garrafa (últimos 50 scans).
   app.get<{ Params: ParamsScans }>(
     "/garrafa/:chainId/:tokenId/scans",
     async (req, reply) => {

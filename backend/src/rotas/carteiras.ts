@@ -18,6 +18,7 @@ interface RegistroUpsert extends RegistroCarteira {
 }
 
 const carteiras: FastifyPluginAsync = async (app) => {
+  // Busca os dados (apelido, papel) de uma carteira conhecida pelo endereço.
   app.get<{ Params: { address: string } }>(
     '/carteiras/:address',
     { preHandler: [exigirCarteiraAutorizada] },
@@ -43,6 +44,7 @@ const carteiras: FastifyPluginAsync = async (app) => {
     },
   );
 
+  // Cria ou atualiza o registro de uma carteira conhecida (apelido, papel, anotações). Só admin.
   app.put<{
     Params: { address: string };
     Body: {

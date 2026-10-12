@@ -13,6 +13,7 @@ interface Contadores {
   totalGarrafas: bigint;
 }
 
+// Dashboard inicial: mostra papéis da conta e contadores gerais (insumos, lotes, envasamentos, garrafas).
 export function Inicio() {
   const { conta, chainId, signer } = useCarteira();
   const papeis = usePapeis();

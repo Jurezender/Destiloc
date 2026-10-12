@@ -1,3 +1,4 @@
+// Ponto de entrada da API — lê variáveis de ambiente e sobe o servidor HTTP.
 import 'dotenv/config';
 import { construirApp } from './app.js';
 

@@ -18,6 +18,7 @@ export class AssinaturaInvalidaError extends Error {
   }
 }
 
+// Verifica se um endereço Ethereum tem formato válido (checksum EIP-55).
 export function validarEndereco(address: string): boolean {
   try {
     getAddress(address);
@@ -35,6 +36,7 @@ function construirMensagem(nonce: string, expiraEm: Date): string {
   return `Destiloc: vincule sua carteira ao sistema.\nNonce: ${nonce}\nVálido até: ${expiraEm.toISOString()}`;
 }
 
+// Cria e persiste um desafio (nonce + mensagem) com validade de 15 min para o usuário assinar.
 export async function gerarChallenge(
   usuarioId: number,
   address: string,
@@ -59,6 +61,7 @@ export async function gerarChallenge(
   return { mensagem, nonce };
 }
 
+// Confere se a assinatura bate com o desafio armazenado; marca o desafio como usado após validar.
 export async function verificarChallenge(
   usuarioId: number,
   nonce: string,

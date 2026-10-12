@@ -64,6 +64,7 @@ function segundosDoDatetimeLocal(valor: string): number {
   return Math.floor(new Date(valor).getTime() / 1000);
 }
 
+// Detalhe de um lote de produção: exibe etapas, insumos vinculados e permite registrar novas etapas.
 export function LoteDetalhe() {
   const { id } = useParams<{ id: string }>();
   const { conta, chainId, signer } = useCarteira();

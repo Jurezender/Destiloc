@@ -183,6 +183,7 @@ async function salvarCache(
 
 // ─── Consulta principal ─────────────────────────────────────────────────────
 
+// Consulta completa de uma garrafa: verifica cache, lê blockchain em paralelo e monta a resposta.
 export async function consultarGarrafa(
   chainId: number,
   tokenId: string

@@ -7,6 +7,7 @@ declare module 'fastify' {
   }
 }
 
+// Verifica se o token JWT enviado no cabeçalho é válido.
 export async function autenticarJWT(req: FastifyRequest, reply: FastifyReply): Promise<void> {
   try {
     await req.jwtVerify();
@@ -15,6 +16,7 @@ export async function autenticarJWT(req: FastifyRequest, reply: FastifyReply): P
   }
 }
 
+// Exige JWT válido + carteira vinculada e aprovada pelo admin.
 export async function exigirCarteiraAutorizada(
   req: FastifyRequest,
   reply: FastifyReply,
@@ -55,6 +57,7 @@ export async function exigirCarteiraAutorizada(
   req.carteiraAddress = address;
 }
 
+// Exige carteira autorizada + papel de admin (via variável de ambiente ou banco).
 export async function exigirAdmin(
   req: FastifyRequest,
   reply: FastifyReply,
@@ -70,6 +73,7 @@ export async function exigirAdmin(
   }
 }
 
+// Retorna true se o endereço constar na variável ADMIN_WALLET ou na tabela carteiras_conhecidas como admin.
 async function verificarAdmin(address: string): Promise<boolean> {
   const adminWallets = (process.env.ADMIN_WALLET ?? '')
     .split(',')

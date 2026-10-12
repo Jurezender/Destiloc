@@ -4,6 +4,7 @@ import { useAuth } from "../contexto/AuthContexto";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { API_URL, fetchApi } from "../lib/api";
 
+// Página para vincular a carteira MetaMask à conta: solicita challenge, pede assinatura, envia ao backend.
 export function VincularCarteira() {
   const { token, usuario, carteira, atualizarCarteira } = useAuth();
   const { disponivel, conta, conectando, erro: erroMeta, conectar, signer } = useCarteira();

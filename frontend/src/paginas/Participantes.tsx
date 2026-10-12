@@ -30,6 +30,7 @@ async function listarMembros(acesso: Contract, papel: string): Promise<string[]>
 }
 
 
+// Página de participantes (só admin): lista carteiras autorizadas cruzando banco + papéis na blockchain.
 export function Participantes() {
   const { token } = useAuth();
   const { chainId, signer } = useCarteira();

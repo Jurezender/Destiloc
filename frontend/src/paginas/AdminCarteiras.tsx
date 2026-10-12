@@ -200,6 +200,7 @@ function CardSolicitacao({
   );
 }
 
+// Página de solicitações de acesso: o admin aprova ou reprova carteiras pendentes (banco + blockchain).
 export function AdminCarteiras() {
   const { token } = useAuth();
   const { chainId, signer } = useCarteira();

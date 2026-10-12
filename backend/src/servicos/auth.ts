@@ -18,6 +18,7 @@ export interface PerfilRegistro {
   cnpj?: string;
 }
 
+// Cria usuário no banco com senha criptografada (bcrypt).
 export async function registrarUsuario(
   email: string,
   senha: string,
@@ -47,6 +48,7 @@ export async function registrarUsuario(
   }
 }
 
+// Verifica email e senha; retorna o usuário ou null se inválido.
 export async function autenticarUsuario(
   email: string,
   senha: string,
@@ -71,6 +73,7 @@ export async function autenticarUsuario(
   return { id: usuario.id, email: usuario.email };
 }
 
+// Busca a carteira vinculada a um email (usada no fluxo de recuperação de senha).
 export async function buscarCarteiraPorEmail(
   email: string,
 ): Promise<{ usuarioId: number; address: string } | null> {
@@ -89,6 +92,7 @@ export async function buscarCarteiraPorEmail(
   return { usuarioId: res.rows[0].usuario_id, address: res.rows[0].address };
 }
 
+// Gera um token de redefinição de senha com validade de 30 minutos.
 export async function gerarTokenRedefinicao(usuarioId: number): Promise<string> {
   const token = randomBytes(32).toString('hex');
   const tokenHash = createHash('sha256').update(token).digest('hex');
@@ -102,6 +106,7 @@ export async function gerarTokenRedefinicao(usuarioId: number): Promise<string> 
   return token;
 }
 
+// Valida o token e salva a nova senha; retorna false se o token expirou.
 export async function redefinirSenha(token: string, novaSenha: string): Promise<boolean> {
   const tokenHash = createHash('sha256').update(token).digest('hex');
 

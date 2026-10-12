@@ -131,6 +131,7 @@ interface FormularioDenuncia {
   dataConsumo: string;
 }
 
+// Página pública (QR Code do consumidor): pede localização, registra scan e exibe histórico + formulário de denúncia.
 export function ConsultaPublica() {
   const { chainId: chainIdParam, tokenId } = useParams<{
     chainId: string;
@@ -241,6 +242,7 @@ export function ConsultaPublica() {
     }
   }
 
+  // Envia a denúncia preenchida pelo consumidor para a API (sem autenticação).
   async function enviarDenuncia() {
     if (!dados || !tokenId || Number.isNaN(chainId)) return;
     if (formDenuncia.motivo.trim().length < 10) {

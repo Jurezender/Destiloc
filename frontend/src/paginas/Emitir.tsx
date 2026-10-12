@@ -29,6 +29,7 @@ interface EnvasamentoInfo {
   metadataURI: string;
 }
 
+// Página de envasamento: o envasador declara a quantidade e emite as garrafas NFT de um lote concluído.
 export function Emitir() {
   const { id } = useParams<{ id: string }>();
   const { conta, chainId, signer } = useCarteira();

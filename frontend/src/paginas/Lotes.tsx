@@ -212,6 +212,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
   );
 }
 
+// Página de lotes de produção: produtor cria novos lotes; todos podem ver a listagem.
 export function Lotes() {
   const { chainId, signer } = useCarteira();
   const papeis = usePapeis();

@@ -18,6 +18,7 @@ const MIGRATIONS = [
   '007_denuncias.sql',
 ];
 
+// Aplica todos os arquivos SQL de migrations em ordem; executar com "npm run migrar".
 async function migrar() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error('DATABASE_URL não configurado.');

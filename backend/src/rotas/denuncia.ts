@@ -2,6 +2,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import { obterPool } from '../db/cliente.js';
 
 const denuncia: FastifyPluginAsync = async (app) => {
+  // Permite qualquer pessoa (sem autenticação) denunciar um lote suspeito.
   app.post<{
     Body: {
       chainId: number;

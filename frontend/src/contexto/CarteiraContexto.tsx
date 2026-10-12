@@ -34,6 +34,7 @@ interface EstadoCarteira {
 
 const CarteiraContexto = createContext<EstadoCarteira | null>(null);
 
+// Provedor da MetaMask: gerencia conta conectada, rede (Sepolia) e signer para transações.
 export function CarteiraProvedor({ children }: { children: ReactNode }) {
   const disponivel = typeof window !== "undefined" && !!window.ethereum;
   const [conectando, setConectando] = useState(false);
@@ -157,6 +158,7 @@ export function CarteiraProvedor({ children }: { children: ReactNode }) {
   return <CarteiraContexto.Provider value={valor}>{children}</CarteiraContexto.Provider>;
 }
 
+// Hook para acessar o contexto da MetaMask em qualquer componente.
 export function useCarteira(): EstadoCarteira {
   const contexto = useContext(CarteiraContexto);
   if (!contexto) throw new Error("useCarteira precisa estar dentro de <CarteiraProvedor>.");

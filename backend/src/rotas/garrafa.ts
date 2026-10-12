@@ -10,6 +10,7 @@ interface ParamsGarrafa {
 }
 
 const garrafa: FastifyPluginAsync = async (app) => {
+  // Consulta pública: retorna todos os dados de uma garrafa a partir da blockchain.
   app.get<{ Params: ParamsGarrafa }>(
     "/garrafa/:chainId/:tokenId",
     async (req, reply) => {

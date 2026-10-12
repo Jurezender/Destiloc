@@ -19,6 +19,7 @@ import { obterPool } from '../db/cliente.js';
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const auth: FastifyPluginAsync = async (app) => {
+  // Cria uma nova conta de usuário no banco.
   app.post<{ Body: { email: string; senha: string } & PerfilRegistro }>(
     '/auth/registrar',
     {
@@ -57,6 +58,7 @@ const auth: FastifyPluginAsync = async (app) => {
     },
   );
 
+  // Autentica email/senha e devolve um token JWT de 24h.
   app.post<{ Body: { email: string; senha: string } }>(
     '/auth/login',
     {
@@ -95,6 +97,7 @@ const auth: FastifyPluginAsync = async (app) => {
     },
   );
 
+  // Retorna os dados do usuário logado (lido pelo token JWT).
   app.get(
     '/auth/eu',
     { preHandler: [autenticarJWT] },
@@ -122,6 +125,7 @@ const auth: FastifyPluginAsync = async (app) => {
     },
   );
 
+  // Gera um "desafio" (mensagem com nonce) para o usuário assinar com a MetaMask.
   app.post<{ Body: { address: string } }>(
     '/auth/carteira/challenge',
     {
@@ -160,6 +164,7 @@ const auth: FastifyPluginAsync = async (app) => {
     },
   );
 
+  // Valida a assinatura do desafio e vincula a carteira à conta do usuário.
   app.post<{ Body: { nonce: string; assinatura: string } }>(
     '/auth/carteira/verificar',
     {
@@ -261,6 +266,7 @@ const auth: FastifyPluginAsync = async (app) => {
   );
 
   // Etapa 3: salva nova senha usando o token emitido na etapa 2
+  // Salva a nova senha usando o token de redefinição emitido na etapa anterior.
   app.post<{ Body: { token: string; novaSenha: string } }>(
     '/auth/redefinir-senha',
     {

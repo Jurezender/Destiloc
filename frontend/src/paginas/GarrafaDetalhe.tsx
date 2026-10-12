@@ -21,6 +21,7 @@ interface DadosGarrafa {
   metadataURI: string;
 }
 
+// Detalhe de uma garrafa: exibe dados do token NFT, envasamento e exibe QR Code de consulta pública.
 export function GarrafaDetalhe() {
   const { tokenId } = useParams<{ tokenId: string }>();
   const { chainId, signer } = useCarteira();

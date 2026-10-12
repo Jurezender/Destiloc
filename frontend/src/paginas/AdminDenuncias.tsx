@@ -34,6 +34,7 @@ const COR_STATUS: Record<StatusDenuncia, string> = {
   confirmada: "badge--erro",
 };
 
+// Página de gerenciamento de denúncias: o admin triagem, investiga e pode confirmar adulteração na blockchain.
 export function AdminDenuncias() {
   const { token } = useAuth();
   const { signer, chainId } = useCarteira();

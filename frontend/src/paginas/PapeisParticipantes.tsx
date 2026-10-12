@@ -106,6 +106,7 @@ function SecaoPapel({
   );
 }
 
+// Página de gerenciamento de papéis (só admin): concede ou revoga papéis no ContratoAcesso.
 export function PapeisParticipantes() {
   const { chainId, signer } = useCarteira();
   const papeis = usePapeis();

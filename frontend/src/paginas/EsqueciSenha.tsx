@@ -5,6 +5,7 @@ import { API_URL, fetchApi } from "../lib/api";
 
 type Etapa = "email" | "carteira" | "senha" | "concluido";
 
+// Fluxo de recuperação de senha em 3 etapas: email → assinatura MetaMask → nova senha.
 export function EsqueciSenha() {
   const { disponivel, conta, conectando, erro: erroMeta, conectar, signer } = useCarteira();
 

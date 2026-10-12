@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexto/AuthContexto";
 
+// Página de login: formulário de email/senha que chama a API e salva o token JWT.
 export function Login() {
   const { login, token } = useAuth();
   const navegar = useNavigate();

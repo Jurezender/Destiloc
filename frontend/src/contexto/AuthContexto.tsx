@@ -36,6 +36,7 @@ interface EstadoAuth {
 
 const AuthContexto = createContext<EstadoAuth | null>(null);
 
+// Provedor global de autenticação: mantém o token JWT, dados do usuário e carteira vinculada.
 export function AuthProvedor({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -139,6 +140,7 @@ export function AuthProvedor({ children }: { children: ReactNode }) {
   return <AuthContexto.Provider value={valor}>{children}</AuthContexto.Provider>;
 }
 
+// Hook para acessar o contexto de autenticação em qualquer componente.
 export function useAuth(): EstadoAuth {
   const ctx = useContext(AuthContexto);
   if (!ctx) throw new Error("useAuth precisa estar dentro de <AuthProvedor>.");

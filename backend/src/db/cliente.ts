@@ -4,7 +4,7 @@ const { Pool } = pg;
 
 let _pool: InstanceType<typeof Pool> | undefined;
 
-// Inicialização lazy — não falha em módulos que importam sem usar o pool (ex.: testes de rota sem banco)
+// Retorna (ou cria) a conexão com o banco PostgreSQL. Leitura lazy: só conecta quando chamado.
 export function obterPool(): InstanceType<typeof Pool> {
   if (!_pool) {
     const url = process.env.DATABASE_URL;

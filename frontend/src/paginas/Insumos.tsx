@@ -236,6 +236,7 @@ async function carregarLote(
   };
 }
 
+// Página de lotes de insumo: fornecedor registra novos lotes; produtor vê os lotes destinados a ele.
 export function Insumos() {
   const { conta, chainId, signer } = useCarteira();
   const papeis = usePapeis();
