@@ -86,13 +86,14 @@ describe("consultarGarrafa — cache", () => {
   });
 
   it("cache hit: retorna dados do banco sem consultar blockchain", async () => {
-    mockQuery.mockResolvedValueOnce({ rows: [{ dados: RESPOSTA_CACHE }] });
+    mockQuery.mockResolvedValueOnce({ rows: [{ dados: RESPOSTA_CACHE }] }); // garrafa_cache
+    mockQuery.mockResolvedValueOnce({ rows: [] }); // denuncias (buscarAlerta)
 
     const resultado = await consultarGarrafa(CHAIN_ID, TOKEN_ID);
 
     expect(resultado).toEqual(RESPOSTA_CACHE);
     expect(obterContrato).not.toHaveBeenCalled();
-    expect(mockQuery).toHaveBeenCalledTimes(1);
+    expect(mockQuery).toHaveBeenCalledTimes(2);
     expect(mockQuery).toHaveBeenCalledWith(
       expect.stringContaining("garrafa_cache"),
       [CHAIN_ID, TOKEN_ID]
@@ -185,13 +186,14 @@ describe("consultarGarrafa — cache", () => {
       ...RESPOSTA_CACHE,
       nomesCarteiras: { [ADDR_PRODUTOR]: "Destilaria Boa Vista" },
     };
-    mockQuery.mockResolvedValueOnce({ rows: [{ dados: comNomes }] });
+    mockQuery.mockResolvedValueOnce({ rows: [{ dados: comNomes }] }); // garrafa_cache
+    mockQuery.mockResolvedValueOnce({ rows: [] }); // denuncias (buscarAlerta)
 
     const resultado = await consultarGarrafa(CHAIN_ID, TOKEN_ID);
 
     expect(resultado.nomesCarteiras[ADDR_PRODUTOR]).toBe("Destilaria Boa Vista");
-    // Apenas 1 query (SELECT cache) — sem nova consulta de carteiras
-    expect(mockQuery).toHaveBeenCalledTimes(1);
+    // 2 queries: SELECT cache + SELECT denuncias (buscarAlerta) — sem nova consulta de carteiras
+    expect(mockQuery).toHaveBeenCalledTimes(2);
   });
 
   it("retry em 429: retenta após rate limit e retorna resposta correta", async () => {

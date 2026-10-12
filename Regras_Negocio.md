@@ -216,6 +216,8 @@ Cada lote de insumo possui:
 - identificador único on-chain do tipo `uint256`;
 - fornecedor responsável;
 - tipo do insumo;
+- quantidade declarada pelo fornecedor (`uint256`, maior que zero);
+- produtor destinatário (`produtorDestinatario`): endereço com `PRODUTOR_ROLE` para o qual o insumo é destinado, informado no momento do cadastro;
 - `metadataURI` obrigatório;
 - timestamp do registro.
 
@@ -244,16 +246,14 @@ veracidade dos documentos.
 ## 6.2 Avaliação por produtor
 
 Para registrar uma nova avaliação, a conta deve possuir `PRODUTOR_ROLE` no
-`ContratoAcesso` no momento da operação.
+`ContratoAcesso` no momento da operação e ser o `produtorDestinatario` do lote.
+Apenas o produtor destinatário pode avaliar o insumo a ele designado.
 
 `ResultadoAvaliacao` possui os valores:
 
 - `NaoAvaliado`;
 - `Aprovado`;
 - `Rejeitado`.
-
-A avaliação é específica para o par produtor e lote de insumo. Não existe
-aprovação global: um produtor pode aprovar um insumo enquanto outro o rejeita.
 
 Toda avaliação exige `metadataURI`, usada para registrar justificativa,
 observações e/ou evidências no IPFS.

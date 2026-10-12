@@ -35,7 +35,7 @@ describe('registrarUsuario', () => {
     expect(resultado).toEqual({ id: 1, email: 'a@b.com' });
     expect(query).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO usuarios'),
-      ['a@b.com', '$hash', 'João Silva', 'Destilaria Teste', 'produtor'],
+      ['a@b.com', '$hash', 'João Silva', 'Destilaria Teste', 'produtor', null],
     );
   });
 
@@ -45,7 +45,7 @@ describe('registrarUsuario', () => {
     await registrarUsuario('User@Example.COM', 'senha123', PERFIL_TESTE);
     expect(query).toHaveBeenCalledWith(
       expect.any(String),
-      ['user@example.com', '$hash', 'João Silva', 'Destilaria Teste', 'produtor'],
+      ['user@example.com', '$hash', 'João Silva', 'Destilaria Teste', 'produtor', null],
     );
   });
 
