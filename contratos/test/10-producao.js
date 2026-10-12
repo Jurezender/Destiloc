@@ -244,6 +244,33 @@ describe("L. ContratoProducao", function () {
       expect(await ctx.producao.totalInsumosUtilizados(lote)).to.equal(1n);
       expect(await ctx.producao.totalLotesQueUtilizaramInsumo(insumo)).to.equal(1n);
     });
+    it("valida quantidadesConsumidas: arrays, zero e saldo acumulado entre etapas", async function () {
+      const ctx = await loadFixture(implantar);
+      const lote = await criarLote(ctx, Bebida.Vodca, config());
+      const insumo = await criarInsumo(ctx, TipoInsumo.BaseAlcoolica);
+      await ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(lote, insumo);
+
+      // comprimentos diferentes
+      await expect(
+        ctx.producao.connect(ctx.produtor).registrarEtapa(lote, Etapa.Filtragem, [insumo], [], 10, 20, URI.c)
+      ).to.be.revertedWithCustomError(ctx.producao, "ArraysDeComprimentosDiferentes");
+
+      // quantidade zero
+      await expect(
+        ctx.producao.connect(ctx.produtor).registrarEtapa(lote, Etapa.Filtragem, [insumo], [0n], 10, 20, URI.c)
+      ).to.be.revertedWithCustomError(ctx.producao, "QuantidadeInvalida");
+
+      // excede quantidade declarada do lote de insumo (100) de uma so vez
+      await expect(
+        ctx.producao.connect(ctx.produtor).registrarEtapa(lote, Etapa.Filtragem, [insumo], [101n], 10, 20, URI.c)
+      ).to.be.revertedWithCustomError(ctx.producao, "QuantidadeInsuficienteNoLote");
+
+      // acumulacao entre etapas: consome 60 na Filtragem; tenta 50 na Blendagem (60+50>100)
+      await ctx.producao.connect(ctx.produtor).registrarEtapa(lote, Etapa.Filtragem, [insumo], [60n], 10, 20, URI.c);
+      await expect(
+        ctx.producao.connect(ctx.produtor).registrarEtapa(lote, Etapa.Blendagem, [insumo], [50n], 10, 20, URI.c)
+      ).to.be.revertedWithCustomError(ctx.producao, "QuantidadeInsuficienteNoLote");
+    });
   });
 
   describe("aplicabilidade e ordem", function () {

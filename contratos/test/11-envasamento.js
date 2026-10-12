@@ -112,6 +112,12 @@ describe("M. ContratoEnvasamento", function () {
       await registrar(ctx, loteId, 1, URI.a, ctx.multipapeis);
       expect((await ctx.envasamento.obterEnvasamento(1)).envasador).to.equal(ctx.multipapeis.address);
     });
+    it("rejeita envasador nao designado para o lote", async function () {
+      const ctx = await loadFixture(implantar); const loteId = await criarProducaoConcluida(ctx);
+      // ctx.envasador é o designado; ctx.envasador2 tem ENVASADOR_ROLE mas não é o designado
+      await expect(registrar(ctx, loteId, 1, URI.a, ctx.envasador2))
+        .to.be.revertedWithCustomError(ctx.envasamento, "EnvasadorNaoAutorizado");
+    });
     it("rejeita producao inexistente e nao concluida", async function () {
       const ctx = await loadFixture(implantar);
       await expect(registrar(ctx, 99)).to.be.revertedWithCustomError(ctx.envasamento, "ProducaoInexistente");
