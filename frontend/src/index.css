@@ -2275,6 +2275,33 @@ details[open] .cp-tecnico__chevron {
   flex-wrap: wrap;
 }
 
+/* ─── Abas de navegação interna ─────────────────────────────────────────────── */
+.abas {
+  display: flex;
+  border-bottom: 1px solid var(--cor-borda);
+  margin-bottom: var(--s-xl);
+}
+
+.abas__item {
+  padding: 0.5rem 1.125rem;
+  text-decoration: none;
+  color: var(--cor-texto-secundario);
+  font-size: 0.9375rem;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s;
+}
+
+.abas__item:hover {
+  color: var(--cor-texto-primario);
+}
+
+.abas__item--ativa {
+  color: var(--cafe-noir);
+  border-bottom-color: var(--cafe-noir);
+  font-weight: 500;
+}
+
 /* Responsivo — ConsultaPublica ───────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .cp-hero {

@@ -11,7 +11,10 @@ import { Emitir } from "./paginas/Emitir";
 import { Garrafas } from "./paginas/Garrafas";
 import { GarrafaDetalhe } from "./paginas/GarrafaDetalhe";
 import { Inicio } from "./paginas/Inicio";
+import { InsumoAvaliacao } from "./paginas/InsumoAvaliacao";
+import { InsumoCorrecoes } from "./paginas/InsumoCorrecoes";
 import { InsumoDetalhe } from "./paginas/InsumoDetalhe";
+import { InsumoLayout } from "./paginas/InsumoLayout";
 import { Insumos } from "./paginas/Insumos";
 import { EsqueciSenha } from "./paginas/EsqueciSenha";
 import { Login } from "./paginas/Login";
@@ -103,10 +106,14 @@ export function App() {
             path="insumos/:id"
             element={
               <RotaProtegida>
-                <InsumoDetalhe />
+                <InsumoLayout />
               </RotaProtegida>
             }
-          />
+          >
+            <Route index element={<InsumoDetalhe />} />
+            <Route path="correcoes" element={<InsumoCorrecoes />} />
+            <Route path="avaliacao" element={<InsumoAvaliacao />} />
+          </Route>
           <Route
             path="lotes"
             element={
