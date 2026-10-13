@@ -170,8 +170,7 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
   }
 
   return (
-    <fieldset disabled={enviando}>
-      <legend>Novo lote de insumo</legend>
+    <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
       <label>
         Tipo de insumo
         <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
@@ -310,7 +309,12 @@ export function Insumos() {
   return (
     <section>
       <h1>Lotes de insumo</h1>
-      {papeis.fornecedor && <NovoLoteInsumo onCriado={carregar} />}
+      {papeis.fornecedor && (
+        <>
+          <h2>Novo lote de insumo</h2>
+          <NovoLoteInsumo onCriado={carregar} />
+        </>
+      )}
       {!papeis.fornecedor && (
         <p className="dica">Sua conta não tem o papel de Fornecedor, mas você ainda pode consultar os insumos cadastrados.</p>
       )}
