@@ -56,9 +56,13 @@ export function DocumentosAnexados({ metadataUri }: Props) {
       {documentos.map((cid, i) => (
         <li key={cid} className="documentos-anexados__item">
           <span className="documentos-anexados__nome">Documento {i + 1}</span>
-          <a href={ipfsParaUrl(cid)} target="_blank" rel="noopener noreferrer" className="link-ipfs">
+          <button
+            type="button"
+            className="botao--compacto"
+            onClick={() => window.open(ipfsParaUrl(cid), "_blank", "noopener,noreferrer")}
+          >
             Abrir documento
-          </a>
+          </button>
         </li>
       ))}
     </ul>

@@ -187,12 +187,18 @@ export function InsumoDetalhe() {
       {erro && <p className="erro">{erro}</p>}
 
       <h2>Documentos</h2>
-      <button type="button" onClick={() => window.open(ipfsParaUrl(lote.metadataURI), "_blank", "noopener,noreferrer")}>
-        Ver metadata
-      </button>
-      <p className="mono" style={{ fontSize: "0.75rem", color: "var(--cor-texto-secundario)", marginTop: "0.375rem" }}>
-        {lote.metadataURI}
-      </p>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "0.375rem", marginBottom: "0.75rem" }}>
+        <span className="mono" style={{ fontSize: "0.8125rem", color: "var(--cor-texto-secundario)" }}>
+          {lote.metadataURI}
+        </span>
+        <button
+          type="button"
+          className="botao--compacto"
+          onClick={() => window.open(ipfsParaUrl(lote.metadataURI), "_blank", "noopener,noreferrer")}
+        >
+          Ver metadata
+        </button>
+      </div>
       <DocumentosAnexados metadataUri={lote.metadataURI} />
 
       <h2>Invalidação</h2>
@@ -209,21 +215,26 @@ export function InsumoDetalhe() {
       )}
 
       <h2>Correções documentais</h2>
-      <ul className="lista-compacta">
-        {correcoes.map((correcao) => (
-          <li key={correcao.indice}>
-            {formatarTimestamp(correcao.registradoEm)}
-            {" · "}<LinkMetadados uri={correcao.metadataURI} />
-          </li>
-        ))}
-        {correcoes.length === 0 && <li className="dica">Nenhuma correção registrada ainda.</li>}
-      </ul>
-      {invalidacao.invalidado ? (
+      {invalidacao.invalidado && (
         <p className="dica">Lote invalidado, não aceita novas correções documentais.</p>
-      ) : podeCorrigirOuInvalidar ? (
-        <RegistrarCorrecao loteId={lote.id} chainId={chainId!} signer={signer!} aoRegistrar={carregar} />
-      ) : (
+      )}
+      {!podeCorrigirOuInvalidar && !invalidacao.invalidado && (
         <p className="dica">Somente o fornecedor original, com papel de Fornecedor, pode registrar correções documentais.</p>
+      )}
+      {correcoes.length === 0 ? (
+        <p className="dica">Nenhuma correção registrada ainda.</p>
+      ) : (
+        <ul className="lista-compacta">
+          {correcoes.map((correcao) => (
+            <li key={correcao.indice}>
+              {formatarTimestamp(correcao.registradoEm)}
+              {" · "}<LinkMetadados uri={correcao.metadataURI} />
+            </li>
+          ))}
+        </ul>
+      )}
+      {podeCorrigirOuInvalidar && !invalidacao.invalidado && (
+        <RegistrarCorrecao loteId={lote.id} chainId={chainId!} signer={signer!} aoRegistrar={carregar} />
       )}
 
       <h2>Avaliação</h2>
@@ -241,20 +252,24 @@ export function InsumoDetalhe() {
             Avaliação atual da sua conta:{" "}
             {resultadoAtual !== null ? RETULO_RESULTADO_AVALIACAO[resultadoAtual] : "carregando…"}
           </p>
-          <h3>Histórico das suas avaliações</h3>
-          <ul className="lista-compacta">
-            {avaliacoes.map((avaliacao) => (
-              <li key={avaliacao.indice}>
-                {formatarTimestamp(avaliacao.registradoEm)}
-                {" · "}{RETULO_RESULTADO_AVALIACAO[avaliacao.resultado]}
-                {" · "}<LinkMetadados uri={avaliacao.metadataURI} />
-              </li>
-            ))}
-            {avaliacoes.length === 0 && <li className="dica">Você ainda não avaliou este insumo.</li>}
-          </ul>
-          {invalidacao.invalidado ? (
+          {invalidacao.invalidado && (
             <p className="dica">Lote invalidado, não aceita novas avaliações.</p>
+          )}
+          <h3>Histórico das suas avaliações</h3>
+          {avaliacoes.length === 0 ? (
+            <p className="dica">Você ainda não avaliou este insumo.</p>
           ) : (
+            <ul className="lista-compacta">
+              {avaliacoes.map((avaliacao) => (
+                <li key={avaliacao.indice}>
+                  {formatarTimestamp(avaliacao.registradoEm)}
+                  {" · "}{RETULO_RESULTADO_AVALIACAO[avaliacao.resultado]}
+                  {" · "}<LinkMetadados uri={avaliacao.metadataURI} />
+                </li>
+              ))}
+            </ul>
+          )}
+          {!invalidacao.invalidado && (
             <AvaliarInsumo loteId={lote.id} chainId={chainId!} signer={signer!} aoAvaliar={carregar} />
           )}
         </>
@@ -343,8 +358,7 @@ function InvalidarLote({
   }
 
   return (
-    <fieldset disabled={enviando}>
-      <legend>Invalidar lote</legend>
+    <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
       <p className="dica">Esta ação é definitiva: o lote não poderá ser reativado, avaliado ou corrigido depois.</p>
       <label>
         Motivo (opcional, vai para os metadados enviados ao IPFS)
@@ -453,8 +467,7 @@ function RegistrarCorrecao({
   }
 
   return (
-    <fieldset disabled={enviando}>
-      <legend>Registrar correção documental</legend>
+    <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
       <AnexosIpfs
         key={chaveAnexos}
         rotulo="Documentos da correção (PDF, JPG, PNG - opcional)"
@@ -568,8 +581,7 @@ function AvaliarInsumo({
   }
 
   return (
-    <fieldset disabled={enviando}>
-      <legend>Avaliar insumo</legend>
+    <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
       <label>
         Resultado
         <select value={resultado} onChange={(e) => setResultado(e.target.value)}>
