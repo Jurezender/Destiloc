@@ -5,30 +5,59 @@ interface Props {
   metadataUri: string;
 }
 
+type Estado = "carregando" | "ok" | "vazio" | "erro";
+
 export function DocumentosAnexados({ metadataUri }: Props) {
-  const [documentos, setDocumentos] = useState<string[] | null>(null);
+  const [estado, setEstado] = useState<Estado>("carregando");
+  const [documentos, setDocumentos] = useState<string[]>([]);
 
   useEffect(() => {
     if (!metadataUri.startsWith("ipfs://")) return;
+    setEstado("carregando");
+    setDocumentos([]);
     let cancelado = false;
 
-    void fetch(ipfsParaUrl(metadataUri))
-      .then((r) => (r.ok ? r.json() : null))
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+
+    void fetch(ipfsParaUrl(metadataUri), { signal: controller.signal })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((json: unknown) => {
-        if (cancelado || !json || typeof json !== "object") return;
-        const docs = (json as { documentos?: unknown }).documentos;
+        if (cancelado) return;
+        clearTimeout(timeout);
+        const docs = json && typeof json === "object"
+          ? (json as { documentos?: unknown }).documentos
+          : undefined;
         if (Array.isArray(docs) && docs.length > 0) {
           setDocumentos(docs as string[]);
+          setEstado("ok");
+        } else {
+          setEstado("vazio");
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!cancelado) setEstado("erro");
+        clearTimeout(timeout);
+      });
 
     return () => {
       cancelado = true;
+      clearTimeout(timeout);
+      controller.abort();
     };
   }, [metadataUri]);
 
-  if (!documentos) return null;
+  if (estado === "carregando") {
+    return <p className="dica" style={{ marginTop: "0.5rem" }}>Buscando documentos anexados…</p>;
+  }
+  if (estado === "erro") {
+    return (
+      <p className="dica" style={{ marginTop: "0.5rem" }}>
+        Não foi possível carregar os documentos (gateway IPFS indisponível).
+      </p>
+    );
+  }
+  if (estado === "vazio") return null;
 
   return (
     <ul className="documentos-anexados">
