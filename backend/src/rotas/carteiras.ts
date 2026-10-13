@@ -18,6 +18,26 @@ interface RegistroUpsert extends RegistroCarteira {
 }
 
 const carteiras: FastifyPluginAsync = async (app) => {
+  // Lista todos os participantes com carteira autorizada (acessível a qualquer usuário autenticado).
+  app.get(
+    '/participantes',
+    { preHandler: [exigirCarteiraAutorizada] },
+    async (_req, reply) => {
+      const res = await obterPool().query<{
+        address: string;
+        nome_responsavel: string;
+        nome_empresa: string;
+      }>(
+        `SELECT cv.address, u.nome_responsavel, u.nome_empresa
+         FROM carteiras_vinculadas cv
+         JOIN usuarios u ON u.id = cv.usuario_id
+         WHERE cv.status = 'autorizada'
+         ORDER BY u.nome_responsavel, u.nome_empresa`,
+      );
+      return reply.send({ participantes: res.rows });
+    },
+  );
+
   // Busca os dados (apelido, papel) de uma carteira conhecida pelo endereço.
   app.get<{ Params: { address: string } }>(
     '/carteiras/:address',

@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../contexto/AuthContexto";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
 import { feedbackDaTransacao, type FeedbackTx, mapearErroContrato } from "../lib/erros";
 import { encurtarEndereco, formatarTimestamp, RETULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
+import { PAPEL_PRODUTOR } from "../lib/papeis";
 import { TipoInsumo } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
 import { adicionarJSON } from "../ipfs/kubo";
 import { montarMetadadosInsumo } from "../ipfs/metadados";
 import { AnexosIpfs } from "../componentes/AnexosIpfs";
+import { API_URL, fetchApi } from "../lib/api";
 
 interface LinhaInsumo {
   id: bigint;
@@ -31,12 +34,18 @@ const OPCOES_TIPO_INSUMO = [
   TipoInsumo.Outro,
 ];
 
-function ehEnderecoValido(valor: string): boolean {
-  return /^0x[0-9a-fA-F]{40}$/.test(valor.trim());
+interface ProducaoDestinatario {
+  address: string;
+  nome: string;
 }
 
 function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
+  const { token } = useAuth();
   const { chainId, signer } = useCarteira();
+
+  const [produtores, setProdutores] = useState<ProducaoDestinatario[]>([]);
+  const [carregandoProdutores, setCarregandoProdutores] = useState(true);
+
   const [tipo, setTipo] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [produtorDestinatario, setProdutorDestinatario] = useState("");
@@ -52,6 +61,41 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
   const [erro, setErro] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
+  useEffect(() => {
+    if (!token || !chainId || !signer) return;
+    setCarregandoProdutores(true);
+    void (async () => {
+      try {
+        const acesso = obterContrato("ContratoAcesso", chainId, signer);
+        const [resDB, totalBc] = await Promise.all([
+          fetchApi(`${API_URL}/participantes`, { headers: { Authorization: `Bearer ${token}` } }),
+          acesso.getRoleMemberCount(PAPEL_PRODUTOR) as Promise<bigint>,
+        ]);
+        const { participantes } = (await resDB.json()) as {
+          participantes: { address: string; nome_responsavel: string; nome_empresa: string }[];
+        };
+        const mapaDB = new Map(participantes.map((p) => [p.address.toLowerCase(), p]));
+        const enderecosBc = await Promise.all(
+          Array.from({ length: Number(totalBc) }, (_, i) =>
+            acesso.getRoleMember(PAPEL_PRODUTOR, i) as Promise<string>
+          )
+        );
+        const lista = enderecosBc.map((address) => {
+          const db = mapaDB.get(address.toLowerCase());
+          const nome = db
+            ? [db.nome_responsavel, db.nome_empresa].filter(Boolean).join(" — ")
+            : encurtarEndereco(address);
+          return { address, nome };
+        });
+        setProdutores(lista);
+      } catch {
+        setProdutores([]);
+      } finally {
+        setCarregandoProdutores(false);
+      }
+    })();
+  }, [token, chainId, signer]);
+
   const atualizarAnexos = useCallback((cids: string[], subindo: boolean) => {
     setDocumentosCids(cids);
     setArquivosSubindo(subindo);
@@ -60,25 +104,12 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
   const tipoSelecionado = tipo !== "" ? (Number(tipo) as TipoInsumo) : null;
   const unidade = tipoSelecionado !== null ? UNIDADE_INSUMO[tipoSelecionado] : "";
   const quantidadeValida = /^\d+(\.\d+)?$/.test(quantidade.trim()) && Number(quantidade.trim()) > 0;
-  const destinatarioValido = ehEnderecoValido(produtorDestinatario);
 
   async function gerarViaIpfs() {
-    if (tipo === "") {
-      setErroIpfs("Selecione o tipo de insumo antes de gerar os metadados.");
-      return;
-    }
-    if (!quantidadeValida) {
-      setErroIpfs("Informe a quantidade antes de gerar os metadados.");
-      return;
-    }
-    if (!destinatarioValido) {
-      setErroIpfs("Informe um endereço de produtor destinatário válido.");
-      return;
-    }
-    if (arquivosSubindo) {
-      setErroIpfs("Aguarde o envio dos arquivos antes de gerar a referência.");
-      return;
-    }
+    if (tipo === "") { setErroIpfs("Selecione o tipo de insumo antes de gerar os metadados."); return; }
+    if (!quantidadeValida) { setErroIpfs("Informe a quantidade antes de gerar os metadados."); return; }
+    if (!produtorDestinatario) { setErroIpfs("Selecione o produtor destinatário."); return; }
+    if (arquivosSubindo) { setErroIpfs("Aguarde o envio dos arquivos antes de gerar a referência."); return; }
     setErroIpfs(null);
     setEnviandoIpfs(true);
     try {
@@ -103,22 +134,10 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
 
   async function enviar() {
     if (!chainId || !signer) return;
-    if (tipo === "") {
-      setErro("Selecione o tipo de insumo.");
-      return;
-    }
-    if (!quantidadeValida) {
-      setErro("Informe uma quantidade válida (número maior que zero).");
-      return;
-    }
-    if (!destinatarioValido) {
-      setErro("Informe um endereço Ethereum válido para o produtor destinatário.");
-      return;
-    }
-    if (erroReferencia) {
-      setErro(erroReferencia);
-      return;
-    }
+    if (tipo === "") { setErro("Selecione o tipo de insumo."); return; }
+    if (!quantidadeValida) { setErro("Informe uma quantidade válida (número maior que zero)."); return; }
+    if (!produtorDestinatario) { setErro("Selecione o produtor destinatário."); return; }
+    if (erroReferencia) { setErro(erroReferencia); return; }
     setErro(null);
     setFeedback(null);
     setEnviando(true);
@@ -128,7 +147,7 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
       const tx = await insumos.registrarLoteInsumo(
         Number(tipo) as TipoInsumo,
         qtdInteira,
-        produtorDestinatario.trim(),
+        produtorDestinatario,
         metadataURI.trim()
       );
       await tx.wait();
@@ -176,14 +195,25 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
         />
       </label>
       <label>
-        Produtor destinatário (endereço Ethereum)
-        <input
+        Produtor destinatário
+        <select
           value={produtorDestinatario}
-          onChange={(e) => setProdutorDestinatario(e.target.value.trim())}
-          placeholder="0x…"
-        />
-        {produtorDestinatario && !destinatarioValido && (
-          <span className="erro">Endereço inválido.</span>
+          onChange={(e) => setProdutorDestinatario(e.target.value)}
+          disabled={carregandoProdutores}
+        >
+          <option value="">
+            {carregandoProdutores ? "Carregando produtores…" : produtores.length === 0 ? "Nenhum produtor cadastrado" : "Selecione…"}
+          </option>
+          {produtores.map((p) => (
+            <option key={p.address} value={p.address}>
+              {p.nome}
+            </option>
+          ))}
+        </select>
+        {produtorDestinatario && (
+          <span className="mono" style={{ fontSize: "0.75rem", color: "var(--cor-texto-secundario)", marginTop: "0.25rem", display: "block" }}>
+            {produtorDestinatario}
+          </span>
         )}
       </label>
       <label>
@@ -207,7 +237,6 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
         Metadados (ipfs://…, preenchido automaticamente pelo botão acima, ou cole uma referência já existente)
         <input value={metadataURI} onChange={(e) => setMetadataURI(e.target.value.trim())} />
       </label>
-
       <button type="button" onClick={() => void enviar()}>
         {enviando ? "Registrando…" : "Registrar lote"}
       </button>
