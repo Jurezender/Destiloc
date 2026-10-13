@@ -265,8 +265,7 @@ function LinhaEnvasamento({
       {!concluido &&
         (temPapelEnvasador ? (
           souEnvasadorOriginal ? (
-            <fieldset disabled={enviando}>
-              <legend>Emitir garrafas</legend>
+            <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
               <label>
                 Quantidade (máx. {restante.toString()})
                 <input value={quantidade} onChange={(e) => setQuantidade(e.target.value.trim())} />
@@ -395,8 +394,7 @@ function RegistrarEnvasamento({
   }
 
   return (
-    <fieldset disabled={enviando}>
-      <legend>Registrar envasamento</legend>
+    <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
       <label>
         Quantidade declarada
         <input

@@ -131,8 +131,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
   }
 
   return (
-    <fieldset disabled={enviando}>
-      <legend>Novo lote de produção</legend>
+    <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
       <label>
         Tipo de bebida
         <select value={tipoBebida} onChange={(e) => { setTipoBebida(e.target.value); setConfiguracao(CONFIGURACAO_PADRAO); }}>
@@ -145,8 +144,8 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
         </select>
       </label>
 
-      <fieldset>
-        <legend>Configuração de produção</legend>
+      <fieldset style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
+        <p style={{ fontWeight: 500, marginTop: "0.75rem", marginBottom: "0.25rem" }}>Configuração de produção</p>
         <label>
           <input
             type="checkbox"
@@ -259,7 +258,12 @@ export function Lotes() {
   return (
     <section>
       <h1>Lotes de produção</h1>
-      {papeis.produtor && <NovoLoteProducao onCriado={carregar} />}
+      {papeis.produtor && (
+        <>
+          <h2>Novo lote de produção</h2>
+          <NovoLoteProducao onCriado={carregar} />
+        </>
+      )}
       {!papeis.produtor && (
         <p className="dica">Sua conta não tem o papel de Produtor, mas você ainda pode consultar os lotes cadastrados.</p>
       )}

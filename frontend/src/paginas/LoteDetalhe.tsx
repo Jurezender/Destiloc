@@ -216,30 +216,36 @@ export function LoteDetalhe() {
       {erro && <p className="erro">{erro}</p>}
 
       <h2>Configuração de produção</h2>
+      {lote.estado !== EstadoProducao.Criado && (
+        <p className="dica">Configuração congelada, só pode ser alterada enquanto o lote está em "Criado".</p>
+      )}
+      {lote.estado === EstadoProducao.Criado && !podeOperar && (
+        <p className="dica">Só o produtor responsável, com papel de Produtor, pode alterar a configuração.</p>
+      )}
       <ul>
         <li>Maturação aplicável: {configuracao.maturacaoAplicavel ? "sim" : "não"}</li>
         <li>Retificação aplicável: {configuracao.retificacaoAplicavel ? "sim" : "não"}</li>
         <li>Blendagem aplicável: {configuracao.blendagemAplicavel ? "sim" : "não"}</li>
         <li>Ajuste final aplicável: {configuracao.ajusteFinalAplicavel ? "sim" : "não"}</li>
       </ul>
-      {lote.estado === EstadoProducao.Criado ? (
-        podeOperar ? (
-          <AtualizarConfiguracao
-            loteId={lote.id}
-            tipoBebida={lote.tipoBebida}
-            configuracaoAtual={configuracao}
-            chainId={chainId!}
-            signer={signer!}
-            aoAtualizar={carregar}
-          />
-        ) : (
-          <p className="dica">Só o produtor responsável, com papel de Produtor, pode alterar a configuração.</p>
-        )
-      ) : (
-        <p className="dica">Configuração congelada, só pode ser alterada enquanto o lote está em "Criado".</p>
+      {lote.estado === EstadoProducao.Criado && podeOperar && (
+        <AtualizarConfiguracao
+          loteId={lote.id}
+          tipoBebida={lote.tipoBebida}
+          configuracaoAtual={configuracao}
+          chainId={chainId!}
+          signer={signer!}
+          aoAtualizar={carregar}
+        />
       )}
 
       <h2>Insumos vinculados</h2>
+      {lote.estado === EstadoProducao.Concluido && (
+        <p className="dica">Produção concluída, não aceita novos vínculos de insumo.</p>
+      )}
+      {lote.estado !== EstadoProducao.Concluido && !podeOperar && (
+        <p className="dica">Só o produtor responsável, com papel de Produtor, pode vincular insumos.</p>
+      )}
       <ul>
         {insumosVinculados.map((insumo) => (
           <li key={insumo.id.toString()}>
@@ -248,15 +254,14 @@ export function LoteDetalhe() {
         ))}
         {insumosVinculados.length === 0 && <li className="lista-vazia">Nenhum insumo vinculado ainda.</li>}
       </ul>
-      {lote.estado === EstadoProducao.Concluido ? (
-        <p className="dica">Produção concluída, não aceita novos vínculos de insumo.</p>
-      ) : podeOperar ? (
+      {lote.estado !== EstadoProducao.Concluido && podeOperar && (
         <VincularInsumo loteId={lote.id} chainId={chainId!} signer={signer!} aoVincular={carregar} />
-      ) : (
-        <p className="dica">Só o produtor responsável, com papel de Produtor, pode vincular insumos.</p>
       )}
 
       <h2>Etapas registradas</h2>
+      {lote.estado !== EstadoProducao.Concluido && !podeOperar && (
+        <p className="dica">Só o produtor responsável, com papel de Produtor, pode registrar etapas.</p>
+      )}
       <div className="tabela-wrapper">
         <table>
           <thead>
@@ -294,27 +299,23 @@ export function LoteDetalhe() {
           </tbody>
         </table>
       </div>
-
-      {lote.estado !== EstadoProducao.Concluido &&
-        (podeOperar ? (
-          etapasPendentes.length > 0 ? (
-            <RegistrarEtapa
-              loteId={lote.id}
-              tipoBebida={lote.tipoBebida}
-              configuracao={configuracao}
-              etapasPendentes={etapasPendentes}
-              etapasRegistradas={etapasRegistradas}
-              insumosVinculados={insumosVinculados}
-              chainId={chainId!}
-              signer={signer!}
-              aoRegistrar={carregar}
-            />
-          ) : (
-            <p className="dica">Nenhuma etapa aplicável está pendente de registro.</p>
-          )
+      {lote.estado !== EstadoProducao.Concluido && podeOperar && (
+        etapasPendentes.length > 0 ? (
+          <RegistrarEtapa
+            loteId={lote.id}
+            tipoBebida={lote.tipoBebida}
+            configuracao={configuracao}
+            etapasPendentes={etapasPendentes}
+            etapasRegistradas={etapasRegistradas}
+            insumosVinculados={insumosVinculados}
+            chainId={chainId!}
+            signer={signer!}
+            aoRegistrar={carregar}
+          />
         ) : (
-          <p className="dica">Só o produtor responsável, com papel de Produtor, pode registrar etapas.</p>
-        ))}
+          <p className="dica">Nenhuma etapa aplicável está pendente de registro.</p>
+        )
+      )}
 
       <h2>Conclusão</h2>
       {lote.estado === EstadoProducao.Concluido ? (
@@ -393,8 +394,7 @@ function AtualizarConfiguracao({
   }
 
   return (
-    <fieldset disabled={enviando}>
-      <legend>Atualizar configuração</legend>
+    <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
       <label>
         <input
           type="checkbox"
@@ -527,8 +527,7 @@ function VincularInsumo({
   }
 
   return (
-    <fieldset disabled={enviando}>
-      <legend>Vincular insumo ao lote</legend>
+    <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
       {carregandoOpcoes ? (
         <p className="dica">Carregando insumos disponíveis…</p>
       ) : opcoes.length === 0 ? (
@@ -732,8 +731,7 @@ function RegistrarEtapa({
   }
 
   return (
-    <fieldset disabled={enviando}>
-      <legend>Registrar etapa</legend>
+    <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
       <label>
         Etapa
         <select value={etapaSelecionada} onChange={(e) => setEtapaSelecionada(e.target.value)}>
@@ -748,8 +746,8 @@ function RegistrarEtapa({
       {etapaSelecionada !== "" &&
         (erroValidacao ? <p className="erro">{erroValidacao}</p> : <p className="ok">Etapa válida para registro.</p>)}
 
-      <fieldset>
-        <legend>Insumos utilizados nesta etapa (dentre os vinculados ao lote)</legend>
+      <fieldset style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
+        <p style={{ fontWeight: 500, marginTop: "0.75rem", marginBottom: "0.25rem" }}>Insumos utilizados nesta etapa (dentre os vinculados ao lote)</p>
         {insumosVinculados.length === 0 && <p className="dica">Nenhum insumo vinculado ao lote ainda.</p>}
         {insumosVinculados.map((insumo) => {
           const idStr = insumo.id.toString();
@@ -910,8 +908,7 @@ function ConcluirProducao({
   }
 
   return (
-    <fieldset disabled={enviando}>
-      <legend>Concluir produção</legend>
+    <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
       <label>
         Envasador designado (endereço Ethereum)
         <input
