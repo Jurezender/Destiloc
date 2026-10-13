@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../contexto/AuthContexto";
+import { API_URL, fetchApi } from "../lib/api";
 import { ipfsParaUrl } from "../lib/ipfs";
 
 interface Props {
@@ -8,23 +10,22 @@ interface Props {
 type Estado = "carregando" | "ok" | "vazio" | "erro";
 
 export function DocumentosAnexados({ metadataUri }: Props) {
+  const { token } = useAuth();
   const [estado, setEstado] = useState<Estado>("carregando");
   const [documentos, setDocumentos] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!metadataUri.startsWith("ipfs://")) return;
+    if (!metadataUri.startsWith("ipfs://") || !token) return;
     setEstado("carregando");
     setDocumentos([]);
     let cancelado = false;
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
-
-    void fetch(ipfsParaUrl(metadataUri), { signal: controller.signal })
+    void fetchApi(`${API_URL}/ipfs/conteudo?uri=${encodeURIComponent(metadataUri)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((json: unknown) => {
         if (cancelado) return;
-        clearTimeout(timeout);
         const docs = json && typeof json === "object"
           ? (json as { documentos?: unknown }).documentos
           : undefined;
@@ -37,25 +38,16 @@ export function DocumentosAnexados({ metadataUri }: Props) {
       })
       .catch(() => {
         if (!cancelado) setEstado("erro");
-        clearTimeout(timeout);
       });
 
-    return () => {
-      cancelado = true;
-      clearTimeout(timeout);
-      controller.abort();
-    };
-  }, [metadataUri]);
+    return () => { cancelado = true; };
+  }, [metadataUri, token]);
 
   if (estado === "carregando") {
-    return <p className="dica" style={{ marginTop: "0.5rem" }}>Buscando documentos anexados…</p>;
+    return <p className="dica" style={{ marginTop: "0.5rem" }}>Buscando documentos…</p>;
   }
   if (estado === "erro") {
-    return (
-      <p className="dica" style={{ marginTop: "0.5rem" }}>
-        Não foi possível carregar os documentos (gateway IPFS indisponível).
-      </p>
-    );
+    return <p className="dica" style={{ marginTop: "0.5rem" }}>Não foi possível carregar os documentos.</p>;
   }
   if (estado === "vazio") return null;
 

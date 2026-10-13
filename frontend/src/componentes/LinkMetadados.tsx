@@ -3,9 +3,10 @@ import { DocumentosAnexados } from "./DocumentosAnexados";
 
 interface Props {
   uri: string;
+  exibirDocumentos?: boolean;
 }
 
-export function LinkMetadados({ uri }: Props) {
+export function LinkMetadados({ uri, exibirDocumentos = false }: Props) {
   if (!uri) return null;
   return (
     <>
@@ -21,7 +22,7 @@ export function LinkMetadados({ uri }: Props) {
           >
             Ver metadata
           </a>
-          <DocumentosAnexados metadataUri={uri} />
+          {exibirDocumentos && <DocumentosAnexados metadataUri={uri} />}
         </>
       )}
     </>

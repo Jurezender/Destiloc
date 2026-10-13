@@ -15,8 +15,6 @@ import {
 } from "../ipfs/metadados";
 import { AnexosIpfs } from "../componentes/AnexosIpfs";
 import { LinkMetadados } from "../componentes/LinkMetadados";
-import { DocumentosAnexados } from "../componentes/DocumentosAnexados";
-import { ipfsParaUrl } from "../lib/ipfs";
 
 type Signer = NonNullable<ReturnType<typeof useCarteira>["signer"]>;
 
@@ -187,21 +185,7 @@ export function InsumoDetalhe() {
       {erro && <p className="erro">{erro}</p>}
 
       <h2>Documentos</h2>
-      <p style={{ marginBottom: "0.5rem" }}>
-        <a
-          href={ipfsParaUrl(lote.metadataURI)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="botao--secundario"
-        >
-          Ver metadados JSON
-        </a>
-        {" "}
-        <span className="mono" style={{ fontSize: "0.75rem", color: "var(--cor-texto-secundario)" }}>
-          {lote.metadataURI}
-        </span>
-      </p>
-      <DocumentosAnexados metadataUri={lote.metadataURI} />
+      <LinkMetadados uri={lote.metadataURI} exibirDocumentos />
 
       <h2>Invalidação</h2>
       {invalidacao.invalidado ? (

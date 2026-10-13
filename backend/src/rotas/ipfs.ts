@@ -70,6 +70,41 @@ const ipfs: FastifyPluginAsync = async (app) => {
     },
   );
 
+  // Busca o conteúdo JSON de um CID via gateway Pinata autenticada (evita timeouts do browser).
+  app.get<{ Querystring: { uri: string } }>(
+    '/ipfs/conteudo',
+    {
+      preHandler: [exigirCarteiraAutorizada],
+      schema: {
+        querystring: {
+          type: 'object',
+          required: ['uri'],
+          properties: { uri: { type: 'string' } },
+        },
+      },
+    },
+    async (req, reply) => {
+      const { uri } = req.query;
+      if (!uri.startsWith('ipfs://')) {
+        return reply.status(400).send({ erro: 'URI inválida. Use o formato ipfs://...' });
+      }
+      const cid = uri.slice(7);
+      const jwt = process.env.PINATA_JWT ?? '';
+      try {
+        const headers: Record<string, string> = {};
+        if (jwt) headers['Authorization'] = `Bearer ${jwt}`;
+        const resposta = await fetch(`https://gateway.pinata.cloud/ipfs/${cid}`, { headers });
+        if (!resposta.ok) {
+          return reply.status(404).send({ erro: 'Conteúdo não encontrado no IPFS.' });
+        }
+        const json = await resposta.json();
+        return reply.send(json);
+      } catch {
+        return reply.status(502).send({ erro: 'Gateway IPFS indisponível.' });
+      }
+    },
+  );
+
   // Envia um arquivo binário (PDF, JPG, PNG) ao IPFS via Pinata.
   app.post(
     '/ipfs/upload-arquivo',
