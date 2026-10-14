@@ -18,7 +18,11 @@ import { InsumoLayout } from "./paginas/InsumoLayout";
 import { Insumos } from "./paginas/Insumos";
 import { EsqueciSenha } from "./paginas/EsqueciSenha";
 import { Login } from "./paginas/Login";
+import { LoteConclusao } from "./paginas/LoteConclusao";
 import { LoteDetalhe } from "./paginas/LoteDetalhe";
+import { LoteEtapas } from "./paginas/LoteEtapas";
+import { LoteInsumos } from "./paginas/LoteInsumos";
+import { LoteLayout } from "./paginas/LoteLayout";
 import { Lotes } from "./paginas/Lotes";
 import { PapeisParticipantes } from "./paginas/PapeisParticipantes";
 import { Participantes } from "./paginas/Participantes";
@@ -126,10 +130,15 @@ export function App() {
             path="lotes/:id"
             element={
               <RotaProtegida>
-                <LoteDetalhe />
+                <LoteLayout />
               </RotaProtegida>
             }
-          />
+          >
+            <Route index element={<LoteDetalhe />} />
+            <Route path="insumos" element={<LoteInsumos />} />
+            <Route path="etapas" element={<LoteEtapas />} />
+            <Route path="conclusao" element={<LoteConclusao />} />
+          </Route>
           <Route
             path="lotes/:id/emitir"
             element={
