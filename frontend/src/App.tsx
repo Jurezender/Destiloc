@@ -10,6 +10,8 @@ import { ConsultaPublica } from "./paginas/ConsultaPublica";
 import { Emitir } from "./paginas/Emitir";
 import { Garrafas } from "./paginas/Garrafas";
 import { GarrafaDetalhe } from "./paginas/GarrafaDetalhe";
+import { GarrafaLayout } from "./paginas/GarrafaLayout";
+import { GarrafaQrCode } from "./paginas/GarrafaQrCode";
 import { Inicio } from "./paginas/Inicio";
 import { InsumoAvaliacao } from "./paginas/InsumoAvaliacao";
 import { InsumoCorrecoes } from "./paginas/InsumoCorrecoes";
@@ -159,10 +161,13 @@ export function App() {
             path="garrafas/:tokenId"
             element={
               <RotaProtegida>
-                <GarrafaDetalhe />
+                <GarrafaLayout />
               </RotaProtegida>
             }
-          />
+          >
+            <Route index element={<GarrafaDetalhe />} />
+            <Route path="qrcode" element={<GarrafaQrCode />} />
+          </Route>
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
