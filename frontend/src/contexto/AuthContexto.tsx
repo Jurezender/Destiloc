@@ -38,6 +38,7 @@ const AuthContexto = createContext<EstadoAuth | null>(null);
 
 // Provedor global de autenticação: mantém o token JWT, dados do usuário e carteira vinculada.
 export function AuthProvedor({ children }: { children: ReactNode }) {
+  // Inicializa o token do localStorage para manter o login entre recarregamentos da página.
   const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [carteira, setCarteira] = useState<Carteira | null>(null);
@@ -51,6 +52,7 @@ export function AuthProvedor({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Evita atualizar o estado após o componente desmontar (ex: navegação rápida).
     let cancelado = false;
     setCarregando(true);
 

@@ -151,6 +151,7 @@ const auth: FastifyPluginAsync = async (app) => {
       const usuarioId = req.user.sub;
       const addressNorm = normalizarEndereco(address);
 
+      // Bloqueia antes de gerar o challenge: a carteira já está registrada em outra conta.
       const existente = await obterPool().query<{ usuario_id: number }>(
         `SELECT usuario_id FROM carteiras_vinculadas WHERE address = $1`,
         [addressNorm],
@@ -265,8 +266,7 @@ const auth: FastifyPluginAsync = async (app) => {
     },
   );
 
-  // Etapa 3: salva nova senha usando o token emitido na etapa 2
-  // Salva a nova senha usando o token de redefinição emitido na etapa anterior.
+  // Etapa 3: salva a nova senha usando o token emitido na etapa anterior.
   app.post<{ Body: { token: string; novaSenha: string } }>(
     '/auth/redefinir-senha',
     {

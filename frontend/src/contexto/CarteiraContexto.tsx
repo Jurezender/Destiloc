@@ -126,6 +126,7 @@ export function CarteiraProvedor({ children }: { children: ReactNode }) {
       void atualizarSigner(conta);
     };
 
+    // Reage em tempo real quando o usuário troca de conta ou de rede dentro da MetaMask.
     eth.on("accountsChanged", aoTrocarContas);
     eth.on("chainChanged", aoTrocarRede);
     return () => {

@@ -39,16 +39,13 @@ contract ContratoAcesso is AccessControlEnumerable {
         return getRoleMemberCount(DEFAULT_ADMIN_ROLE);
     }
 
-    /** @dev Impede que membros inoperáveis alterem contagens e invariantes do RBAC. */
+    // Impede dar papel ao endereço nulo (address(0) não pertence a ninguém).
     function _grantRole(bytes32 papel, address conta) internal virtual override returns (bool) {
         if (conta == address(0)) revert ContaInvalida();
         return super._grantRole(papel, conta);
     }
 
-    /**
-     * @dev Preserva ao menos um administrador em todos os caminhos de remoção,
-     *      incluindo revokeRole e renounceRole.
-     */
+    // Impede remover o último admin — sem admin, ninguém consegue gerenciar papéis nunca mais.
     function _revokeRole(bytes32 papel, address conta) internal virtual override returns (bool) {
         if (
             papel == DEFAULT_ADMIN_ROLE &&

@@ -54,6 +54,7 @@ export async function exigirCarteiraAutorizada(
     return;
   }
 
+  // Disponibiliza o endereço para as rotas sem nova consulta ao banco.
   req.carteiraAddress = address;
 }
 
@@ -74,6 +75,7 @@ export async function exigirAdmin(
 }
 
 // Retorna true se o endereço constar na variável ADMIN_WALLET ou na tabela carteiras_conhecidas como admin.
+// ADMIN_WALLET no .env é o bootstrap — permite o primeiro admin antes de existir qualquer admin no banco.
 async function verificarAdmin(address: string): Promise<boolean> {
   const adminWallets = (process.env.ADMIN_WALLET ?? '')
     .split(',')

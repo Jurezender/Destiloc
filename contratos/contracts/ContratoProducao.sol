@@ -163,6 +163,7 @@ contract ContratoProducao {
         emit LoteProducaoCriado(loteId, msg.sender, tipoBebida, metadataURI, agora);
     }
 
+    // Configuração congela ao registrar a primeira etapa (estado passa de Criado para EmProducao).
     function atualizarConfiguracao(uint256 loteId, ConfiguracaoProducao calldata configuracao) external {
         LoteProducao storage lote = _exigirLote(loteId);
         _exigirProdutorResponsavel(lote);
@@ -213,6 +214,7 @@ contract ContratoProducao {
             uint256 insumoId = insumosUtilizados[i];
             _insumosPorIndiceEtapa[loteId][indiceEtapa].push(insumoId);
             _quantidadeConsumida[insumoId] += quantidadesConsumidas[i];
+            // Deduplicação: mesmo insumo em várias etapas aparece uma única vez na rastreabilidade reversa.
             if (!_insumoUtilizado[loteId][insumoId]) {
                 _insumoUtilizado[loteId][insumoId] = true;
                 _insumosUtilizados[loteId].push(insumoId);
@@ -220,6 +222,7 @@ contract ContratoProducao {
             }
         }
 
+        // Primeira etapa registrada avança o estado automaticamente e congela a configuração.
         if (lote.estado == EstadoProducao.Criado) lote.estado = EstadoProducao.EmProducao;
         emit EtapaProducaoRegistrada(loteId, etapa, msg.sender, indiceEtapa, agora);
     }
@@ -468,6 +471,7 @@ contract ContratoProducao {
     function _tem(uint256 loteId, EtapaProducao etapa) private view returns (bool) {
         return _etapaRegistrada[loteId][etapa];
     }
+    // Revalida insumos no momento da conclusão — um insumo pode ter sido invalidado após o uso na etapa.
     function _validarInsumosParaConclusao(uint256 loteId, address produtor, TipoBebida tipo) private view {
         bool temAgricola;
         bool temBase;

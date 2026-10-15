@@ -61,6 +61,7 @@ export function RotaProtegida({ children, exigirPapel, mensagemPapel }: Props) {
     );
   }
 
+  // A conta ativa na MetaMask pode ser diferente da carteira autorizada no banco.
   if (conta.toLowerCase() !== carteira.address.toLowerCase()) {
     return (
       <div className="aviso-acesso">

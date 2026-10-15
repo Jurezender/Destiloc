@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { randomBytes, createHash } from 'node:crypto';
 import { obterPool } from '../db/cliente.js';
 
+// 12 rounds é o custo mínimo recomendado — quanto maior, mais lento para ataques de força bruta.
 const BCRYPT_ROUNDS = 12;
 
 export class EmailJaCadastradoError extends Error {
@@ -94,6 +95,7 @@ export async function buscarCarteiraPorEmail(
 
 // Gera um token de redefinição de senha com validade de 30 minutos.
 export async function gerarTokenRedefinicao(usuarioId: number): Promise<string> {
+    // O token enviado ao usuário e o hash salvo no banco são diferentes — se o banco vazar, o token não está lá.
   const token = randomBytes(32).toString('hex');
   const tokenHash = createHash('sha256').update(token).digest('hex');
   const expira = new Date(Date.now() + 30 * 60 * 1000); // 30 min

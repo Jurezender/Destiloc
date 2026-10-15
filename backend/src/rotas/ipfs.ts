@@ -41,6 +41,7 @@ const ipfs: FastifyPluginAsync = async (app) => {
       const hash = calcularHashConteudo(conteudo);
       const pool = obterPool();
 
+      // Evita upload duplicado ao Pinata: mesmo conteúdo sempre gera o mesmo CID.
       const cache = await pool.query<{ cid: string }>(
         'SELECT cid FROM ipfs_cache WHERE hash_conteudo = $1',
         [hash],

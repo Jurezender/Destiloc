@@ -140,6 +140,7 @@ contract ContratoEnvasamento is ERC721 {
             emit GarrafaEmitida(tokenId, envasamentoId, envasamento.envasador, agora);
         }
 
+        // Envasamento se conclui automaticamente quando todas as garrafas declaradas são emitidas.
         if (envasamento.quantidadeEmitida == envasamento.quantidadeDeclarada) {
             envasamento.concluidoEm = agora;
             emit EnvasamentoConcluido(
@@ -167,7 +168,8 @@ contract ContratoEnvasamento is ERC721 {
         revert TokenNaoTransferivel();
     }
 
-    /** @dev Permite somente mint. Transferência e destruição de token existente revertem. */
+    // Único ponto de controle do ERC-721: bloqueia transfer e burn, permite apenas mint.
+    // _ownerOf != 0 → token já existe (transfer). to == 0 → destino nulo (burn).
     function _update(address to, uint256 tokenId, address auth) internal override returns (address) {
         if (_ownerOf(tokenId) != address(0) || to == address(0)) revert TokenNaoTransferivel();
         return super._update(to, tokenId, auth);

@@ -46,6 +46,7 @@ export async function gerarChallenge(
   const expiraEm = new Date(Date.now() + DURACAO_MS);
   const mensagem = construirMensagem(nonce, expiraEm);
 
+  // Invalida challenges anteriores pendentes antes de criar um novo.
   await pool.query(
     `UPDATE auth_challenges SET usado_em = now()
      WHERE usuario_id = $1 AND address = $2 AND usado_em IS NULL`,
@@ -96,6 +97,7 @@ export async function verificarChallenge(
     throw new ChallengeInvalidoError('Challenge expirado.');
   }
 
+  // verifyMessage recupera matematicamente o endereço que gerou a assinatura (ECDSA).
   let enderecoRecuperado: string;
   try {
     enderecoRecuperado = verifyMessage(challenge.mensagem, assinatura);
@@ -107,6 +109,7 @@ export async function verificarChallenge(
     throw new AssinaturaInvalidaError('Assinatura não corresponde ao endereço informado.');
   }
 
+  // AND usado_em IS NULL evita race condition se duas requisições chegarem ao mesmo tempo.
   await pool.query(
     `UPDATE auth_challenges SET usado_em = now() WHERE id = $1 AND usado_em IS NULL`,
     [challenge.id],

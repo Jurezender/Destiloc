@@ -104,6 +104,7 @@ contract ContratoInsumos {
         uint64 registradoEm
     );
 
+    // Rejeita endereço nulo e endereço sem contrato publicado (ex: carteira comum).
     constructor(address enderecoContratoAcesso) {
         if (enderecoContratoAcesso == address(0) || enderecoContratoAcesso.code.length == 0) {
             revert ContratoAcessoInvalido();
@@ -111,6 +112,7 @@ contract ContratoInsumos {
         contratoAcesso = IContratoAcesso(enderecoContratoAcesso);
     }
 
+    // IDs começam em 1 — o 0 é usado como sentinela para detectar registros inexistentes.
     function registrarLoteInsumo(
         TipoInsumo tipo,
         uint256 quantidade,
@@ -246,6 +248,7 @@ contract ContratoInsumos {
         return historico[historico.length - 1].resultado;
     }
 
+    // Lote invalidado nunca é aprovado, mesmo que a avaliação mais recente diga Aprovado.
     function aprovadoPor(uint256 insumoId, address produtor) external view returns (bool) {
         _exigirLote(insumoId);
         if (_invalidacoes[insumoId].invalidado) return false;
@@ -272,6 +275,7 @@ contract ContratoInsumos {
         return _invalidacoes[insumoId];
     }
 
+    // fornecedor == address(0) significa que o lote nunca foi registrado (valor padrão do mapping).
     function _exigirLote(uint256 insumoId) private view returns (LoteInsumo storage lote) {
         lote = _lotes[insumoId];
         if (lote.fornecedor == address(0)) revert LoteInsumoInexistente();
