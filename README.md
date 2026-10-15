@@ -91,22 +91,26 @@ O JWT do Pinata fica exclusivamente no `backend/.env` e nunca é exposto no bund
 ```
 destiloc/
 ├── contratos/          # Contratos Solidity, testes e scripts de implantação
-│   ├── contracts/      # Código-fonte dos contratos (.sol)
+│   ├── contracts/      # Código-fonte dos contratos (.sol) e interfaces
 │   ├── test/           # Suíte de testes com Hardhat
 │   └── scripts/        # Deploy e exportação de ABI para o frontend
 │
 ├── backend/            # API Fastify (Node.js + TypeScript)
 │   ├── src/
-│   │   ├── rotas/      # Endpoints HTTP
-│   │   ├── servicos/   # Integração com Pinata, lógica de negócio
-│   │   └── db/         # Schema SQL e acesso ao PostgreSQL
-│   └── test/           # Testes do backend com Vitest
+│   │   ├── rotas/      # Endpoints HTTP (auth, insumos, lotes, garrafas, scans, denúncias)
+│   │   ├── servicos/   # Integração com Pinata, autenticação, lógica de negócio
+│   │   ├── blockchain/ # ABIs, endereços e cliente ethers para leitura on-chain
+│   │   ├── middlewares/# Verificação de JWT e papel
+│   │   └── db/         # Schema SQL, migrations e acesso ao PostgreSQL
+│   └── test/           # Testes de integração com Vitest
 │
 └── frontend/           # Interface web (React + TypeScript)
     └── src/
         ├── paginas/    # Telas da aplicação
         ├── componentes/# Componentes reutilizáveis
         ├── contexto/   # Contextos React (carteira, papéis, auth)
+        ├── lib/        # Utilitários, formatadores, tipos e validações
+        ├── contracts/  # ABIs e endereços dos contratos por rede
         └── ipfs/       # Upload de arquivos e JSON ao IPFS via backend
 ```
 
@@ -213,7 +217,7 @@ cd contratos
 npm test
 ```
 
-134 testes cobrindo todos os contratos, incluindo o fluxo completo de ponta a ponta (insumo → produção → envasamento → consulta pública de garrafa).
+136 testes cobrindo todos os contratos, incluindo o fluxo completo de ponta a ponta (insumo → produção → envasamento → consulta pública de garrafa).
 
 ### Backend
 
