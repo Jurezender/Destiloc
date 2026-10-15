@@ -105,6 +105,8 @@ O sistema controla permissões, não empresas.
 
 # 4. Contratos principais
 
+Neste sistema, um contrato é um programa publicado na blockchain que executa regras automaticamente, sem intermediários e sem possibilidade de alteração após o deploy. Cada contrato tem um endereço único e permanente na rede.
+
 ## ContratoAcesso
 
 Responsável por:
@@ -126,8 +128,7 @@ Responsável por:
 - correções documentais;
 - invalidação de lotes de insumo.
 
-O contrato mantém uma referência `immutable` ao `ContratoAcesso`. Seu
-construtor deve rejeitar `address(0)` e endereço sem código.
+O contrato guarda uma referência permanente ao `ContratoAcesso` para verificar permissões a cada operação. Esse endereço é definido no momento do deploy e não pode ser alterado depois. Para evitar configurações inválidas, o contrato recusa dois casos durante a inicialização: o endereço nulo (equivalente a um valor `null` — um endereço que não representa ninguém) e qualquer endereço que não tenha um contrato publicado nele (ou seja, uma carteira comum, não um contrato).
 
 Fluxo:
 
@@ -153,7 +154,7 @@ Responsável por:
 
 - criação dos lotes;
 - registro das etapas;
-- regras de precedência;
+- regras de precedência (ordem obrigatória em que as etapas devem ser registradas para cada bebida);
 - conclusão da produção.
 
 ---
@@ -174,11 +175,11 @@ Responsável por:
 
 Armazena:
 
-- identificadores;
-- responsáveis;
+- identificadores numéricos de cada insumo, lote de produção, envasamento e garrafa;
+- endereços das contas responsáveis por cada registro (o fornecedor que cadastrou o insumo, o produtor que registrou a etapa, o envasador que emitiu a garrafa);
 - etapas realizadas;
 - datas;
-- relacionamentos;
+- vínculos entre entidades: quais insumos pertencem a qual lote de produção, qual lote originou qual envasamento, qual envasamento gerou qual garrafa;
 - hashes/CIDs.
 
 ---
@@ -200,7 +201,7 @@ As referências IPFS armazenadas on-chain usam URI completa no formato
 
 Nesta versão, a validação é apenas sintática: verifica o prefixo `ipfs://` e
 limites de comprimento. O contrato não valida existência, disponibilidade,
-autenticidade nem conteúdo do CID.
+autenticidade nem conteúdo do CID. Essa é uma escolha de escopo do protótipo — o contrato não faz chamadas externas para verificar se o arquivo realmente existe no IPFS. A responsabilidade de publicar o conteúdo corretamente é do fornecedor ou produtor que realiza o registro.
 
 ---
 
@@ -213,7 +214,7 @@ registrar lotes de insumo.
 
 Cada lote de insumo possui:
 
-- identificador único on-chain do tipo `uint256`;
+- identificador único on-chain do tipo `uint256` (inteiro sem sinal de 256 bits, padrão na blockchain Ethereum — suporta valores de 0 até aproximadamente 1,15 × 10⁷⁷, o que na prática é ilimitado para IDs sequenciais);
 - fornecedor responsável;
 - tipo do insumo;
 - quantidade declarada pelo fornecedor (`uint256`, maior que zero);
@@ -221,13 +222,12 @@ Cada lote de insumo possui:
 - `metadataURI` obrigatório;
 - timestamp do registro.
 
-Formatos visuais como `INS-001` pertencem ao frontend e não são armazenados
-como identificador on-chain.
+O identificador armazenado on-chain é apenas o número (1, 2, 3...). Formatos visuais como `INS-001` são gerados pelo frontend para facilitar a leitura humana, mas não existem na blockchain. Ao referenciar um insumo em qualquer operação, o valor utilizado é sempre o número.
 
 `TipoInsumo` possui os valores:
 
 - `NaoDefinido`;
-- `MateriaPrimaAgricola`;
+- `MateriaPrimaAgricola` (exemplos: cana-de-açúcar para cachaça, cevada maltada para whisky, milho, batata ou beterraba para vodca, centeio);
 - `BaseAlcoolica`;
 - `Agua`;
 - `Levedura`;
@@ -264,8 +264,7 @@ a avaliação mais recente daquele produtor para aquele insumo é a vigente.
 Avaliações já registradas continuam no histórico mesmo se o
 `PRODUTOR_ROLE` da conta for revogado posteriormente.
 
-Nesta versão, não é mantido um índice global de todos os produtores que
-avaliaram um insumo.
+Nesta versão, para consultar as avaliações de um insumo é necessário saber de antemão qual produtor avaliou. O contrato mantém o histórico por produtor, mas não guarda uma lista de todos os produtores que já avaliaram determinado insumo — para isso seria necessário varrer externamente os eventos emitidos.
 
 ## 6.3 Correção documental
 
@@ -352,8 +351,7 @@ AjusteFinal referencia INS-001
 
 ## 6.6 Consultas
 
-Consultas de coleções devem preferir funções de total e acesso por índice,
-evitando retornar arrays completos sem limite.
+Na blockchain, retornar uma coleção inteira em uma única chamada pode ser inviável ou muito caro em gas se a coleção crescer. Por isso, o padrão adotado é expor duas funções por coleção: uma que retorna o total de elementos e outra que retorna o elemento por índice. O frontend então consulta quantos existem e itera pelos índices conforme necessário, sem impor um limite arbitrário na consulta on-chain.
 
 ---
 
@@ -391,7 +389,7 @@ Somente contas com `PRODUTOR_ROLE` podem cadastrar lotes de produção.
 Cada lote é cadastrado com:
 
 - identificador on-chain `uint256`, sequencial e iniciado em 1;
-- produtor responsável igual a `msg.sender`;
+- produtor responsável igual a `msg.sender` — variável nativa do Solidity que contém automaticamente o endereço da conta que está chamando a função naquele momento. A identidade não é declarada pelo chamador, ela é provada pela assinatura criptográfica da transação. Quem controla a chave privada daquela carteira é, por definição, `msg.sender`;
 - `TipoBebida` diferente de `NaoDefinido`;
 - `metadataURI` obrigatória;
 - `criadoEm` igual a `block.timestamp`;
@@ -410,7 +408,7 @@ Para vincular um insumo:
 - o insumo deve existir;
 - o insumo deve estar válido;
 - o insumo deve estar aprovado por aquele produtor no `ContratoInsumos`;
-- não pode existir vínculo duplicado.
+- não pode existir vínculo duplicado: o mesmo insumo não pode ser vinculado mais de uma vez ao mesmo lote — se o insumo 5 já está vinculado ao lote 3, uma segunda tentativa de vinculá-lo ao lote 3 é rejeitada.
 
 Os vínculos são append-only. Não existe desvinculação nesta versão.
 
@@ -447,7 +445,7 @@ O registro de uma etapa contém conceitualmente:
 - `fimInformado`;
 - `registradoEm`;
 - `metadataURI`;
-- relação com os insumos utilizados.
+- relação com os insumos utilizados e as quantidades consumidas de cada um.
 
 Para registrar uma etapa:
 
@@ -464,18 +462,25 @@ Para registrar uma etapa:
 `inicioInformado` e `fimInformado` são declarados pelo produtor.
 `registradoEm` representa quando a informação entrou na blockchain.
 
-Ao registrar uma etapa, o produtor pode informar zero ou vários insumos
-utilizados. Cada insumo utilizado:
+Ao registrar uma etapa, o produtor pode informar zero ou vários insumos utilizados. Isso é necessário porque nem toda etapa introduz novos materiais: a `Destilacao`, por exemplo, transforma o que foi fermentado sem adicionar um novo insumo. A obrigatoriedade de tipos específicos de insumo (como `Zimbro` para gin ou `MateriaPrimaAgricola` para cachaça) é verificada no momento da conclusão, não por etapa. Ao tentar concluir a produção, o sistema verifica se ao menos um insumo do tipo exigido foi efetivamente utilizado em alguma etapa — se não foi, a conclusão é rejeitada.
+
+Cada insumo utilizado:
 
 - deve estar previamente vinculado ao lote;
 - deve continuar válido;
 - deve continuar aprovado pelo produtor responsável;
 - não pode aparecer mais de uma vez dentro da mesma etapa.
 
+Para cada insumo utilizado, o produtor declara a quantidade consumida naquela etapa. A quantidade consumida declarada deve ser maior que zero, e o total acumulado de consumo daquele insumo em todas as etapas não pode ultrapassar a quantidade declarada pelo fornecedor no cadastro do lote de insumo.
+
 A relação entre etapa e insumos utilizados fica registrada on-chain e deve ser
 consultável por total e índice. Uma etapa pode validamente não introduzir
 nenhum novo insumo. O mesmo insumo pode ser utilizado em etapas diferentes do
 mesmo lote.
+
+## 7.7 Marcação de adulteração
+
+O `ADMIN` pode marcar um lote de produção como adulterado, registrando o motivo on-chain. A marcação é informacional — não altera o estado do lote nem bloqueia consultas, mas fica permanentemente registrada e consultável.
 
 ---
 
@@ -493,13 +498,13 @@ Sem ela o lote não pode ser concluído.
 
 Opcional.
 
-Pode existir ou não.
+Pode existir ou não. Não requer configuração prévia.
 
 ## COND
 
 Condicional.
 
-Passa a ser obrigatória quando o produtor a declara aplicável ao lote.
+Passa a ser obrigatória quando o produtor a declara aplicável ao lote. Se não declarada aplicável, não pode ser registrada.
 
 ## N/A
 
@@ -555,23 +560,23 @@ seu registro deve ser rejeitado.
 
 Fluxo principal:
 
-PreparacaoBase
+PreparacaoBase (OBR)
 
 ↓
 
-Fermentacao
+Fermentacao (OBR)
 
 ↓
 
-Destilacao
+Destilacao (OBR)
 
 ↓
 
-Maturacao (quando aplicável)
+Maturacao (COND — somente quando declarada aplicável na configuração do lote)
 
 ↓
 
-AjusteFinal (quando aplicável)
+AjusteFinal (COND — somente quando declarada aplicável na configuração do lote)
 
 Para atender ao requisito mínimo de insumos, pelo menos um insumo do tipo
 `MateriaPrimaAgricola` deve ter sido efetivamente utilizado em alguma etapa.
@@ -582,27 +587,27 @@ Para atender ao requisito mínimo de insumos, pelo menos um insumo do tipo
 
 Fluxo principal:
 
-PreparacaoBase
+PreparacaoBase (OBR)
 
 ↓
 
-Fermentacao
+Fermentacao (OBR)
 
 ↓
 
-Destilacao
+Destilacao (OBR)
 
 ↓
 
-Maturacao obrigatória
+Maturacao (OBR)
 
 ↓
 
-Blendagem (quando aplicável)
+Blendagem (COND — somente quando declarada aplicável na configuração do lote)
 
 ↓
 
-AjusteFinal (quando aplicável)
+AjusteFinal (COND — somente quando declarada aplicável na configuração do lote)
 
 Para atender ao requisito mínimo de insumos, pelo menos um insumo do tipo
 `MateriaPrimaAgricola` deve ter sido efetivamente utilizado em alguma etapa.
@@ -628,7 +633,7 @@ deve ter sido efetivamente utilizada em alguma etapa.
 
 Observação:
 
-A base alcoólica pode ser fornecida por outro participante.
+A base alcoólica pode ser fornecida por outro participante (um fornecedor cadastrado no sistema com `FORNECEDOR_ROLE`).
 
 ---
 
@@ -644,11 +649,11 @@ Zimbro/extrato de zimbro aprovado
 
 ↓
 
-Aromatizacao
+Aromatizacao (OBR)
 
 ↓
 
-AjusteFinal
+AjusteFinal (COND — somente quando declarada aplicável na configuração do lote)
 
 Para atender ao requisito mínimo de insumos, pelo menos uma `BaseAlcoolica` e
 um `Zimbro` devem ter sido efetivamente utilizados em alguma etapa.
@@ -667,10 +672,9 @@ obrigatórios para a conclusão.
 
 A conclusão usa uma operação explícita equivalente a:
 
-`concluirProducao(loteId, metadataURI)`
+`concluirProducao(loteId, envasadorDesignado, metadataURI)`
 
-Somente o produtor responsável pode concluir a produção e ele deve possuir
-`PRODUTOR_ROLE` no momento da operação. O lote deve estar em `EmProducao`.
+O parâmetro `envasadorDesignado` é o endereço da conta com `ENVASADOR_ROLE` que ficará autorizada a registrar envasamentos para este lote. Somente o produtor responsável pode concluir a produção e ele deve possuir `PRODUTOR_ROLE` no momento da operação. O lote deve estar em `EmProducao`.
 
 Para concluir:
 
@@ -687,7 +691,8 @@ Ao concluir:
 
 - o estado passa a `Concluido`;
 - `concluidoEm` recebe `block.timestamp`;
-- a `metadataURI` da conclusão é registrada.
+- a `metadataURI` da conclusão é registrada;
+- o `envasadorDesignado` fica registrado on-chain.
 
 Depois de `Concluido`, o lote:
 
@@ -715,6 +720,8 @@ quais lotes de produção efetivamente utilizaram determinado insumo. Se o mesmo
 insumo for utilizado em várias etapas do mesmo lote, esse lote deve aparecer
 apenas uma vez na relação reversa daquele insumo.
 
+Toda essa rastreabilidade reversa está implementada no `ContratoProducao` via `totalLotesQueUtilizaramInsumo` e `loteQueUtilizouInsumoPorIndice`. A deduplicação (mesmo insumo em múltiplas etapas aparecendo uma única vez na relação reversa) é garantida por um índice interno que registra cada par lote-insumo apenas na primeira vez.
+
 ---
 
 # 12. Regras de envasamento
@@ -723,9 +730,7 @@ apenas uma vez na relação reversa daquele insumo.
 
 O `ContratoEnvasamento` depende do `ContratoAcesso` e do `ContratoProducao`.
 
-Somente contas com `ENVASADOR_ROLE` vigente podem registrar envasamentos e
-emitir novas garrafas. Uma mesma conta pode possuir `PRODUTOR_ROLE` e
-`ENVASADOR_ROLE`.
+Para registrar envasamentos e emitir garrafas, a conta deve possuir `ENVASADOR_ROLE` vigente e ser o envasador designado pelo produtor no momento da conclusão daquele lote. Uma mesma conta pode possuir `PRODUTOR_ROLE` e `ENVASADOR_ROLE`.
 
 O contrato registra declarações do envasador autorizado e preserva autoria,
 timestamp e relacionamentos. Ele não comprova a verdade física da declaração.
@@ -765,6 +770,7 @@ registrarEnvasamento(
 Para registrar:
 
 - a conta deve possuir `ENVASADOR_ROLE` vigente;
+- a conta deve ser o envasador designado para aquele lote de produção;
 - a produção deve existir e estar concluída;
 - `quantidadeDeclarada` deve ser maior que zero;
 - `metadataURI` deve ser obrigatória e válida;
@@ -832,15 +838,17 @@ O ERC-721 possui:
 - nome `Destiloc Garrafa`;
 - símbolo `DSG`.
 
+Esses valores ficam registrados diretamente no contrato publicado na blockchain e são visíveis em exploradores de bloco após o deploy. No ambiente de desenvolvimento local, podem ser consultados diretamente no contrato implantado.
+
 Devem ser bloqueados:
 
 - `transferFrom`;
 - `safeTransferFrom`;
-- `approve`;
+- `approve` (função padrão do ERC-721 que permite ao dono de um token autorizar outra conta a transferi-lo — mecanismo usado por marketplaces de NFT, que não faz sentido para garrafas);
 - `setApprovalForAll`;
 - `burn`.
 
-Não deve existir função pública de `burn`. A implementação também deve impedir
+Não deve existir função pública de `burn`. A proibição é intencional: uma garrafa registrada é uma evidência permanente de que aquela unidade foi produzida. Destruir esse registro violaria o princípio de imutabilidade do histórico. Mesmo que a garrafa física seja perdida ou destruída, o registro de sua produção permanece. A implementação também deve impedir
 que tokens já emitidos sejam destruídos por qualquer mecanismo de
 transferência ou atualização do ERC-721. Uma garrafa emitida permanece
 registrada permanentemente.
@@ -880,6 +888,8 @@ O contrato deve oferecer consultas equivalentes a:
 - `envasamentoDaGarrafa`;
 - `totalGarrafasDoEnvasamento`;
 - `garrafaDoEnvasamentoPorIndice`.
+
+Essas funções seguem o mesmo padrão descrito na seção 6.6: em vez de retornar listas completas, expõem o total e permitem acesso por índice, deixando a iteração para o frontend.
 
 O QR Code não é armazenado on-chain. Ele é gerado no frontend e referencia o
 `tokenId`.
