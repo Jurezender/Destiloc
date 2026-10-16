@@ -124,6 +124,13 @@ describe("M. ContratoEnvasamento", function () {
       await ctx.producao.connect(ctx.produtor).criarLoteProducao(Bebida.Vodca, configVazia, URI.a);
       await expect(registrar(ctx, 1)).to.be.revertedWithCustomError(ctx.envasamento, "ProducaoNaoConcluida");
     });
+    it("rejeita producao cancelada com ProducaoNaoConcluida", async function () {
+      const ctx = await loadFixture(implantar);
+      await ctx.producao.connect(ctx.produtor).criarLoteProducao(Bebida.Vodca, configVazia, URI.a);
+      const loteId = await ctx.producao.totalLotesProducao();
+      await ctx.producao.connect(ctx.produtor).cancelarLote(loteId, URI.b);
+      await expect(registrar(ctx, loteId)).to.be.revertedWithCustomError(ctx.envasamento, "ProducaoNaoConcluida");
+    });
     it("rejeita quantidade zero e metadataURI invalida", async function () {
       const ctx = await loadFixture(implantar); const loteId = await criarProducaoConcluida(ctx);
       await expect(registrar(ctx, loteId, 0)).to.be.revertedWithCustomError(ctx.envasamento, "QuantidadeInvalida");

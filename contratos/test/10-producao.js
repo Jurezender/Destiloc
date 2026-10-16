@@ -4,7 +4,7 @@ const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 
 const Bebida = { NaoDefinido: 0, Cachaca: 1, Whisky: 2, Vodca: 3, Gin: 4 };
-const Estado = { Criado: 0, EmProducao: 1, Concluido: 2 };
+const Estado = { Criado: 0, EmProducao: 1, Concluido: 2, Cancelado: 3 };
 const Etapa = {
   PreparacaoBase: 0, Fermentacao: 1, Destilacao: 2, Retificacao: 3, Maturacao: 4,
   Filtragem: 5, Blendagem: 6, Aromatizacao: 7, AjusteFinal: 8,
@@ -407,6 +407,73 @@ describe("L. ContratoProducao", function () {
       expect(await ctx.producao.loteProducaoConcluido(loteId)).to.equal(true);
       await expect(ctx.producao.connect(ctx.produtor).concluirProducao(loteId, ctx.envasador.address, URI.d)).to.be.revertedWithCustomError(ctx.producao, "EstadoProducaoInvalido");
       await expect(etapa(ctx, loteId, Etapa.Maturacao)).to.be.revertedWithCustomError(ctx.producao, "EstadoProducaoInvalido");
+    });
+  });
+
+  describe("cancelamento de lote", function () {
+    it("cancela lote em Criado: estado, canceladoEm, metadataURICancelamento, evento e loteProducaoCancelado", async function () {
+      const ctx = await loadFixture(implantar);
+      const loteId = await criarLote(ctx);
+      const tx = await ctx.producao.connect(ctx.produtor).cancelarLote(loteId, URI.b);
+      await expect(tx).to.emit(ctx.producao, "LoteProducaoCancelado")
+        .withArgs(loteId, ctx.produtor.address, URI.b, anyValue);
+      const recibo = await tx.wait();
+      const bloco = await ethers.provider.getBlock(recibo.blockNumber);
+      const lote = await ctx.producao.obterLoteProducao(loteId);
+      expect(lote.estado).to.equal(Estado.Cancelado);
+      expect(lote.canceladoEm).to.equal(BigInt(bloco.timestamp));
+      expect(lote.metadataURICancelamento).to.equal(URI.b);
+      expect(await ctx.producao.loteProducaoCancelado(loteId)).to.equal(true);
+    });
+    it("cancela lote em EmProducao", async function () {
+      const ctx = await loadFixture(implantar);
+      const loteId = await criarLote(ctx);
+      await etapa(ctx, loteId, Etapa.PreparacaoBase);
+      expect((await ctx.producao.obterLoteProducao(loteId)).estado).to.equal(Estado.EmProducao);
+      await ctx.producao.connect(ctx.produtor).cancelarLote(loteId, URI.b);
+      expect((await ctx.producao.obterLoteProducao(loteId)).estado).to.equal(Estado.Cancelado);
+    });
+    it("vincularInsumoAoLote e registrarEtapa revertem com LoteJaCancelado apos cancelamento", async function () {
+      const ctx = await loadFixture(implantar);
+      const loteId = await criarLote(ctx);
+      await ctx.producao.connect(ctx.produtor).cancelarLote(loteId, URI.b);
+      const insumo = await criarInsumo(ctx, TipoInsumo.MateriaPrimaAgricola);
+      await expect(ctx.producao.connect(ctx.produtor).vincularInsumoAoLote(loteId, insumo))
+        .to.be.revertedWithCustomError(ctx.producao, "LoteJaCancelado");
+      await expect(etapa(ctx, loteId, Etapa.PreparacaoBase))
+        .to.be.revertedWithCustomError(ctx.producao, "LoteJaCancelado");
+    });
+    it("produtor diferente reverte com NaoEhProdutorResponsavel; sem papel reverte com SemPermissao", async function () {
+      const ctx = await loadFixture(implantar);
+      const loteId = await criarLote(ctx);
+      await expect(ctx.producao.connect(ctx.produtor2).cancelarLote(loteId, URI.b))
+        .to.be.revertedWithCustomError(ctx.producao, "NaoEhProdutorResponsavel");
+      await expect(ctx.producao.connect(ctx.semPapel).cancelarLote(loteId, URI.b))
+        .to.be.revertedWithCustomError(ctx.producao, "SemPermissao");
+    });
+    it("cancelar lote Concluido reverte com EstadoProducaoInvalido", async function () {
+      const ctx = await loadFixture(implantar);
+      const { loteId } = await prepararCachaca(ctx, config(), true);
+      await expect(ctx.producao.connect(ctx.produtor).cancelarLote(loteId, URI.b))
+        .to.be.revertedWithCustomError(ctx.producao, "EstadoProducaoInvalido");
+    });
+    it("cancelamento duplo reverte com LoteJaCancelado", async function () {
+      const ctx = await loadFixture(implantar);
+      const loteId = await criarLote(ctx);
+      await ctx.producao.connect(ctx.produtor).cancelarLote(loteId, URI.b);
+      await expect(ctx.producao.connect(ctx.produtor).cancelarLote(loteId, URI.c))
+        .to.be.revertedWithCustomError(ctx.producao, "LoteJaCancelado");
+    });
+    it("metadataURI invalida reverte com ReferenciaIPFSInvalida", async function () {
+      const ctx = await loadFixture(implantar);
+      const loteId = await criarLote(ctx);
+      await expect(ctx.producao.connect(ctx.produtor).cancelarLote(loteId, ""))
+        .to.be.revertedWithCustomError(ctx.producao, "ReferenciaIPFSInvalida");
+    });
+    it("lote inexistente reverte com LoteProducaoInexistente", async function () {
+      const ctx = await loadFixture(implantar);
+      await expect(ctx.producao.connect(ctx.produtor).cancelarLote(99, URI.b))
+        .to.be.revertedWithCustomError(ctx.producao, "LoteProducaoInexistente");
     });
   });
 

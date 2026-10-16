@@ -149,6 +149,7 @@ function CancelarLote({
       <div style={{ marginTop: "2rem", borderTop: "1px solid var(--cor-borda)", paddingTop: "1.5rem" }}>
         <h2>Cancelar lote</h2>
         <p className="dica">O cancelamento é permanente e irreversível. O lote ficará registrado como cancelado na blockchain.</p>
+        <p className="dica">Não inclua dados pessoais na justificativa nem nos documentos: o conteúdo enviado ao IPFS é público e permanente.</p>
         <button type="button" onClick={() => setConfirmando(true)}>
           Cancelar este lote
         </button>

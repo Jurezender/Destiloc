@@ -310,9 +310,15 @@ export function ConsultaPublica() {
               registra uma localização aproximada de onde ela está sendo verificada.
             </p>
             <p className="cp-consentimento__texto">
-              Sua privacidade é protegida por{" "}
-              <strong>minimização de dados</strong>: apenas a cidade e o estado são
-              armazenados, nunca o endereço exato.
+              Sua privacidade é protegida pela{" "}
+              <strong>minimização de dados</strong>: as coordenadas são truncadas
+              a cerca de 1 km de precisão; cidade, estado e país são obtidos a
+              partir delas por um serviço externo de geocodificação
+              (Nominatim/OpenStreetMap) e podem não estar disponíveis; somente
+              um prefixo do endereço IP e o tipo de dispositivo (celular, tablet
+              ou computador) são salvos. A consulta também é analisada para
+              identificar deslocamentos geograficamente implausíveis entre
+              escaneamentos consecutivos da mesma garrafa.
             </p>
             <div className="cp-consentimento__acoes">
               <button type="button" onClick={solicitarLocalizacao}>
