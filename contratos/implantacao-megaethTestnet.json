@@ -1,0 +1,45 @@
+{
+  "rede": "megaethTestnet",
+  "implantador": "0xCf1C265f662567c499A2CF046Ab555488c2Df399",
+  "momento": "2026-10-16T21:09:29.152Z",
+  "contratos": {
+    "ContratoAcesso": {
+      "endereco": "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E",
+      "hashDaTransacao": "0xe84dc4ff35fe281ddd1f4690d2fc18b004407f305b386e2bf74d005f3c369427",
+      "bloco": 32474518,
+      "gasUtilizado": "27314003",
+      "argumentos": [
+        "0xCf1C265f662567c499A2CF046Ab555488c2Df399"
+      ]
+    },
+    "ContratoInsumos": {
+      "endereco": "0xEc16392cc714c1B04620a4822675a690Ec6e0A46",
+      "hashDaTransacao": "0x6fa4b60c53de47ea8fd3184e3c96245540b3247228ff8c880d842b1d04451edc",
+      "bloco": 32474520,
+      "gasUtilizado": "68420080",
+      "argumentos": [
+        "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E"
+      ]
+    },
+    "ContratoProducao": {
+      "endereco": "0x545B89F81698b40Cd90B84A523A86671EB274522",
+      "hashDaTransacao": "0xbada150545a4ef936e6096dc636e2b522efc7253223ea16d747865db9eccbc45",
+      "bloco": 32474521,
+      "gasUtilizado": "136769428",
+      "argumentos": [
+        "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E",
+        "0xEc16392cc714c1B04620a4822675a690Ec6e0A46"
+      ]
+    },
+    "ContratoEnvasamento": {
+      "endereco": "0x00fEf30384Cd94c428249732996090Ec25D8856E",
+      "hashDaTransacao": "0x43648a5f65455d8df5bb2c6e2ef8a31c55b5d8818a1e6b5f0328600cba7a7079",
+      "bloco": 32474524,
+      "gasUtilizado": "61986464",
+      "argumentos": [
+        "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E",
+        "0x545B89F81698b40Cd90B84A523A86671EB274522"
+      ]
+    }
+  }
+}

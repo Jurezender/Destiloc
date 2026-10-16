@@ -1,0 +1,45 @@
+{
+  "rede": "monadTestnet",
+  "implantador": "0xCf1C265f662567c499A2CF046Ab555488c2Df399",
+  "momento": "2026-10-16T21:02:26.368Z",
+  "contratos": {
+    "ContratoAcesso": {
+      "endereco": "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E",
+      "hashDaTransacao": "0x3416e37d428e6b0ce98c47a6d6dc1b3da02f511c0eb1b46ab9897fd7f6503937",
+      "bloco": 71637663,
+      "gasUtilizado": "745862",
+      "argumentos": [
+        "0xCf1C265f662567c499A2CF046Ab555488c2Df399"
+      ]
+    },
+    "ContratoInsumos": {
+      "endereco": "0xEc16392cc714c1B04620a4822675a690Ec6e0A46",
+      "hashDaTransacao": "0x2b01aeb26ae05dbdf364255fc98ec32326f50ed8f152ab674cbf1c1bad20a942",
+      "bloco": 71637668,
+      "gasUtilizado": "1528759",
+      "argumentos": [
+        "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E"
+      ]
+    },
+    "ContratoProducao": {
+      "endereco": "0x545B89F81698b40Cd90B84A523A86671EB274522",
+      "hashDaTransacao": "0xbc65fc87321929d76e7c3d9131c8538bf167bda8c50355d93a7cf1c963d8a0a9",
+      "bloco": 71637673,
+      "gasUtilizado": "2974977",
+      "argumentos": [
+        "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E",
+        "0xEc16392cc714c1B04620a4822675a690Ec6e0A46"
+      ]
+    },
+    "ContratoEnvasamento": {
+      "endereco": "0x00fEf30384Cd94c428249732996090Ec25D8856E",
+      "hashDaTransacao": "0xb9e07962d367455ffb57d70f48bb6db641da90c785f325bd50f59c90aacb10b9",
+      "bloco": 71637679,
+      "gasUtilizado": "1465107",
+      "argumentos": [
+        "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E",
+        "0x545B89F81698b40Cd90B84A523A86671EB274522"
+      ]
+    }
+  }
+}

@@ -1,7 +1,14 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
-const { SEPOLIA_RPC_URL, PRIVATE_KEY } = process.env;
+const {
+  SEPOLIA_RPC_URL,
+  ARBITRUM_SEPOLIA_RPC_URL,
+  BASE_SEPOLIA_RPC_URL,
+  MONAD_TESTNET_RPC_URL,
+  MEGAETH_TESTNET_RPC_URL,
+  PRIVATE_KEY,
+} = process.env;
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -12,6 +19,9 @@ module.exports = {
       evmVersion: "cancun",
       viaIR: true,
     },
+  },
+  gasReporter: {
+    enabled: true,
   },
   networks: {
     // Rede local em memória (padrão dos testes automatizados)
@@ -26,6 +36,27 @@ module.exports = {
     // Sepolia Testnet — preencha o .env antes de usar
     sepolia: {
       url: SEPOLIA_RPC_URL || "",
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+    },
+    arbitrumSepolia: {
+      url: ARBITRUM_SEPOLIA_RPC_URL || "",
+      chainId: 421614,
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+    },
+    baseSepolia: {
+      url: BASE_SEPOLIA_RPC_URL || "",
+      chainId: 84532,
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+    },
+    // Chain ID e RPC: confirmar na documentação oficial antes de usar
+    monadTestnet: {
+      url: MONAD_TESTNET_RPC_URL || "",
+      chainId: 10143,
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+    },
+    megaethTestnet: {
+      url: MEGAETH_TESTNET_RPC_URL || "",
+      chainId: 6343,
       accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
     },
   },
