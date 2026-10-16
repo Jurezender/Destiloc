@@ -39,6 +39,8 @@ const RESPOSTA_EXEMPLO: consultaModulo.RespostaGarrafa = {
     concluidoEm: "1699990000",
     metadataURI: "ipfs://QmLote",
     metadataURIConclusao: "ipfs://QmLoteConclusao",
+    canceladoEm: "0",
+    metadataURICancelamento: "",
   },
   configuracao: {
     maturacaoAplicavel: true,

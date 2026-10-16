@@ -35,6 +35,7 @@ export const RETULO_ESTADO_PRODUCAO: Record<EstadoProducao, string> = {
   [EstadoProducao.Criado]: "Criado",
   [EstadoProducao.EmProducao]: "Em produção",
   [EstadoProducao.Concluido]: "Concluído",
+  [EstadoProducao.Cancelado]: "Cancelado",
 };
 
 export const RETULO_ETAPA_PRODUCAO: Record<EtapaProducao, string> = {

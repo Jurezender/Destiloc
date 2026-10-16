@@ -97,6 +97,11 @@
   },
   {
     "inputs": [],
+    "name": "LoteJaCancelado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "LoteProducaoInexistente",
     "type": "error"
   },
@@ -272,6 +277,37 @@
         "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "canceladoEm",
+        "type": "uint64"
+      }
+    ],
+    "name": "LoteProducaoCancelado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      },
+      {
         "indexed": true,
         "internalType": "enum ContratoProducao.TipoBebida",
         "name": "tipoBebida",
@@ -366,6 +402,24 @@
       }
     ],
     "name": "atualizarConfiguracao",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      }
+    ],
+    "name": "cancelarLote",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -721,6 +775,25 @@
         "type": "uint256"
       }
     ],
+    "name": "loteProducaoCancelado",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
     "name": "loteProducaoConcluido",
     "outputs": [
       {
@@ -896,6 +969,11 @@
             "type": "uint64"
           },
           {
+            "internalType": "uint64",
+            "name": "canceladoEm",
+            "type": "uint64"
+          },
+          {
             "internalType": "string",
             "name": "metadataURI",
             "type": "string"
@@ -903,6 +981,11 @@
           {
             "internalType": "string",
             "name": "metadataURIConclusao",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "metadataURICancelamento",
             "type": "string"
           }
         ],

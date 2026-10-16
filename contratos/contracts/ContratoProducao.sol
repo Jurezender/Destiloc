@@ -9,7 +9,7 @@ contract ContratoProducao {
     using ReferenciaIPFS for string;
 
     enum TipoBebida { NaoDefinido, Cachaca, Whisky, Vodca, Gin }
-    enum EstadoProducao { Criado, EmProducao, Concluido }
+    enum EstadoProducao { Criado, EmProducao, Concluido, Cancelado }
     enum EtapaProducao {
         PreparacaoBase,
         Fermentacao,
@@ -36,8 +36,10 @@ contract ContratoProducao {
         address envasadorDesignado;
         uint64 criadoEm;
         uint64 concluidoEm;
+        uint64 canceladoEm;
         string metadataURI;
         string metadataURIConclusao;
+        string metadataURICancelamento;
     }
 
     struct RegistroEtapa {
@@ -76,6 +78,7 @@ contract ContratoProducao {
     error QuantidadeInvalida();
     error QuantidadeInsuficienteNoLote();
     error EnvasadorDesignadoInvalido();
+    error LoteJaCancelado();
 
     IContratoAcesso public immutable contratoAcesso;
     IContratoInsumos public immutable contratoInsumos;
@@ -119,6 +122,12 @@ contract ContratoProducao {
         string metadataURI,
         uint64 concluidoEm
     );
+    event LoteProducaoCancelado(
+        uint256 indexed loteId,
+        address indexed produtor,
+        string metadataURI,
+        uint64 canceladoEm
+    );
     event LoteMarcadoComoAdulterado(
         uint256 indexed loteId,
         address indexed marcadoPor,
@@ -155,8 +164,10 @@ contract ContratoProducao {
             envasadorDesignado: address(0),
             criadoEm: agora,
             concluidoEm: 0,
+            canceladoEm: 0,
             metadataURI: metadataURI,
-            metadataURIConclusao: ""
+            metadataURIConclusao: "",
+            metadataURICancelamento: ""
         });
         _configuracoes[loteId] = configuracao;
         _lotesPorProdutor[msg.sender].push(loteId);
@@ -177,6 +188,7 @@ contract ContratoProducao {
         LoteProducao storage lote = _exigirLote(loteId);
         _exigirProdutorResponsavel(lote);
         if (lote.estado == EstadoProducao.Concluido) revert EstadoProducaoInvalido();
+        if (lote.estado == EstadoProducao.Cancelado) revert LoteJaCancelado();
         if (_insumoVinculado[loteId][insumoId]) revert InsumoJaVinculado();
         _exigirInsumoAprovado(insumoId, lote.produtor);
         _insumoVinculado[loteId][insumoId] = true;
@@ -196,6 +208,7 @@ contract ContratoProducao {
         LoteProducao storage lote = _exigirLote(loteId);
         _exigirProdutorResponsavel(lote);
         if (lote.estado == EstadoProducao.Concluido) revert EstadoProducaoInvalido();
+        if (lote.estado == EstadoProducao.Cancelado) revert LoteJaCancelado();
         if (_etapaRegistrada[loteId][etapa]) revert EtapaJaRegistrada();
         _validarAplicabilidade(lote.tipoBebida, _configuracoes[loteId], etapa);
         _validarPrecedencia(loteId, lote.tipoBebida, _configuracoes[loteId], etapa);
@@ -243,6 +256,21 @@ contract ContratoProducao {
         lote.concluidoEm = uint64(block.timestamp);
         lote.metadataURIConclusao = metadataURI;
         emit ProducaoConcluida(loteId, msg.sender, envasadorDesignado, metadataURI, lote.concluidoEm);
+    }
+
+    // Encerra definitivamente o lote; produtor justifica o motivo via metadataURI no IPFS.
+    function cancelarLote(uint256 loteId, string calldata metadataURI) external {
+        LoteProducao storage lote = _exigirLote(loteId);
+        _exigirProdutorResponsavel(lote);
+        if (lote.estado == EstadoProducao.Concluido) revert EstadoProducaoInvalido();
+        if (lote.estado == EstadoProducao.Cancelado) revert LoteJaCancelado();
+        _validarReferencia(metadataURI);
+
+        uint64 agora = uint64(block.timestamp);
+        lote.estado = EstadoProducao.Cancelado;
+        lote.canceladoEm = agora;
+        lote.metadataURICancelamento = metadataURI;
+        emit LoteProducaoCancelado(loteId, msg.sender, metadataURI, agora);
     }
 
     function loteProducaoExiste(uint256 loteId) public view returns (bool) {
@@ -323,6 +351,9 @@ contract ContratoProducao {
     }
     function loteProducaoConcluido(uint256 loteId) external view returns (bool) {
         LoteProducao storage lote = _exigirLote(loteId); return lote.estado == EstadoProducao.Concluido;
+    }
+    function loteProducaoCancelado(uint256 loteId) external view returns (bool) {
+        LoteProducao storage lote = _exigirLote(loteId); return lote.estado == EstadoProducao.Cancelado;
     }
     function loteAdulterado(uint256 loteId) external view returns (bool) {
         return _adulterado[loteId];

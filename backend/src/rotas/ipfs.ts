@@ -13,6 +13,7 @@ const TIPOS_VALIDOS = [
   'lote-producao',
   'etapa-producao',
   'conclusao-producao',
+  'cancelamento-producao',
   'envasamento',
 ] as const;
 

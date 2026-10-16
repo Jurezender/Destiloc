@@ -17,6 +17,11 @@
   },
   {
     "inputs": [],
+    "name": "ArraysDeComprimentosDiferentes",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "ConfiguracaoCongelada",
     "type": "error"
   },
@@ -33,6 +38,11 @@
   {
     "inputs": [],
     "name": "ContratoInsumosInvalido",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "EnvasadorDesignadoInvalido",
     "type": "error"
   },
   {
@@ -87,6 +97,11 @@
   },
   {
     "inputs": [],
+    "name": "LoteJaCancelado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "LoteProducaoInexistente",
     "type": "error"
   },
@@ -103,6 +118,16 @@
   {
     "inputs": [],
     "name": "PrecedenciaInvalida",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "QuantidadeInsuficienteNoLote",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "QuantidadeInvalida",
     "type": "error"
   },
   {
@@ -223,6 +248,62 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "marcadoPor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "motivo",
+        "type": "string"
+      }
+    ],
+    "name": "LoteMarcadoComoAdulterado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "produtor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "canceladoEm",
+        "type": "uint64"
+      }
+    ],
+    "name": "LoteProducaoCancelado",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "produtor",
         "type": "address"
       },
@@ -261,6 +342,12 @@
         "indexed": true,
         "internalType": "address",
         "name": "produtor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "envasadorDesignado",
         "type": "address"
       },
       {
@@ -325,6 +412,29 @@
         "internalType": "uint256",
         "name": "loteId",
         "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      }
+    ],
+    "name": "cancelarLote",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "envasadorDesignado",
+        "type": "address"
       },
       {
         "internalType": "string",
@@ -412,6 +522,25 @@
       }
     ],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
+    "name": "envasadorDesignadoDaProducao",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -598,6 +727,25 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
+    "name": "loteAdulterado",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "produtor",
         "type": "address"
@@ -614,6 +762,25 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
+    "name": "loteProducaoCancelado",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -676,6 +843,43 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "motivo",
+        "type": "string"
+      }
+    ],
+    "name": "marcarComoAdulterado",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "loteId",
+        "type": "uint256"
+      }
+    ],
+    "name": "motivoAdulteracao",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -750,6 +954,11 @@
             "type": "uint8"
           },
           {
+            "internalType": "address",
+            "name": "envasadorDesignado",
+            "type": "address"
+          },
+          {
             "internalType": "uint64",
             "name": "criadoEm",
             "type": "uint64"
@@ -757,6 +966,11 @@
           {
             "internalType": "uint64",
             "name": "concluidoEm",
+            "type": "uint64"
+          },
+          {
+            "internalType": "uint64",
+            "name": "canceladoEm",
             "type": "uint64"
           },
           {
@@ -768,11 +982,35 @@
             "internalType": "string",
             "name": "metadataURIConclusao",
             "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "metadataURICancelamento",
+            "type": "string"
           }
         ],
         "internalType": "struct ContratoProducao.LoteProducao",
         "name": "",
         "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "insumoId",
+        "type": "uint256"
+      }
+    ],
+    "name": "quantidadeConsumidaDoInsumo",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -793,6 +1031,11 @@
       {
         "internalType": "uint256[]",
         "name": "insumosUtilizados",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "quantidadesConsumidas",
         "type": "uint256[]"
       },
       {

@@ -27,8 +27,10 @@ export interface LoteProducaoInfo {
   envasadorDesignado: string;
   criadoEm: bigint;
   concluidoEm: bigint;
+  canceladoEm: bigint;
   metadataURI: string;
   metadataURIConclusao: string;
+  metadataURICancelamento: string;
 }
 
 export interface InsumoVinculado {
@@ -150,8 +152,10 @@ export function LoteLayout() {
         envasadorDesignado: dadoLote.envasadorDesignado as string,
         criadoEm: dadoLote.criadoEm as bigint,
         concluidoEm: dadoLote.concluidoEm as bigint,
+        canceladoEm: dadoLote.canceladoEm as bigint,
         metadataURI: dadoLote.metadataURI as string,
         metadataURIConclusao: dadoLote.metadataURIConclusao as string,
+        metadataURICancelamento: dadoLote.metadataURICancelamento as string,
       });
       setConfiguracao({
         maturacaoAplicavel: config.maturacaoAplicavel as boolean,
@@ -211,7 +215,7 @@ export function LoteLayout() {
       <Link className="link-voltar" to="/lotes">← Lotes de produção</Link>
       <div className="secao-titulo-area">
         <h1>Lote #{lote.id.toString()} - {RETULO_TIPO_BEBIDA[lote.tipoBebida]}</h1>
-        <span className={`badge ${lote.estado === EstadoProducao.Concluido ? "badge--ok" : lote.estado === EstadoProducao.EmProducao ? "badge--neutro" : "badge--aviso"}`}>
+        <span className={`badge ${lote.estado === EstadoProducao.Concluido ? "badge--ok" : lote.estado === EstadoProducao.EmProducao ? "badge--neutro" : lote.estado === EstadoProducao.Cancelado ? "badge--erro" : "badge--aviso"}`}>
           {RETULO_ESTADO_PRODUCAO[lote.estado]}
         </span>
       </div>

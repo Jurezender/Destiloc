@@ -17,6 +17,7 @@ interface MetadadosBase {
     | "lote-producao"
     | "etapa-producao"
     | "conclusao-producao"
+    | "cancelamento-producao"
     | "envasamento";
   geradoEm: string;
   documentos?: string[];
@@ -83,6 +84,12 @@ export interface MetadadosConclusaoProducao extends MetadadosBase {
   tipo: "conclusao-producao";
   loteProducaoId: string;
   envasadorDesignado: string;
+}
+
+export interface MetadadosCancelamentoProducao extends MetadadosBase {
+  tipo: "cancelamento-producao";
+  loteProducaoId: string;
+  motivo?: string;
 }
 
 export interface MetadadosEnvasamento extends MetadadosBase {
@@ -207,6 +214,19 @@ export function montarMetadadosConclusaoProducao(params: {
     ...camposBase("conclusao-producao", params),
     loteProducaoId: params.loteProducaoId,
     envasadorDesignado: params.envasadorDesignado,
+  };
+}
+
+export function montarMetadadosCancelamentoProducao(params: {
+  loteProducaoId: string;
+  motivo?: string;
+  documentos?: string[];
+  observacoes?: string;
+}): MetadadosCancelamentoProducao {
+  return {
+    ...camposBase("cancelamento-producao", params),
+    loteProducaoId: params.loteProducaoId,
+    motivo: params.motivo,
   };
 }
 

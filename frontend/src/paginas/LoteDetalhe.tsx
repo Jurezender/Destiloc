@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { obterContrato } from "../contracts";
 import { feedbackDaTransacao, type FeedbackTx } from "../lib/erros";
+import { formatarTimestamp } from "../lib/formatadores";
 import { EstadoProducao, TipoBebida } from "../lib/tipos";
+import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
+import { adicionarJSON } from "../ipfs/kubo";
+import { montarMetadadosCancelamentoProducao } from "../ipfs/metadados";
+import { AnexosIpfs } from "../componentes/AnexosIpfs";
+import { LinkMetadados } from "../componentes/LinkMetadados";
 import {
   validarConfiguracaoProducao,
   type ConfiguracaoProducao,
@@ -43,7 +49,150 @@ export function LoteDetalhe() {
           aoAtualizar={carregar}
         />
       )}
+
+      {lote.estado === EstadoProducao.Cancelado && (
+        <div className="aviso-acesso">
+          <h2>Lote cancelado</h2>
+          <p>Cancelado em {formatarTimestamp(lote.canceladoEm)}.</p>
+          <p>Justificativa: <LinkMetadados uri={lote.metadataURICancelamento} /></p>
+        </div>
+      )}
+
+      {(lote.estado === EstadoProducao.Criado || lote.estado === EstadoProducao.EmProducao) && podeOperar && (
+        <CancelarLote
+          loteId={lote.id}
+          chainId={chainId}
+          signer={signer}
+          aoCancelar={carregar}
+        />
+      )}
     </>
+  );
+}
+
+function CancelarLote({
+  loteId,
+  chainId,
+  signer,
+  aoCancelar,
+}: {
+  loteId: bigint;
+  chainId: number;
+  signer: Signer;
+  aoCancelar: () => void;
+}) {
+  const [motivo, setMotivo] = useState("");
+  const [documentosCids, setDocumentosCids] = useState<string[]>([]);
+  const [arquivosSubindo, setArquivosSubindo] = useState(false);
+  const [chaveAnexos, setChaveAnexos] = useState(0);
+  const [metadataURI, setMetadataURI] = useState("");
+  const [enviandoIpfs, setEnviandoIpfs] = useState(false);
+  const [erroIpfs, setErroIpfs] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
+  const [confirmando, setConfirmando] = useState(false);
+  const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
+
+  const atualizarAnexos = useCallback((cids: string[], subindo: boolean) => {
+    setDocumentosCids(cids);
+    setArquivosSubindo(subindo);
+  }, []);
+
+  async function gerarViaIpfs() {
+    if (arquivosSubindo) {
+      setErroIpfs("Aguarde o envio dos arquivos antes de gerar a referência.");
+      return;
+    }
+    setErroIpfs(null);
+    setEnviandoIpfs(true);
+    try {
+      const metadados = montarMetadadosCancelamentoProducao({
+        loteProducaoId: loteId.toString(),
+        motivo: motivo.trim() || undefined,
+        documentos: documentosCids.length > 0 ? documentosCids : undefined,
+      });
+      const referencia = await adicionarJSON(metadados);
+      setMetadataURI(referencia);
+    } catch (erroUpload) {
+      setErroIpfs(erroUpload instanceof Error ? erroUpload.message : "Não foi possível enviar ao IPFS.");
+    } finally {
+      setEnviandoIpfs(false);
+    }
+  }
+
+  const erroReferencia =
+    motivoReferenciaInvalida(metadataURI) ?? (metadataURI.trim() === "" ? "Informe a referência ipfs://." : null);
+
+  async function cancelar() {
+    if (erroReferencia) return;
+    setFeedback(null);
+    setEnviando(true);
+    try {
+      const producao = obterContrato("ContratoProducao", chainId, signer);
+      const tx = await producao.cancelarLote(loteId, metadataURI.trim());
+      await tx.wait();
+      setConfirmando(false);
+      setMotivo("");
+      setDocumentosCids([]);
+      setChaveAnexos((k) => k + 1);
+      setMetadataURI("");
+      setFeedback({ tipo: "ok", texto: "Lote cancelado. O registro permanece consultável na blockchain." });
+      aoCancelar();
+    } catch (erroEnvio) {
+      setFeedback(feedbackDaTransacao(erroEnvio));
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  if (!confirmando) {
+    return (
+      <div style={{ marginTop: "2rem", borderTop: "1px solid var(--cor-borda)", paddingTop: "1.5rem" }}>
+        <h2>Cancelar lote</h2>
+        <p className="dica">O cancelamento é permanente e irreversível. O lote ficará registrado como cancelado na blockchain.</p>
+        <button type="button" onClick={() => setConfirmando(true)}>
+          Cancelar este lote
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ marginTop: "2rem", borderTop: "1px solid var(--cor-borda)", paddingTop: "1.5rem" }}>
+      <h2>Confirmar cancelamento</h2>
+      <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
+        <label>
+          Motivo do cancelamento (opcional)
+          <input
+            value={motivo}
+            onChange={(e) => setMotivo(e.target.value)}
+            placeholder="Ex.: insumo invalidado pelo fornecedor"
+          />
+        </label>
+        <AnexosIpfs
+          key={chaveAnexos}
+          rotulo="Documentos de suporte (PDF, JPG, PNG - opcional)"
+          onChange={atualizarAnexos}
+          desabilitado={enviandoIpfs || enviando}
+        />
+        <button type="button" onClick={() => void gerarViaIpfs()} disabled={enviandoIpfs || arquivosSubindo}>
+          {enviandoIpfs ? "Enviando ao IPFS…" : "Gerar referência no IPFS"}
+        </button>
+        {erroIpfs && <p className="erro">{erroIpfs}</p>}
+        <label>
+          Metadados (ipfs://…)
+          <input value={metadataURI} onChange={(e) => setMetadataURI(e.target.value.trim())} />
+        </label>
+        <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
+          <button type="button" onClick={() => void cancelar()} disabled={!!erroReferencia}>
+            {enviando ? "Cancelando…" : "Confirmar cancelamento"}
+          </button>
+          <button type="button" onClick={() => setConfirmando(false)}>
+            Voltar
+          </button>
+        </div>
+        {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
+      </fieldset>
+    </div>
   );
 }
 

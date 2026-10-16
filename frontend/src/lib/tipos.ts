@@ -31,6 +31,7 @@ export enum EstadoProducao {
   Criado = 0,
   EmProducao = 1,
   Concluido = 2,
+  Cancelado = 3,
 }
 
 /** Espelha ContratoProducao.EtapaProducao — mesma ordem, mesmos valores. */

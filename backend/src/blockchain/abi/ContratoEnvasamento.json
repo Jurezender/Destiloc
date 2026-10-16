@@ -135,6 +135,11 @@
   },
   {
     "inputs": [],
+    "name": "EnvasadorNaoAutorizado",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "EnvasamentoInexistente",
     "type": "error"
   },

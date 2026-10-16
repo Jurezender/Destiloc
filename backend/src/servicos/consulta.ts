@@ -32,8 +32,10 @@ export interface RespostaGarrafa {
     envasadorDesignado: string;
     criadoEm: string;
     concluidoEm: string;
+    canceladoEm: string;
     metadataURI: string;
     metadataURIConclusao: string;
+    metadataURICancelamento: string;
   };
   configuracao: {
     maturacaoAplicavel: boolean;
@@ -355,8 +357,10 @@ export async function consultarGarrafa(
       envasadorDesignado: dadoLote.envasadorDesignado as string,
       criadoEm: (dadoLote.criadoEm as bigint).toString(),
       concluidoEm: (dadoLote.concluidoEm as bigint).toString(),
+      canceladoEm: (dadoLote.canceladoEm as bigint).toString(),
       metadataURI: dadoLote.metadataURI as string,
       metadataURIConclusao: dadoLote.metadataURIConclusao as string,
+      metadataURICancelamento: dadoLote.metadataURICancelamento as string,
     },
     configuracao: {
       maturacaoAplicavel: dadoConfiguracao.maturacaoAplicavel as boolean,

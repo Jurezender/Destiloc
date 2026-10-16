@@ -38,8 +38,10 @@ interface DadosConsulta {
     envasadorDesignado: string;
     criadoEm: string;
     concluidoEm: string;
+    canceladoEm: string;
     metadataURI: string;
     metadataURIConclusao: string;
+    metadataURICancelamento: string;
   };
   configuracao: {
     maturacaoAplicavel: boolean;
@@ -616,7 +618,7 @@ export function ConsultaPublica() {
                 <div className="cp-campo">
                   <dt className="cp-campo__rotulo">Estado do lote</dt>
                   <dd className="cp-campo__valor">
-                    <span className={`cp-badge ${dados.lote.estado === EstadoProducao.Concluido ? "cp-badge--ok" : "cp-badge--neutro"}`}>
+                    <span className={`cp-badge ${dados.lote.estado === EstadoProducao.Concluido ? "cp-badge--ok" : dados.lote.estado === EstadoProducao.Cancelado ? "cp-badge--erro" : "cp-badge--neutro"}`}>
                       {RETULO_ESTADO_PRODUCAO[dados.lote.estado]}
                     </span>
                   </dd>
@@ -658,6 +660,17 @@ export function ConsultaPublica() {
                         Abrir no IPFS →
                       </a>
                       <DocumentosAnexados metadataUri={dados.lote.metadataURIConclusao} />
+                    </dd>
+                  </div>
+                )}
+                {dados.lote.estado === EstadoProducao.Cancelado && dados.lote.metadataURICancelamento && (
+                  <div className="cp-campo">
+                    <dt className="cp-campo__rotulo">Justificativa do cancelamento (IPFS)</dt>
+                    <dd className="cp-campo__valor">
+                      <a href={ipfsParaUrl(dados.lote.metadataURICancelamento)} target="_blank" rel="noopener noreferrer" className="cp-link-ipfs">
+                        Abrir no IPFS →
+                      </a>
+                      <DocumentosAnexados metadataUri={dados.lote.metadataURICancelamento} />
                     </dd>
                   </div>
                 )}

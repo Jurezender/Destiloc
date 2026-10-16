@@ -24,8 +24,8 @@ const RESPOSTA_CACHE: RespostaGarrafa = {
   lote: {
     id: "1", produtor: ADDR_PRODUTOR, tipoBebida: 1, estado: 2,
     envasadorDesignado: ADDR_ENVASADOR,
-    criadoEm: "1", concluidoEm: "2", metadataURI: "ipfs://lote",
-    metadataURIConclusao: "ipfs://conclusao",
+    criadoEm: "1", concluidoEm: "2", canceladoEm: "0", metadataURI: "ipfs://lote",
+    metadataURIConclusao: "ipfs://conclusao", metadataURICancelamento: "",
   },
   configuracao: { maturacaoAplicavel: false, retificacaoAplicavel: false, blendagemAplicavel: false, ajusteFinalAplicavel: true },
   insumosVinculados: [],
@@ -50,8 +50,8 @@ function criarContratosFake() {
     obterLoteProducao:        vi.fn().mockResolvedValue({
       produtor: ADDR_PRODUTOR, tipoBebida: 1n, estado: 2n,
       envasadorDesignado: ADDR_ENVASADOR,
-      criadoEm: 1n, concluidoEm: 2n,
-      metadataURI: "ipfs://lote", metadataURIConclusao: "ipfs://conclusao",
+      criadoEm: 1n, concluidoEm: 2n, canceladoEm: 0n,
+      metadataURI: "ipfs://lote", metadataURIConclusao: "ipfs://conclusao", metadataURICancelamento: "",
     }),
     obterConfiguracao:        vi.fn().mockResolvedValue({
       maturacaoAplicavel: false, retificacaoAplicavel: false,
