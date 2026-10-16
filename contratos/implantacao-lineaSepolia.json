@@ -1,0 +1,45 @@
+{
+  "rede": "lineaSepolia",
+  "implantador": "0xCf1C265f662567c499A2CF046Ab555488c2Df399",
+  "momento": "2026-10-16T21:29:56.622Z",
+  "contratos": {
+    "ContratoAcesso": {
+      "endereco": "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E",
+      "hashDaTransacao": "0xd40a713cd1d9585110273c22f228f1ee2bffce1dce4cca0c5de670af3d9fb958",
+      "bloco": 32955856,
+      "gasUtilizado": "715563",
+      "argumentos": [
+        "0xCf1C265f662567c499A2CF046Ab555488c2Df399"
+      ]
+    },
+    "ContratoInsumos": {
+      "endereco": "0xEc16392cc714c1B04620a4822675a690Ec6e0A46",
+      "hashDaTransacao": "0x8e3f4744903f1c09477559e4dc91b8b0f6737677aa205420c316c04c3716309b",
+      "bloco": 32955857,
+      "gasUtilizado": "1502880",
+      "argumentos": [
+        "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E"
+      ]
+    },
+    "ContratoProducao": {
+      "endereco": "0x545B89F81698b40Cd90B84A523A86671EB274522",
+      "hashDaTransacao": "0x0e6c91f00a845a5ec88fd940832242d64eed2fc07c902fdbffe6d7fcbfec5093",
+      "bloco": 32955858,
+      "gasUtilizado": "2930988",
+      "argumentos": [
+        "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E",
+        "0xEc16392cc714c1B04620a4822675a690Ec6e0A46"
+      ]
+    },
+    "ContratoEnvasamento": {
+      "endereco": "0x00fEf30384Cd94c428249732996090Ec25D8856E",
+      "hashDaTransacao": "0x52989160a666f53f88a275fede285bffc4a8ded07d73880a13c639e8347e21d9",
+      "bloco": 32955859,
+      "gasUtilizado": "1446984",
+      "argumentos": [
+        "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E",
+        "0x545B89F81698b40Cd90B84A523A86671EB274522"
+      ]
+    }
+  }
+}

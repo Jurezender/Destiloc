@@ -7,6 +7,7 @@ const {
   BASE_SEPOLIA_RPC_URL,
   MONAD_TESTNET_RPC_URL,
   MEGAETH_TESTNET_RPC_URL,
+  LINEA_SEPOLIA_RPC_URL,
   PRIVATE_KEY,
 } = process.env;
 
@@ -46,6 +47,11 @@ module.exports = {
     baseSepolia: {
       url: BASE_SEPOLIA_RPC_URL || "",
       chainId: 84532,
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+    },
+    lineaSepolia: {
+      url: LINEA_SEPOLIA_RPC_URL || "",
+      chainId: 59141,
       accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
     },
     // Chain ID e RPC: confirmar na documentação oficial antes de usar
