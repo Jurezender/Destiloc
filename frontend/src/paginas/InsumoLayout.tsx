@@ -161,6 +161,7 @@ export function InsumoLayout() {
 
   const dadosFornecedor: DadosParticipante | undefined = nomes.get(lote.fornecedor.toLowerCase());
   const dadosDestinatario: DadosParticipante | undefined = nomes.get(lote.produtorDestinatario.toLowerCase());
+  const mesmoParticipante = lote.fornecedor.toLowerCase() === lote.produtorDestinatario.toLowerCase();
   const souFornecedorOriginal = conta?.toLowerCase() === lote.fornecedor.toLowerCase();
   const podeCorrigirOuInvalidar = papeis.fornecedor && souFornecedorOriginal;
   const souProdutorDestinatario = papeis.produtor && conta?.toLowerCase() === lote.produtorDestinatario.toLowerCase();
@@ -212,28 +213,33 @@ export function InsumoLayout() {
           </div>
         )}
         <div className="info-campo info-campo--largo">
-          <dt className="info-campo__rotulo">Carteira do fornecedor</dt>
-          <dd className="info-campo__valor mono">{lote.fornecedor}</dd>
+          <dt className="info-campo__rotulo">{mesmoParticipante ? "Carteira do fornecedor / destinatário" : "Carteira do fornecedor"}</dt>
+          <dd className="info-campo__valor mono">
+            {lote.fornecedor}
+            {mesmoParticipante && souProdutorDestinatario && <span className="badge badge--neutro" style={{ marginLeft: "0.5rem" }}>Você</span>}
+          </dd>
         </div>
-        {dadosDestinatario?.empresa && (
+        {!mesmoParticipante && dadosDestinatario?.empresa && (
           <div className="info-campo">
             <dt className="info-campo__rotulo">Empresa produtora</dt>
             <dd className="info-campo__valor">{dadosDestinatario.empresa}</dd>
           </div>
         )}
-        {dadosDestinatario?.responsavel && (
+        {!mesmoParticipante && dadosDestinatario?.responsavel && (
           <div className="info-campo">
             <dt className="info-campo__rotulo">Responsável</dt>
             <dd className="info-campo__valor">{dadosDestinatario.responsavel}</dd>
           </div>
         )}
-        <div className="info-campo info-campo--largo">
-          <dt className="info-campo__rotulo">Carteira do destinatário</dt>
-          <dd className="info-campo__valor mono">
-            {lote.produtorDestinatario}
-            {souProdutorDestinatario && <span className="badge badge--neutro" style={{ marginLeft: "0.5rem" }}>Você</span>}
-          </dd>
-        </div>
+        {!mesmoParticipante && (
+          <div className="info-campo info-campo--largo">
+            <dt className="info-campo__rotulo">Carteira do destinatário</dt>
+            <dd className="info-campo__valor mono">
+              {lote.produtorDestinatario}
+              {souProdutorDestinatario && <span className="badge badge--neutro" style={{ marginLeft: "0.5rem" }}>Você</span>}
+            </dd>
+          </div>
+        )}
       </dl>
       {erro && <p className="erro">{erro}</p>}
 
