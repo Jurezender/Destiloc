@@ -1,0 +1,775 @@
+{
+  "rede": "lineaSepolia",
+  "chainId": "59141",
+  "carteira": "0xCf1C265f662567c499A2CF046Ab555488c2Df399",
+  "contratos": {
+    "ContratoAcesso": "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E",
+    "ContratoInsumos": "0xEc16392cc714c1B04620a4822675a690Ec6e0A46",
+    "ContratoProducao": "0x545B89F81698b40Cd90B84A523A86671EB274522",
+    "ContratoEnvasamento": "0x00fEf30384Cd94c428249732996090Ec25D8856E"
+  },
+  "inicio": "2026-10-17T00:20:00.628Z",
+  "fim": "2026-10-17T00:23:45.647Z",
+  "parametros": {
+    "repeticoes": 5,
+    "garrafas": "3",
+    "gasLimiteFixo": null
+  },
+  "saldoInicialWei": "1256565900840000",
+  "saldoFinalWei": "768963276016000",
+  "falhas": [],
+  "resumo": {
+    "grantRole": {
+      "execucoes": 5,
+      "gasUsado": {
+        "media": 101073.6,
+        "min": 101064,
+        "max": 101076
+      },
+      "taxaSaldoWei": {
+        "media": 3730020134400,
+        "min": 3729665856000,
+        "max": 3730108704000
+      },
+      "taxaReciboWei": {
+        "media": 3730020134400,
+        "min": 3729665856000,
+        "max": 3730108704000
+      },
+      "tempoMs": {
+        "media": 3136.4,
+        "min": 2577,
+        "max": 3305
+      }
+    },
+    "registrarLoteInsumo": {
+      "execucoes": 5,
+      "gasUsado": {
+        "media": 262160,
+        "min": 255320,
+        "max": 289520
+      },
+      "taxaSaldoWei": {
+        "media": 9674752640000,
+        "min": 9422329280000,
+        "max": 10684446080000
+      },
+      "taxaReciboWei": {
+        "media": 9674752640000,
+        "min": 9422329280000,
+        "max": 10684446080000
+      },
+      "tempoMs": {
+        "media": 3704.6,
+        "min": 3245,
+        "max": 4014
+      }
+    },
+    "avaliarInsumo": {
+      "execucoes": 5,
+      "gasUsado": {
+        "media": 175169,
+        "min": 175169,
+        "max": 175169
+      },
+      "taxaSaldoWei": {
+        "media": 6464436776000,
+        "min": 6464436776000,
+        "max": 6464436776000
+      },
+      "taxaReciboWei": {
+        "media": 6464436776000,
+        "min": 6464436776000,
+        "max": 6464436776000
+      },
+      "tempoMs": {
+        "media": 3539.6,
+        "min": 3239,
+        "max": 3962
+      }
+    },
+    "criarLoteProducao": {
+      "execucoes": 5,
+      "gasUsado": {
+        "media": 216046,
+        "min": 212626,
+        "max": 229726
+      },
+      "taxaSaldoWei": {
+        "media": 7972961584000,
+        "min": 7846749904000,
+        "max": 8477808304000
+      },
+      "taxaReciboWei": {
+        "media": 7972961584000,
+        "min": 7846749904000,
+        "max": 8477808304000
+      },
+      "tempoMs": {
+        "media": 3265,
+        "min": 3178,
+        "max": 3364
+      }
+    },
+    "vincularInsumoAoLote": {
+      "execucoes": 5,
+      "gasUsado": {
+        "media": 114067,
+        "min": 114067,
+        "max": 114067
+      },
+      "taxaSaldoWei": {
+        "media": 4209528568000,
+        "min": 4209528568000,
+        "max": 4209528568000
+      },
+      "taxaReciboWei": {
+        "media": 4209528568000,
+        "min": 4209528568000,
+        "max": 4209528568000
+      },
+      "tempoMs": {
+        "media": 3161.4,
+        "min": 2881,
+        "max": 3240
+      }
+    },
+    "registrarEtapa": {
+      "execucoes": 5,
+      "gasUsado": {
+        "media": 480550,
+        "min": 480550,
+        "max": 480550
+      },
+      "taxaSaldoWei": {
+        "media": 17734217200000,
+        "min": 17734217200000,
+        "max": 17734217200000
+      },
+      "taxaReciboWei": {
+        "media": 17734217200000,
+        "min": 17734217200000,
+        "max": 17734217200000
+      },
+      "tempoMs": {
+        "media": 3425.2,
+        "min": 3247,
+        "max": 3968
+      }
+    },
+    "concluirProducao": {
+      "execucoes": 5,
+      "gasUsado": {
+        "media": 201274,
+        "min": 201274,
+        "max": 201274
+      },
+      "taxaSaldoWei": {
+        "media": 7427815696000,
+        "min": 7427815696000,
+        "max": 7427815696000
+      },
+      "taxaReciboWei": {
+        "media": 7427815696000,
+        "min": 7427815696000,
+        "max": 7427815696000
+      },
+      "tempoMs": {
+        "media": 3590.6,
+        "min": 3239,
+        "max": 3967
+      }
+    },
+    "registrarEnvasamento": {
+      "execucoes": 5,
+      "gasUsado": {
+        "media": 274626,
+        "min": 274626,
+        "max": 274626
+      },
+      "taxaSaldoWei": {
+        "media": 10134797904000,
+        "min": 10134797904000,
+        "max": 10134797904000
+      },
+      "taxaReciboWei": {
+        "media": 10134797904000,
+        "min": 10134797904000,
+        "max": 10134797904000
+      },
+      "tempoMs": {
+        "media": 3561,
+        "min": 3259,
+        "max": 4052
+      }
+    },
+    "emitirGarrafas": {
+      "execucoes": 5,
+      "gasUsado": {
+        "media": 383358,
+        "min": 379938,
+        "max": 397038
+      },
+      "taxaSaldoWei": {
+        "media": 14147443632000,
+        "min": 14021231952000,
+        "max": 14652290352000
+      },
+      "taxaReciboWei": {
+        "media": 14147443632000,
+        "min": 14021231952000,
+        "max": 14652290352000
+      },
+      "tempoMs": {
+        "media": 3268,
+        "min": 3136,
+        "max": 3368
+      }
+    },
+    "cancelarLote": {
+      "execucoes": 5,
+      "gasUsado": {
+        "media": 150691,
+        "min": 150691,
+        "max": 150691
+      },
+      "taxaSaldoWei": {
+        "media": 5561100664000,
+        "min": 5561100664000,
+        "max": 5561100664000
+      },
+      "taxaReciboWei": {
+        "media": 5561100664000,
+        "min": 5561100664000,
+        "max": 5561100664000
+      },
+      "tempoMs": {
+        "media": 3831.2,
+        "min": 3189,
+        "max": 4117
+      }
+    }
+  },
+  "amostras": {
+    "grantRole": [
+      {
+        "hash": "0x99d562a1d576d87ecc4c666079f57522b5a769de476303151ef78d2aef4d2f7d",
+        "bloco": 32958511,
+        "gasUsado": "101076",
+        "gasLimite": "102060",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "3730108704000",
+        "taxaSaldoWei": "3730108704000",
+        "tempoMs": 3258
+      },
+      {
+        "hash": "0xb12754e15d11ec0e86110d945d73d9005352605735e65dedfbedd58378ee88ed",
+        "bloco": 32958522,
+        "gasUsado": "101064",
+        "gasLimite": "102048",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "3729665856000",
+        "taxaSaldoWei": "3729665856000",
+        "tempoMs": 3270
+      },
+      {
+        "hash": "0x6367cde7423189bb2f34b7c3fc2ed5bf292e0c77834fa8e336f10b4dbd4e97dc",
+        "bloco": 32958533,
+        "gasUsado": "101076",
+        "gasLimite": "102060",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "3730108704000",
+        "taxaSaldoWei": "3730108704000",
+        "tempoMs": 3272
+      },
+      {
+        "hash": "0x99acf1f4836b38cbe29b6c3fa22ad0ddc7e52b788be11b9e2c7de478c004b59b",
+        "bloco": 32958544,
+        "gasUsado": "101076",
+        "gasLimite": "102060",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "3730108704000",
+        "taxaSaldoWei": "3730108704000",
+        "tempoMs": 3305
+      },
+      {
+        "hash": "0x9d07ce1286f3f3a35ba24a3348c932551612cd8a22025a224d6b9da09eaebada",
+        "bloco": 32958555,
+        "gasUsado": "101076",
+        "gasLimite": "102060",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "3730108704000",
+        "taxaSaldoWei": "3730108704000",
+        "tempoMs": 2577
+      }
+    ],
+    "registrarLoteInsumo": [
+      {
+        "hash": "0x23f9a809d911684323008d659dd20079386332d8cf4614a41fd70418a95444f2",
+        "bloco": 32958512,
+        "gasUsado": "289520",
+        "gasLimite": "292985",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "10684446080000",
+        "taxaSaldoWei": "10684446080000",
+        "tempoMs": 3987
+      },
+      {
+        "hash": "0xa544319cb62de6a506805ae54eadeb9f200b93e428860836aac6c866c9a9a598",
+        "bloco": 32958523,
+        "gasUsado": "255320",
+        "gasLimite": "258514",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "9422329280000",
+        "taxaSaldoWei": "9422329280000",
+        "tempoMs": 3286
+      },
+      {
+        "hash": "0x438b696574ed9d2680d90ed6352841e3cb6046f3c0ac589284af64a704ffdf2e",
+        "bloco": 32958534,
+        "gasUsado": "255320",
+        "gasLimite": "258514",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "9422329280000",
+        "taxaSaldoWei": "9422329280000",
+        "tempoMs": 3991
+      },
+      {
+        "hash": "0x67f1459c3ec546eb575589069ebaa41a2eff2f174173347630e8914efd19e1dd",
+        "bloco": 32958545,
+        "gasUsado": "255320",
+        "gasLimite": "258514",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "9422329280000",
+        "taxaSaldoWei": "9422329280000",
+        "tempoMs": 3245
+      },
+      {
+        "hash": "0x9e981ee1a0bba9e0fe68945d0860c1b6f398994aae5abb4031dac4d901e27c81",
+        "bloco": 32958556,
+        "gasUsado": "255320",
+        "gasLimite": "258514",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "9422329280000",
+        "taxaSaldoWei": "9422329280000",
+        "tempoMs": 4014
+      }
+    ],
+    "avaliarInsumo": [
+      {
+        "hash": "0x8ea19618890ae10284c547d924faffa8f8216480e912809d1019a9f48b840edf",
+        "bloco": 32958513,
+        "gasUsado": "175169",
+        "gasLimite": "177726",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "6464436776000",
+        "taxaSaldoWei": "6464436776000",
+        "tempoMs": 3245
+      },
+      {
+        "hash": "0x5f07254c7d18206f38fd9645dc5051e2c9edcfe60818aed8bbff583c873a5708",
+        "bloco": 32958524,
+        "gasUsado": "175169",
+        "gasLimite": "177726",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "6464436776000",
+        "taxaSaldoWei": "6464436776000",
+        "tempoMs": 3925
+      },
+      {
+        "hash": "0x9cdbdff3789961e6479ca6094f69b7f48a9c63dd4134342b129707087c5e720a",
+        "bloco": 32958535,
+        "gasUsado": "175169",
+        "gasLimite": "177726",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "6464436776000",
+        "taxaSaldoWei": "6464436776000",
+        "tempoMs": 3239
+      },
+      {
+        "hash": "0x73eda87b22f0ed210fc24c9f121bf6782cb511111eccd298004c69af0b6eef55",
+        "bloco": 32958546,
+        "gasUsado": "175169",
+        "gasLimite": "177726",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "6464436776000",
+        "taxaSaldoWei": "6464436776000",
+        "tempoMs": 3962
+      },
+      {
+        "hash": "0x1360832ce9b54190dcda0e3606e91ec40c5bbe30ea571b52846533079ca91cf9",
+        "bloco": 32958557,
+        "gasUsado": "175169",
+        "gasLimite": "177726",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "6464436776000",
+        "taxaSaldoWei": "6464436776000",
+        "tempoMs": 3327
+      }
+    ],
+    "criarLoteProducao": [
+      {
+        "hash": "0x98b439313f0f3d677203066e62980812ae826930a6a33d0d6441b528ab8d0adb",
+        "bloco": 32958514,
+        "gasUsado": "229726",
+        "gasLimite": "232716",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "8477808304000",
+        "taxaSaldoWei": "8477808304000",
+        "tempoMs": 3202
+      },
+      {
+        "hash": "0x1d64eb1aedf80556fd8f242991ca8a4f687665ae88e41b92bc72f2d9da21b404",
+        "bloco": 32958525,
+        "gasUsado": "212626",
+        "gasLimite": "215481",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "7846749904000",
+        "taxaSaldoWei": "7846749904000",
+        "tempoMs": 3364
+      },
+      {
+        "hash": "0xb4e210979e72c7baa0080afb6b34a11fe96f5b3c4fbc20361efff3288d536d74",
+        "bloco": 32958536,
+        "gasUsado": "212626",
+        "gasLimite": "215481",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "7846749904000",
+        "taxaSaldoWei": "7846749904000",
+        "tempoMs": 3178
+      },
+      {
+        "hash": "0x18dc51da4f863b8ecea7cd33770430592b664f07060c52613bf9fb997f09005d",
+        "bloco": 32958547,
+        "gasUsado": "212626",
+        "gasLimite": "215481",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "7846749904000",
+        "taxaSaldoWei": "7846749904000",
+        "tempoMs": 3261
+      },
+      {
+        "hash": "0x94ef95b797e22b6f9e9938dd9fb51888efae12beded2c4015ab20288997ff668",
+        "bloco": 32958558,
+        "gasUsado": "212626",
+        "gasLimite": "215481",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "7846749904000",
+        "taxaSaldoWei": "7846749904000",
+        "tempoMs": 3320
+      }
+    ],
+    "vincularInsumoAoLote": [
+      {
+        "hash": "0x5b6a559a7db92e4ee12d171c69b7a5bffe17ec7fa9b894422a7b0ed471bf20d5",
+        "bloco": 32958515,
+        "gasUsado": "114067",
+        "gasLimite": "115103",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "4209528568000",
+        "taxaSaldoWei": "4209528568000",
+        "tempoMs": 3229
+      },
+      {
+        "hash": "0x910b7a871073fd4fb14d3360035da24bfd2e8e82589043d4e2e5b960f3da36bf",
+        "bloco": 32958526,
+        "gasUsado": "114067",
+        "gasLimite": "115103",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "4209528568000",
+        "taxaSaldoWei": "4209528568000",
+        "tempoMs": 3218
+      },
+      {
+        "hash": "0x64ba73a11cd64daa7c3696c1dfa5b03707b4fa5ebd79be6be02aa47c8ce7ade5",
+        "bloco": 32958537,
+        "gasUsado": "114067",
+        "gasLimite": "115103",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "4209528568000",
+        "taxaSaldoWei": "4209528568000",
+        "tempoMs": 3239
+      },
+      {
+        "hash": "0x46d31c45850cded3f446bd4b95ac4ed6b6ae268cb1755f7ad0a2d765c84f92e0",
+        "bloco": 32958548,
+        "gasUsado": "114067",
+        "gasLimite": "115103",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "4209528568000",
+        "taxaSaldoWei": "4209528568000",
+        "tempoMs": 3240
+      },
+      {
+        "hash": "0x06342f3742eda561852f8cfd0ea08f4ec63960d2fd99cd3ad3a7165791da1a79",
+        "bloco": 32958559,
+        "gasUsado": "114067",
+        "gasLimite": "115103",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "4209528568000",
+        "taxaSaldoWei": "4209528568000",
+        "tempoMs": 2881
+      }
+    ],
+    "registrarEtapa": [
+      {
+        "hash": "0xbe62bf5a9a750023205e0c5d72330ec9b2698b4b310634017a2c045caee3851b",
+        "bloco": 32958516,
+        "gasUsado": "480550",
+        "gasLimite": "485531",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "17734217200000",
+        "taxaSaldoWei": "17734217200000",
+        "tempoMs": 3968
+      },
+      {
+        "hash": "0x0c918ea83278316562de46782e07ef90de12270d91ced46c8ec41b8e34055ef6",
+        "bloco": 32958527,
+        "gasUsado": "480550",
+        "gasLimite": "485531",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "17734217200000",
+        "taxaSaldoWei": "17734217200000",
+        "tempoMs": 3309
+      },
+      {
+        "hash": "0xe5b27c491730062faf9eabd7b522005acdc9fb08fbe9710b819ca6666a297d6b",
+        "bloco": 32958538,
+        "gasUsado": "480550",
+        "gasLimite": "485531",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "17734217200000",
+        "taxaSaldoWei": "17734217200000",
+        "tempoMs": 3339
+      },
+      {
+        "hash": "0xe64ae0e6407235f0fb0f64cf779cb90886e32f6a73c53d36ad54eacef620ac6d",
+        "bloco": 32958549,
+        "gasUsado": "480550",
+        "gasLimite": "485531",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "17734217200000",
+        "taxaSaldoWei": "17734217200000",
+        "tempoMs": 3247
+      },
+      {
+        "hash": "0x740872cd56f53461da121fc97b6081a8efa869802e2c5b39c7af9e57b3cfcd62",
+        "bloco": 32958560,
+        "gasUsado": "480550",
+        "gasLimite": "485531",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "17734217200000",
+        "taxaSaldoWei": "17734217200000",
+        "tempoMs": 3263
+      }
+    ],
+    "concluirProducao": [
+      {
+        "hash": "0xb56f6f5e2c545ef7443fccf3867930eafb67c68c15b23d67d52ab09c48bfd8e0",
+        "bloco": 32958517,
+        "gasUsado": "201274",
+        "gasLimite": "204039",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "7427815696000",
+        "taxaSaldoWei": "7427815696000",
+        "tempoMs": 3269
+      },
+      {
+        "hash": "0x4f7960b26bb38250940d4526a5551b5a94bcc62a173b63f90c3753bfe280d5d8",
+        "bloco": 32958528,
+        "gasUsado": "201274",
+        "gasLimite": "204039",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "7427815696000",
+        "taxaSaldoWei": "7427815696000",
+        "tempoMs": 3239
+      },
+      {
+        "hash": "0xd0720e9c8dec3bd1b71fc3cdd565f278fb8b1ce51574195471a982ec9fbc5266",
+        "bloco": 32958539,
+        "gasUsado": "201274",
+        "gasLimite": "204039",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "7427815696000",
+        "taxaSaldoWei": "7427815696000",
+        "tempoMs": 3953
+      },
+      {
+        "hash": "0xe4866eb47b40a6f145e67247edf04ba87a98f7b89d8ec1247b594e25b63617eb",
+        "bloco": 32958550,
+        "gasUsado": "201274",
+        "gasLimite": "204039",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "7427815696000",
+        "taxaSaldoWei": "7427815696000",
+        "tempoMs": 3967
+      },
+      {
+        "hash": "0x69cfc34c894c204cf212ef5ff203829b395c5937c70112ff6d23434f12037b92",
+        "bloco": 32958561,
+        "gasUsado": "201274",
+        "gasLimite": "204039",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "7427815696000",
+        "taxaSaldoWei": "7427815696000",
+        "tempoMs": 3525
+      }
+    ],
+    "registrarEnvasamento": [
+      {
+        "hash": "0xce29f77d7cdffefbf25677ee4aaecd7525fb814c0737b8d5d99ec15b1b244530",
+        "bloco": 32958518,
+        "gasUsado": "274626",
+        "gasLimite": "277973",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "10134797904000",
+        "taxaSaldoWei": "10134797904000",
+        "tempoMs": 3259
+      },
+      {
+        "hash": "0xc564441460d6dcf55363ca0407a8c55f66231e87d90d458b18567cf604d5e074",
+        "bloco": 32958529,
+        "gasUsado": "274626",
+        "gasLimite": "277973",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "10134797904000",
+        "taxaSaldoWei": "10134797904000",
+        "tempoMs": 3934
+      },
+      {
+        "hash": "0xa6c8e9a051b7cb7791256f63b84780281bd4a62f355f85c464ea3ffce4dc4bb1",
+        "bloco": 32958540,
+        "gasUsado": "274626",
+        "gasLimite": "277973",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "10134797904000",
+        "taxaSaldoWei": "10134797904000",
+        "tempoMs": 3268
+      },
+      {
+        "hash": "0x5bb82c8eb05de29e5462e17ff7b74690fd4fee21669de7e3c709157bdc725117",
+        "bloco": 32958551,
+        "gasUsado": "274626",
+        "gasLimite": "277973",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "10134797904000",
+        "taxaSaldoWei": "10134797904000",
+        "tempoMs": 3292
+      },
+      {
+        "hash": "0xf13e3b9bbfbfe42ca6d0a29dcd9a9e38592571efca819d7e1a7ce0e7d75e1f25",
+        "bloco": 32958562,
+        "gasUsado": "274626",
+        "gasLimite": "277973",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "10134797904000",
+        "taxaSaldoWei": "10134797904000",
+        "tempoMs": 4052
+      }
+    ],
+    "emitirGarrafas": [
+      {
+        "hash": "0x14b13d682f72fdfefdd71c0295cd83b3be6158fc41e90b61529195b8f4b21bd3",
+        "bloco": 32958519,
+        "gasUsado": "397038",
+        "gasLimite": "401356",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "14652290352000",
+        "taxaSaldoWei": "14652290352000",
+        "tempoMs": 3368
+      },
+      {
+        "hash": "0x5f7f21ffdb4bc7589d30298e3dc9c062bf709556fd0853fd28418c5ad9e6b3e9",
+        "bloco": 32958530,
+        "gasUsado": "379938",
+        "gasLimite": "384121",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "14021231952000",
+        "taxaSaldoWei": "14021231952000",
+        "tempoMs": 3244
+      },
+      {
+        "hash": "0x0750e846983182bd7c0a2d081d26dacead7d20528235e0ae8a79c385844cbfd7",
+        "bloco": 32958541,
+        "gasUsado": "379938",
+        "gasLimite": "384121",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "14021231952000",
+        "taxaSaldoWei": "14021231952000",
+        "tempoMs": 3304
+      },
+      {
+        "hash": "0x06775b1a3c724bcfe84e4fb8b347405d49a96904152e977e9be3f162ac3647f5",
+        "bloco": 32958552,
+        "gasUsado": "379938",
+        "gasLimite": "384121",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "14021231952000",
+        "taxaSaldoWei": "14021231952000",
+        "tempoMs": 3288
+      },
+      {
+        "hash": "0x4250bb8c0af10f426d5a1515672a5048f0a36e328e12564038f976f6b82af0ce",
+        "bloco": 32958563,
+        "gasUsado": "379938",
+        "gasLimite": "384121",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "14021231952000",
+        "taxaSaldoWei": "14021231952000",
+        "tempoMs": 3136
+      }
+    ],
+    "cancelarLote": [
+      {
+        "hash": "0xca3cbf785c564b17a688e052a718ff4dd173ca794f8fea6d290db8c554ff91e7",
+        "bloco": 32958521,
+        "gasUsado": "150691",
+        "gasLimite": "151872",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "5561100664000",
+        "taxaSaldoWei": "5561100664000",
+        "tempoMs": 3951
+      },
+      {
+        "hash": "0xb26b548235eaf8b1ee41d2220ad7007d6030c79d1a2ed51675d8b625cf69fe38",
+        "bloco": 32958532,
+        "gasUsado": "150691",
+        "gasLimite": "151872",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "5561100664000",
+        "taxaSaldoWei": "5561100664000",
+        "tempoMs": 3189
+      },
+      {
+        "hash": "0xc35cfa8deea1fba2646ad9ae37fe04e8fd5b02a3992052fc2a7c1ee70565e0a0",
+        "bloco": 32958543,
+        "gasUsado": "150691",
+        "gasLimite": "151872",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "5561100664000",
+        "taxaSaldoWei": "5561100664000",
+        "tempoMs": 3946
+      },
+      {
+        "hash": "0x90077309e165c74fe7baf4b6aefd37af698dd6de08e8b5b216b366598cb35c17",
+        "bloco": 32958554,
+        "gasUsado": "150691",
+        "gasLimite": "151872",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "5561100664000",
+        "taxaSaldoWei": "5561100664000",
+        "tempoMs": 4117
+      },
+      {
+        "hash": "0xbd3167ac0546c4aa863fa7851ea78429892c8fe89e20ef2610adf0d57bb6a4b9",
+        "bloco": 32958565,
+        "gasUsado": "150691",
+        "gasLimite": "151872",
+        "precoGasWei": "36904000",
+        "taxaReciboWei": "5561100664000",
+        "taxaSaldoWei": "5561100664000",
+        "tempoMs": 3953
+      }
+    ]
+  }
+}

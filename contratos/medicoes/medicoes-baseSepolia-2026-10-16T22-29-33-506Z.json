@@ -1,0 +1,97 @@
+{
+  "rede": "baseSepolia",
+  "chainId": "84532",
+  "carteira": "0xCf1C265f662567c499A2CF046Ab555488c2Df399",
+  "contratos": {
+    "ContratoAcesso": "0xda81ba0bc8B5df00B4b7685F6B2E988D33f9038E",
+    "ContratoInsumos": "0xEc16392cc714c1B04620a4822675a690Ec6e0A46",
+    "ContratoProducao": "0x545B89F81698b40Cd90B84A523A86671EB274522",
+    "ContratoEnvasamento": "0x00fEf30384Cd94c428249732996090Ec25D8856E"
+  },
+  "inicio": "2026-10-16T22:29:33.506Z",
+  "fim": "2026-10-16T22:29:42.795Z",
+  "parametros": {
+    "repeticoes": 5,
+    "garrafas": "3",
+    "gasLimiteFixo": null
+  },
+  "saldoInicialWei": "9960421509969088",
+  "saldoFinalWei": "9955950765968068",
+  "falhas": [
+    "execution reverted"
+  ],
+  "resumo": {
+    "grantRole": {
+      "execucoes": 1,
+      "gasUsado": {
+        "media": 101076,
+        "min": 101076,
+        "max": 101076
+      },
+      "taxaSaldoWei": {
+        "media": 709056000183,
+        "min": 709056000183,
+        "max": 709056000183
+      },
+      "taxaReciboWei": {
+        "media": 606456000000,
+        "min": 606456000000,
+        "max": 606456000000
+      },
+      "tempoMs": {
+        "media": 1073,
+        "min": 1073,
+        "max": 1073
+      }
+    },
+    "registrarLoteInsumo": {
+      "execucoes": 1,
+      "gasUsado": {
+        "media": 289520,
+        "min": 289520,
+        "max": 289520
+      },
+      "taxaSaldoWei": {
+        "media": 0,
+        "min": 0,
+        "max": 0
+      },
+      "taxaReciboWei": {
+        "media": 1737120000000,
+        "min": 1737120000000,
+        "max": 1737120000000
+      },
+      "tempoMs": {
+        "media": 1070,
+        "min": 1070,
+        "max": 1070
+      }
+    }
+  },
+  "amostras": {
+    "grantRole": [
+      {
+        "hash": "0x50d953917887dd7fba94d2fa37abffd04ba12271f65f04cf4bf4878753a6d04e",
+        "bloco": 48210748,
+        "gasUsado": "101076",
+        "gasLimite": "102060",
+        "precoGasWei": "6000000",
+        "taxaReciboWei": "606456000000",
+        "taxaSaldoWei": "709056000183",
+        "tempoMs": 1073
+      }
+    ],
+    "registrarLoteInsumo": [
+      {
+        "hash": "0x7cba57fd362d4f1d15c0ef299b21a211762d05cc749124774209dcdc0577ecc4",
+        "bloco": 48210748,
+        "gasUsado": "289520",
+        "gasLimite": "292985",
+        "precoGasWei": "6000000",
+        "taxaReciboWei": "1737120000000",
+        "taxaSaldoWei": "0",
+        "tempoMs": 1070
+      }
+    ]
+  }
+}
