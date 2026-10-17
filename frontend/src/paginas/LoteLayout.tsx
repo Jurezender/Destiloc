@@ -5,7 +5,6 @@ import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
 import {
-  encurtarEndereco,
   formatarTimestamp,
   ROTULO_ESTADO_PRODUCAO,
   ROTULO_TIPO_BEBIDA,

@@ -4,7 +4,7 @@ import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
-import { encurtarEndereco, formatarTimestamp, ROTULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
+import { formatarTimestamp, ROTULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
 import { useNomesParticipantes } from "../lib/useNomesParticipantes";
 import type { DadosParticipante } from "../lib/useNomesParticipantes";
 import { ResultadoAvaliacao, TipoInsumo } from "../lib/tipos";
