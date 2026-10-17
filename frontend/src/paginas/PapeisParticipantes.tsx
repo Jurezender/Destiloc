@@ -63,6 +63,13 @@ function SecaoPapel({
         setErro("Esta conta não possui este papel.");
         return;
       }
+      if (acao === "revogar" && papel === PAPEL_ADMIN) {
+        const totalAdmins = (await acesso.totalAdministradores()) as bigint;
+        if (totalAdmins === 1n) {
+          setErro("Não é possível revogar o papel do único administrador do sistema.");
+          return;
+        }
+      }
       setStatus(`${acao === "conceder" ? "Concedendo" : "Revogando"} papel…`);
       await aplicarPapel(papel, endereco, acao, signer, chainId);
       setStatus(null);
