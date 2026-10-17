@@ -5,6 +5,7 @@ import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
 import { encurtarEndereco, formatarTimestamp, ROTULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
 import { TipoInsumo } from "../lib/tipos";
+import { useNomesParticipantes } from "../lib/useNomesParticipantes";
 
 interface LinhaInsumo {
   id: bigint;
@@ -37,6 +38,7 @@ async function carregarLote(
 
 export function Insumos() {
   const { conta, chainId, signer } = useCarteira();
+  const nomes = useNomesParticipantes();
   const [linhas, setLinhas] = useState<LinhaInsumo[]>([]);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -87,8 +89,8 @@ export function Insumos() {
             </div>
             <p className="item-lista__meta">
               {linha.quantidade.toString()} {UNIDADE_INSUMO[linha.tipo]}
-              {" · "}Fornecedor: <span className="mono">{encurtarEndereco(linha.fornecedor)}</span>
-              {" · "}Produtor: <span className="mono">{encurtarEndereco(linha.produtorDestinatario)}</span>
+              {" · "}Fornecedor: {nomes.get(linha.fornecedor.toLowerCase()) ?? encurtarEndereco(linha.fornecedor)}
+              {" · "}Produtor: {nomes.get(linha.produtorDestinatario.toLowerCase()) ?? encurtarEndereco(linha.produtorDestinatario)}
               {" · "}Registrado em {formatarTimestamp(linha.registradoEm)}
             </p>
           </li>

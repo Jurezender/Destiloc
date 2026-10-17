@@ -29,8 +29,8 @@ const abis: Record<NomeContrato, InterfaceAbi> = {
 };
 
 const registros: Record<string, RegistroEnderecos> = {
-  localhost: require("./enderecos/localhost.json") as RegistroEnderecos,
-  sepolia:   require("./enderecos/sepolia.json") as RegistroEnderecos,
+  localhost:    require("./enderecos/localhost.json") as RegistroEnderecos,
+  sepolia:      require("./enderecos/sepolia.json") as RegistroEnderecos,
 };
 
 export class ContratosIndisponiveisError extends Error {

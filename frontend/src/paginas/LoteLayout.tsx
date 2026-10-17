@@ -5,10 +5,12 @@ import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
 import {
+  encurtarEndereco,
   formatarTimestamp,
   ROTULO_ESTADO_PRODUCAO,
   ROTULO_TIPO_BEBIDA,
 } from "../lib/formatadores";
+import { useNomesParticipantes } from "../lib/useNomesParticipantes";
 import { EstadoProducao, EtapaProducao, TipoBebida, TipoInsumo } from "../lib/tipos";
 import {
   obterEtapasAplicaveis,
@@ -185,6 +187,7 @@ export function LoteLayout() {
   if (erro && !lote) return <p className="erro">{erro}</p>;
   if (!lote || !configuracao) return null;
 
+  const nomes = useNomesParticipantes();
   const souProdutorResponsavel = conta?.toLowerCase() === lote.produtor.toLowerCase();
   const podeOperar = papeis.produtor && souProdutorResponsavel;
   const etapasRegistradas = etapas.map((e) => e.etapa);
@@ -224,8 +227,12 @@ export function LoteLayout() {
           <dt className="info-campo__rotulo">Criado em</dt>
           <dd className="info-campo__valor">{formatarTimestamp(lote.criadoEm)}</dd>
         </div>
-        <div className="info-campo info-campo--largo">
+        <div className="info-campo">
           <dt className="info-campo__rotulo">Produtor</dt>
+          <dd className="info-campo__valor">{nomes.get(lote.produtor.toLowerCase()) ?? encurtarEndereco(lote.produtor)}</dd>
+        </div>
+        <div className="info-campo info-campo--largo">
+          <dt className="info-campo__rotulo">Carteira</dt>
           <dd className="info-campo__valor mono">{lote.produtor}</dd>
         </div>
         <div className="info-campo info-campo--largo">

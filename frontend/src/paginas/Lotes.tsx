@@ -5,6 +5,7 @@ import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
 import { encurtarEndereco, formatarTimestamp, ROTULO_ESTADO_PRODUCAO, ROTULO_TIPO_BEBIDA } from "../lib/formatadores";
 import { EstadoProducao, TipoBebida } from "../lib/tipos";
+import { useNomesParticipantes } from "../lib/useNomesParticipantes";
 
 interface LinhaLote {
   id: bigint;
@@ -17,6 +18,7 @@ interface LinhaLote {
 
 export function Lotes() {
   const { chainId, signer } = useCarteira();
+  const nomes = useNomesParticipantes();
   const [linhas, setLinhas] = useState<LinhaLote[]>([]);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -78,7 +80,7 @@ export function Lotes() {
               </span>
             </div>
             <p className="item-lista__meta">
-              Produtor: <span className="mono">{encurtarEndereco(linha.produtor)}</span>
+              Produtor: {nomes.get(linha.produtor.toLowerCase()) ?? encurtarEndereco(linha.produtor)}
               {" · "}Criado em {formatarTimestamp(linha.criadoEm)}
               {" · "}{linha.totalEtapas.toString()} etapa(s)
             </p>

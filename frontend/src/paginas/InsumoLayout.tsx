@@ -4,7 +4,8 @@ import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
-import { formatarTimestamp, ROTULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
+import { encurtarEndereco, formatarTimestamp, ROTULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
+import { useNomesParticipantes } from "../lib/useNomesParticipantes";
 import { ResultadoAvaliacao, TipoInsumo } from "../lib/tipos";
 
 export type Signer = NonNullable<ReturnType<typeof useCarteira>["signer"]>;
@@ -156,6 +157,7 @@ export function InsumoLayout() {
   if (erro && !lote) return <p className="erro">{erro}</p>;
   if (!lote || !invalidacao) return null;
 
+  const nomes = useNomesParticipantes();
   const souFornecedorOriginal = conta?.toLowerCase() === lote.fornecedor.toLowerCase();
   const podeCorrigirOuInvalidar = papeis.fornecedor && souFornecedorOriginal;
   const souProdutorDestinatario = papeis.produtor && conta?.toLowerCase() === lote.produtorDestinatario.toLowerCase();
@@ -194,16 +196,24 @@ export function InsumoLayout() {
           <dt className="info-campo__rotulo">Quantidade</dt>
           <dd className="info-campo__valor">{lote.quantidade.toString()} {UNIDADE_INSUMO[lote.tipo]}</dd>
         </div>
-        <div className="info-campo info-campo--largo">
+        <div className="info-campo">
           <dt className="info-campo__rotulo">Fornecedor</dt>
-          <dd className="info-campo__valor mono">{lote.fornecedor}</dd>
+          <dd className="info-campo__valor">{nomes.get(lote.fornecedor.toLowerCase()) ?? encurtarEndereco(lote.fornecedor)}</dd>
         </div>
         <div className="info-campo info-campo--largo">
+          <dt className="info-campo__rotulo">Carteira do fornecedor</dt>
+          <dd className="info-campo__valor mono">{lote.fornecedor}</dd>
+        </div>
+        <div className="info-campo">
           <dt className="info-campo__rotulo">Produtor destinatário</dt>
-          <dd className="info-campo__valor mono">
-            {lote.produtorDestinatario}
+          <dd className="info-campo__valor">
+            {nomes.get(lote.produtorDestinatario.toLowerCase()) ?? encurtarEndereco(lote.produtorDestinatario)}
             {souProdutorDestinatario && <span className="badge badge--neutro" style={{ marginLeft: "0.5rem" }}>Você</span>}
           </dd>
+        </div>
+        <div className="info-campo info-campo--largo">
+          <dt className="info-campo__rotulo">Carteira do destinatário</dt>
+          <dd className="info-campo__valor mono">{lote.produtorDestinatario}</dd>
         </div>
       </dl>
       {erro && <p className="erro">{erro}</p>}
