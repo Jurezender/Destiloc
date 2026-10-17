@@ -4,6 +4,8 @@ import { useCarteira } from "../contexto/CarteiraContexto";
 import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
 import { formatarTimestamp } from "../lib/formatadores";
+import { useNomesParticipantes } from "../lib/useNomesParticipantes";
+import type { DadosParticipante } from "../lib/useNomesParticipantes";
 
 export interface DadosGarrafa {
   tokenId: bigint;
@@ -34,6 +36,7 @@ export function GarrafaLayout() {
   const [dados, setDados] = useState<DadosGarrafa | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
+  const nomes = useNomesParticipantes();
 
   const carregar = useCallback(async () => {
     if (!chainId || !signer || !tokenId) return;
@@ -87,6 +90,8 @@ export function GarrafaLayout() {
   if (erro && !dados) return <p className="erro">{erro}</p>;
   if (!dados) return null;
 
+  const dadosEnvasador: DadosParticipante | undefined = nomes.get(dados.envasador.toLowerCase());
+
   return (
     <section>
       <Link className="link-voltar" to="/garrafas">← Garrafas</Link>
@@ -108,8 +113,20 @@ export function GarrafaLayout() {
           <dt className="info-campo__rotulo">Emitida em</dt>
           <dd className="info-campo__valor">{formatarTimestamp(dados.emitidaEm)}</dd>
         </div>
+        {dadosEnvasador?.empresa && (
+          <div className="info-campo">
+            <dt className="info-campo__rotulo">Empresa envasadora</dt>
+            <dd className="info-campo__valor">{dadosEnvasador.empresa}</dd>
+          </div>
+        )}
+        {dadosEnvasador?.responsavel && (
+          <div className="info-campo">
+            <dt className="info-campo__rotulo">Responsável</dt>
+            <dd className="info-campo__valor">{dadosEnvasador.responsavel}</dd>
+          </div>
+        )}
         <div className="info-campo info-campo--largo">
-          <dt className="info-campo__rotulo">Envasador</dt>
+          <dt className="info-campo__rotulo">Carteira do envasador</dt>
           <dd className="info-campo__valor mono">{dados.envasador}</dd>
         </div>
       </dl>
