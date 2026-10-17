@@ -1571,6 +1571,15 @@ details[open] .cp-tecnico__chevron {
   color: var(--cor-texto-primario);
 }
 
+.cp-consentimento__lista {
+  font-size: 0.9375rem;
+  color: var(--cor-texto-secundario);
+  line-height: 1.6;
+  padding-left: 1.25rem;
+  margin-top: calc(-1 * var(--s-sm));
+  margin-bottom: var(--s-md);
+}
+
 .cp-consentimento__acoes {
   display: flex;
   gap: var(--s-md);
