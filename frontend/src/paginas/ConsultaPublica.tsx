@@ -306,19 +306,20 @@ export function ConsultaPublica() {
           <div className="cp-consentimento__corpo">
             <h2 className="cp-consentimento__titulo">Localização necessária</h2>
             <p className="cp-consentimento__texto">
-              Para garantir a rastreabilidade pós-consumo desta garrafa, esta consulta
-              registra uma localização aproximada de onde ela está sendo verificada.
+              Para garantir a rastreabilidade pós-consumo desta garrafa, esta
+              consulta registra uma localização aproximada de onde ela está
+              sendo verificada.
             </p>
+            <p className="cp-consentimento__texto"><strong>O que guardamos</strong></p>
+            <ul className="cp-consentimento__lista">
+              <li>Sua localização aproximada, com precisão de cerca de 1 km (nunca o endereço exato).</li>
+              <li>A cidade, o estado e o país dessa localização, obtidos por um serviço externo (OpenStreetMap). Eles podem não estar disponíveis.</li>
+              <li>O tipo de aparelho (celular, tablet ou computador) e só o começo do número de IP, nunca o IP completo.</li>
+            </ul>
             <p className="cp-consentimento__texto">
-              Sua privacidade é protegida pela{" "}
-              <strong>minimização de dados</strong>: as coordenadas são truncadas
-              a cerca de 1 km de precisão; cidade, estado e país são obtidos a
-              partir delas por um serviço externo de geocodificação
-              (Nominatim/OpenStreetMap) e podem não estar disponíveis; somente
-              um prefixo do endereço IP e o tipo de dispositivo (celular, tablet
-              ou computador) são salvos. A consulta também é analisada para
-              identificar deslocamentos geograficamente implausíveis entre
-              escaneamentos consecutivos da mesma garrafa.
+              <strong>Para que usamos:</strong> também verificamos se há
+              deslocamentos impossíveis entre consultas da mesma garrafa, para
+              detectar possíveis falsificações.
             </p>
             <div className="cp-consentimento__acoes">
               <button type="button" onClick={solicitarLocalizacao}>
