@@ -6,6 +6,7 @@ import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
 import { encurtarEndereco, formatarTimestamp, ROTULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
 import { useNomesParticipantes } from "../lib/useNomesParticipantes";
+import type { DadosParticipante } from "../lib/useNomesParticipantes";
 import { ResultadoAvaliacao, TipoInsumo } from "../lib/tipos";
 
 export type Signer = NonNullable<ReturnType<typeof useCarteira>["signer"]>;
@@ -71,6 +72,7 @@ export function InsumoLayout() {
   const [resultadoAtual, setResultadoAtual] = useState<ResultadoAvaliacao | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
+  const nomes = useNomesParticipantes();
 
   const carregar = useCallback(async () => {
     if (!chainId || !signer || !id) return;
@@ -157,7 +159,8 @@ export function InsumoLayout() {
   if (erro && !lote) return <p className="erro">{erro}</p>;
   if (!lote || !invalidacao) return null;
 
-  const nomes = useNomesParticipantes();
+  const dadosFornecedor: DadosParticipante | undefined = nomes.get(lote.fornecedor.toLowerCase());
+  const dadosDestinatario: DadosParticipante | undefined = nomes.get(lote.produtorDestinatario.toLowerCase());
   const souFornecedorOriginal = conta?.toLowerCase() === lote.fornecedor.toLowerCase();
   const podeCorrigirOuInvalidar = papeis.fornecedor && souFornecedorOriginal;
   const souProdutorDestinatario = papeis.produtor && conta?.toLowerCase() === lote.produtorDestinatario.toLowerCase();
@@ -196,24 +199,40 @@ export function InsumoLayout() {
           <dt className="info-campo__rotulo">Quantidade</dt>
           <dd className="info-campo__valor">{lote.quantidade.toString()} {UNIDADE_INSUMO[lote.tipo]}</dd>
         </div>
-        <div className="info-campo">
-          <dt className="info-campo__rotulo">Fornecedor</dt>
-          <dd className="info-campo__valor">{nomes.get(lote.fornecedor.toLowerCase()) ?? encurtarEndereco(lote.fornecedor)}</dd>
-        </div>
+        {dadosFornecedor?.empresa && (
+          <div className="info-campo">
+            <dt className="info-campo__rotulo">Empresa fornecedora</dt>
+            <dd className="info-campo__valor">{dadosFornecedor.empresa}</dd>
+          </div>
+        )}
+        {dadosFornecedor?.responsavel && (
+          <div className="info-campo">
+            <dt className="info-campo__rotulo">Responsável</dt>
+            <dd className="info-campo__valor">{dadosFornecedor.responsavel}</dd>
+          </div>
+        )}
         <div className="info-campo info-campo--largo">
           <dt className="info-campo__rotulo">Carteira do fornecedor</dt>
           <dd className="info-campo__valor mono">{lote.fornecedor}</dd>
         </div>
-        <div className="info-campo">
-          <dt className="info-campo__rotulo">Produtor destinatário</dt>
-          <dd className="info-campo__valor">
-            {nomes.get(lote.produtorDestinatario.toLowerCase()) ?? encurtarEndereco(lote.produtorDestinatario)}
-            {souProdutorDestinatario && <span className="badge badge--neutro" style={{ marginLeft: "0.5rem" }}>Você</span>}
-          </dd>
-        </div>
+        {dadosDestinatario?.empresa && (
+          <div className="info-campo">
+            <dt className="info-campo__rotulo">Empresa produtora</dt>
+            <dd className="info-campo__valor">{dadosDestinatario.empresa}</dd>
+          </div>
+        )}
+        {dadosDestinatario?.responsavel && (
+          <div className="info-campo">
+            <dt className="info-campo__rotulo">Responsável</dt>
+            <dd className="info-campo__valor">{dadosDestinatario.responsavel}</dd>
+          </div>
+        )}
         <div className="info-campo info-campo--largo">
           <dt className="info-campo__rotulo">Carteira do destinatário</dt>
-          <dd className="info-campo__valor mono">{lote.produtorDestinatario}</dd>
+          <dd className="info-campo__valor mono">
+            {lote.produtorDestinatario}
+            {souProdutorDestinatario && <span className="badge badge--neutro" style={{ marginLeft: "0.5rem" }}>Você</span>}
+          </dd>
         </div>
       </dl>
       {erro && <p className="erro">{erro}</p>}

@@ -3,7 +3,7 @@ import { useCarteira } from "../contexto/CarteiraContexto";
 import { obterContrato } from "../contracts";
 import { feedbackDaTransacao, type FeedbackTx } from "../lib/erros";
 import { encurtarEndereco, ROTULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
-import { useNomesParticipantes } from "../lib/useNomesParticipantes";
+import { nomeResumido, useNomesParticipantes } from "../lib/useNomesParticipantes";
 import { EstadoProducao, TipoInsumo } from "../lib/tipos";
 import { useLoteContexto, type Signer } from "./LoteLayout";
 
@@ -36,7 +36,7 @@ export function LoteInsumos() {
       <ul>
         {insumosVinculados.map((insumo) => (
           <li key={insumo.id.toString()}>
-            #{insumo.id.toString()} - {ROTULO_TIPO_INSUMO[insumo.tipo]} - fornecedor {nomes.get(insumo.fornecedor.toLowerCase()) ?? encurtarEndereco(insumo.fornecedor)}
+            #{insumo.id.toString()} - {ROTULO_TIPO_INSUMO[insumo.tipo]} - fornecedor {nomeResumido(nomes.get(insumo.fornecedor.toLowerCase()), encurtarEndereco(insumo.fornecedor))}
           </li>
         ))}
         {insumosVinculados.length === 0 && <li className="lista-vazia">Nenhum insumo vinculado ainda.</li>}

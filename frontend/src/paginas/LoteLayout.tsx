@@ -11,6 +11,7 @@ import {
   ROTULO_TIPO_BEBIDA,
 } from "../lib/formatadores";
 import { useNomesParticipantes } from "../lib/useNomesParticipantes";
+import type { DadosParticipante } from "../lib/useNomesParticipantes";
 import { EstadoProducao, EtapaProducao, TipoBebida, TipoInsumo } from "../lib/tipos";
 import {
   obterEtapasAplicaveis,
@@ -85,6 +86,7 @@ export function LoteLayout() {
   const [etapas, setEtapas] = useState<EtapaRegistrada[]>([]);
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(true);
+  const nomes = useNomesParticipantes();
 
   const carregar = useCallback(async () => {
     if (!chainId || !signer || !id) return;
@@ -187,7 +189,7 @@ export function LoteLayout() {
   if (erro && !lote) return <p className="erro">{erro}</p>;
   if (!lote || !configuracao) return null;
 
-  const nomes = useNomesParticipantes();
+  const dadosProdutor: DadosParticipante | undefined = nomes.get(lote.produtor.toLowerCase());
   const souProdutorResponsavel = conta?.toLowerCase() === lote.produtor.toLowerCase();
   const podeOperar = papeis.produtor && souProdutorResponsavel;
   const etapasRegistradas = etapas.map((e) => e.etapa);
@@ -227,12 +229,20 @@ export function LoteLayout() {
           <dt className="info-campo__rotulo">Criado em</dt>
           <dd className="info-campo__valor">{formatarTimestamp(lote.criadoEm)}</dd>
         </div>
-        <div className="info-campo">
-          <dt className="info-campo__rotulo">Produtor</dt>
-          <dd className="info-campo__valor">{nomes.get(lote.produtor.toLowerCase()) ?? encurtarEndereco(lote.produtor)}</dd>
-        </div>
+        {dadosProdutor?.empresa && (
+          <div className="info-campo">
+            <dt className="info-campo__rotulo">Empresa produtora</dt>
+            <dd className="info-campo__valor">{dadosProdutor.empresa}</dd>
+          </div>
+        )}
+        {dadosProdutor?.responsavel && (
+          <div className="info-campo">
+            <dt className="info-campo__rotulo">Responsável</dt>
+            <dd className="info-campo__valor">{dadosProdutor.responsavel}</dd>
+          </div>
+        )}
         <div className="info-campo info-campo--largo">
-          <dt className="info-campo__rotulo">Carteira</dt>
+          <dt className="info-campo__rotulo">Carteira do produtor</dt>
           <dd className="info-campo__valor mono">{lote.produtor}</dd>
         </div>
         <div className="info-campo info-campo--largo">

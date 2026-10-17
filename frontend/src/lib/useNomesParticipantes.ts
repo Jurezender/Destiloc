@@ -2,9 +2,20 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../contexto/AuthContexto";
 import { API_URL, fetchApi } from "./api";
 
-export function useNomesParticipantes(): Map<string, string> {
+export interface DadosParticipante {
+  empresa: string;
+  responsavel: string;
+}
+
+/** Retorna a empresa (se houver), senão o responsável, senão o fallback. */
+export function nomeResumido(dados: DadosParticipante | undefined, fallback: string): string {
+  if (!dados) return fallback;
+  return dados.empresa || dados.responsavel || fallback;
+}
+
+export function useNomesParticipantes(): Map<string, DadosParticipante> {
   const { token } = useAuth();
-  const [nomes, setNomes] = useState<Map<string, string>>(new Map());
+  const [nomes, setNomes] = useState<Map<string, DadosParticipante>>(new Map());
 
   useEffect(() => {
     if (!token) return;
@@ -22,7 +33,10 @@ export function useNomesParticipantes(): Map<string, string> {
               .filter((p) => p.nome_responsavel || p.nome_empresa)
               .map((p) => [
                 p.address.toLowerCase(),
-                [p.nome_responsavel, p.nome_empresa].filter(Boolean).join(" — "),
+                {
+                  empresa: p.nome_empresa ?? "",
+                  responsavel: p.nome_responsavel ?? "",
+                },
               ])
           )
         );

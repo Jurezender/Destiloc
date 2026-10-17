@@ -19,7 +19,7 @@ import { montarMetadadosEtapaProducao } from "../ipfs/metadados";
 import { AnexosIpfs } from "../componentes/AnexosIpfs";
 import { LinkMetadados } from "../componentes/LinkMetadados";
 import { useLoteContexto, type EtapaRegistrada, type InsumoVinculado, type Signer } from "./LoteLayout";
-import { useNomesParticipantes } from "../lib/useNomesParticipantes";
+import { nomeResumido, useNomesParticipantes } from "../lib/useNomesParticipantes";
 
 function segundosDoDatetimeLocal(valor: string): number {
   return Math.floor(new Date(valor).getTime() / 1000);
@@ -87,7 +87,7 @@ function TabelaEtapas({ etapas }: { etapas: EtapaRegistrada[] }) {
           {etapas.map((evento) => (
             <tr key={evento.indice}>
               <td>{ROTULO_ETAPA_PRODUCAO[evento.etapa]}</td>
-              <td>{nomes.get(evento.executadoPor.toLowerCase()) ?? encurtarEndereco(evento.executadoPor)}</td>
+              <td>{nomeResumido(nomes.get(evento.executadoPor.toLowerCase()), encurtarEndereco(evento.executadoPor))}</td>
               <td>{formatarTimestamp(evento.inicioInformado)}</td>
               <td>{formatarTimestamp(evento.fimInformado)}</td>
               <td>{formatarTimestamp(evento.registradoEm)}</td>

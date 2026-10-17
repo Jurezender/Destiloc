@@ -5,7 +5,7 @@ import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
 import { encurtarEndereco, formatarTimestamp, ROTULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
 import { TipoInsumo } from "../lib/tipos";
-import { useNomesParticipantes } from "../lib/useNomesParticipantes";
+import { nomeResumido, useNomesParticipantes } from "../lib/useNomesParticipantes";
 
 interface LinhaInsumo {
   id: bigint;
@@ -89,8 +89,8 @@ export function Insumos() {
             </div>
             <p className="item-lista__meta">
               {linha.quantidade.toString()} {UNIDADE_INSUMO[linha.tipo]}
-              {" · "}Fornecedor: {nomes.get(linha.fornecedor.toLowerCase()) ?? encurtarEndereco(linha.fornecedor)}
-              {" · "}Produtor: {nomes.get(linha.produtorDestinatario.toLowerCase()) ?? encurtarEndereco(linha.produtorDestinatario)}
+              {" · "}Fornecedor: {nomeResumido(nomes.get(linha.fornecedor.toLowerCase()), encurtarEndereco(linha.fornecedor))}
+              {" · "}Produtor: {nomeResumido(nomes.get(linha.produtorDestinatario.toLowerCase()), encurtarEndereco(linha.produtorDestinatario))}
               {" · "}Registrado em {formatarTimestamp(linha.registradoEm)}
             </p>
           </li>
