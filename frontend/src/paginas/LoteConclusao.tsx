@@ -1,8 +1,10 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../contexto/AuthContexto";
 import { obterContrato } from "../contracts";
 import { feedbackDaTransacao, type FeedbackTx } from "../lib/erros";
-import { formatarTimestamp } from "../lib/formatadores";
+import { encurtarEndereco, formatarTimestamp } from "../lib/formatadores";
+import { PAPEL_ENVASADOR } from "../lib/papeis";
 import { EstadoProducao } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
 import { adicionarJSON } from "../ipfs/kubo";
@@ -10,9 +12,11 @@ import { montarMetadadosConclusaoProducao } from "../ipfs/metadados";
 import { AnexosIpfs } from "../componentes/AnexosIpfs";
 import { LinkMetadados } from "../componentes/LinkMetadados";
 import { useLoteContexto, type Signer } from "./LoteLayout";
+import { API_URL, fetchApi } from "../lib/api";
 
-function ehEnderecoValido(valor: string): boolean {
-  return /^0x[0-9a-fA-F]{40}$/.test(valor.trim());
+interface OpcaoEnvasador {
+  address: string;
+  nome: string;
 }
 
 export function LoteConclusao() {
@@ -67,6 +71,9 @@ function ConcluirProducao({
   signer: Signer;
   aoConcluir: () => void;
 }) {
+  const { token } = useAuth();
+  const [envasadores, setEnvasadores] = useState<OpcaoEnvasador[]>([]);
+  const [carregandoEnvasadores, setCarregandoEnvasadores] = useState(true);
   const [envasadorDesignado, setEnvasadorDesignado] = useState("");
   const [documentosCids, setDocumentosCids] = useState<string[]>([]);
   const [arquivosSubindo, setArquivosSubindo] = useState(false);
@@ -78,16 +85,49 @@ function ConcluirProducao({
   const [erro, setErro] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<FeedbackTx | null>(null);
 
+  useEffect(() => {
+    if (!token || !chainId || !signer) return;
+    setCarregandoEnvasadores(true);
+    void (async () => {
+      try {
+        const acesso = obterContrato("ContratoAcesso", chainId, signer);
+        const [resDB, totalBc] = await Promise.all([
+          fetchApi(`${API_URL}/participantes`, { headers: { Authorization: `Bearer ${token}` } }),
+          acesso.getRoleMemberCount(PAPEL_ENVASADOR) as Promise<bigint>,
+        ]);
+        const { participantes } = (await resDB.json()) as {
+          participantes: { address: string; nome_responsavel: string; nome_empresa: string }[];
+        };
+        const mapaDB = new Map(participantes.map((p) => [p.address.toLowerCase(), p]));
+        const enderecosBc = await Promise.all(
+          Array.from({ length: Number(totalBc) }, (_, i) =>
+            acesso.getRoleMember(PAPEL_ENVASADOR, i) as Promise<string>
+          )
+        );
+        const lista = enderecosBc.map((address) => {
+          const db = mapaDB.get(address.toLowerCase());
+          const nome = db
+            ? [db.nome_empresa, db.nome_responsavel].filter(Boolean).join(" — ")
+            : encurtarEndereco(address);
+          return { address, nome };
+        });
+        setEnvasadores(lista);
+      } catch {
+        setEnvasadores([]);
+      } finally {
+        setCarregandoEnvasadores(false);
+      }
+    })();
+  }, [token, chainId, signer]);
+
   const atualizarAnexos = useCallback((cids: string[], subindo: boolean) => {
     setDocumentosCids(cids);
     setArquivosSubindo(subindo);
   }, []);
 
-  const envasadorValido = ehEnderecoValido(envasadorDesignado);
-
   async function gerarViaIpfs() {
-    if (!envasadorValido) {
-      setErroIpfs("Informe um endereço válido para o envasador designado antes de gerar os metadados.");
+    if (!envasadorDesignado) {
+      setErroIpfs("Selecione o envasador designado antes de gerar os metadados.");
       return;
     }
     if (arquivosSubindo) {
@@ -115,8 +155,8 @@ function ConcluirProducao({
     motivoReferenciaInvalida(metadataURI) ?? (metadataURI.trim() === "" ? "Informe a referência ipfs://." : null);
 
   async function enviar() {
-    if (!envasadorValido) {
-      setErro("Informe um endereço Ethereum válido para o envasador designado.");
+    if (!envasadorDesignado) {
+      setErro("Selecione o envasador designado.");
       return;
     }
     if (erroReferencia) {
@@ -147,14 +187,26 @@ function ConcluirProducao({
   return (
     <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
       <label>
-        Envasador designado (endereço Ethereum)
-        <input
+        Envasador designado
+        <select
           value={envasadorDesignado}
-          onChange={(e) => setEnvasadorDesignado(e.target.value.trim())}
-          placeholder="0x…"
-        />
-        {envasadorDesignado && !envasadorValido && (
-          <span className="erro">Endereço inválido.</span>
+          onChange={(e) => setEnvasadorDesignado(e.target.value)}
+          disabled={carregandoEnvasadores}
+        >
+          <option value="">
+            {carregandoEnvasadores ? "Carregando…" : "Selecione…"}
+          </option>
+          {envasadores.map((e) => (
+            <option key={e.address} value={e.address}>{e.nome}</option>
+          ))}
+        </select>
+        {envasadorDesignado && (
+          <span className="mono" style={{ fontSize: "0.75rem", color: "var(--cor-texto-secundario)", marginTop: "0.25rem", display: "block" }}>
+            {envasadorDesignado}
+          </span>
+        )}
+        {!carregandoEnvasadores && envasadores.length === 0 && (
+          <span className="dica">Nenhum envasador cadastrado no sistema.</span>
         )}
       </label>
       <AnexosIpfs
