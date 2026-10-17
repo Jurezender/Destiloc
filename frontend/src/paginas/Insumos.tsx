@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
-import { encurtarEndereco, formatarTimestamp, RETULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
+import { encurtarEndereco, formatarTimestamp, ROTULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
 import { TipoInsumo } from "../lib/tipos";
 
 interface LinhaInsumo {
@@ -76,7 +76,7 @@ export function Insumos() {
           <li key={linha.id.toString()}>
             <div className="item-lista__cabecalho">
               <Link className="item-lista__titulo" to={`/insumos/${linha.id}`}>
-                #{linha.id.toString()} - {RETULO_TIPO_INSUMO[linha.tipo]}
+                #{linha.id.toString()} - {ROTULO_TIPO_INSUMO[linha.tipo]}
               </Link>
               <span className={`badge ${linha.valido ? "badge--ok" : "badge--erro"}`}>
                 {linha.valido ? "Válido" : "Invalidado"}

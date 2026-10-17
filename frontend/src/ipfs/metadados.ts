@@ -1,8 +1,8 @@
-import {
-  RETULO_ETAPA_PRODUCAO,
-  RETULO_RESULTADO_AVALIACAO,
-  RETULO_TIPO_BEBIDA,
-  RETULO_TIPO_INSUMO,
+﻿import {
+  ROTULO_ETAPA_PRODUCAO,
+  ROTULO_RESULTADO_AVALIACAO,
+  ROTULO_TIPO_BEBIDA,
+  ROTULO_TIPO_INSUMO,
   UNIDADE_INSUMO,
 } from "../lib/formatadores";
 import { EtapaProducao, ResultadoAvaliacao, TipoBebida, TipoInsumo } from "../lib/tipos";
@@ -124,7 +124,7 @@ export function montarMetadadosInsumo(params: {
 }): MetadadosInsumo {
   return {
     ...camposBase("insumo", params),
-    tipoInsumo: RETULO_TIPO_INSUMO[params.tipoInsumo],
+    tipoInsumo: ROTULO_TIPO_INSUMO[params.tipoInsumo],
     quantidade: params.quantidade,
     unidade: UNIDADE_INSUMO[params.tipoInsumo],
     descricao: params.descricao,
@@ -141,7 +141,7 @@ export function montarMetadadosAvaliacao(params: {
   return {
     ...camposBase("avaliacao-insumo", params),
     insumoId: params.insumoId,
-    resultado: RETULO_RESULTADO_AVALIACAO[params.resultado],
+    resultado: ROTULO_RESULTADO_AVALIACAO[params.resultado],
   };
 }
 
@@ -178,7 +178,7 @@ export function montarMetadadosLoteProducao(params: {
 }): MetadadosLoteProducao {
   return {
     ...camposBase("lote-producao", params),
-    tipoBebida: RETULO_TIPO_BEBIDA[params.tipoBebida],
+    tipoBebida: ROTULO_TIPO_BEBIDA[params.tipoBebida],
     configuracao: params.configuracao,
     descricao: params.descricao,
   };
@@ -196,7 +196,7 @@ export function montarMetadadosEtapaProducao(params: {
   return {
     ...camposBase("etapa-producao", params),
     loteProducaoId: params.loteProducaoId,
-    etapa: RETULO_ETAPA_PRODUCAO[params.etapa],
+    etapa: ROTULO_ETAPA_PRODUCAO[params.etapa],
     insumosUtilizados: params.insumosConsumidos.map((i) => i.id),
     insumosConsumidos: params.insumosConsumidos,
     inicioInformado: params.inicioInformado,

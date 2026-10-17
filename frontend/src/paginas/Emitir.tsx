@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
 import { feedbackDaTransacao, type FeedbackTx, mapearErroContrato } from "../lib/erros";
-import { encurtarEndereco, formatarTimestamp, RETULO_TIPO_BEBIDA } from "../lib/formatadores";
+import { encurtarEndereco, formatarTimestamp, ROTULO_TIPO_BEBIDA } from "../lib/formatadores";
 import { TipoBebida } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
 import { adicionarJSON } from "../ipfs/kubo";
@@ -119,7 +119,7 @@ export function Emitir() {
       <Link className="link-voltar" to={`/lotes/${id}`}>← Lote #{id}</Link>
       <h1>
         Envasamento do lote #{id}
-        {loteInfo ? ` - ${RETULO_TIPO_BEBIDA[loteInfo.tipoBebida]}` : ""}
+        {loteInfo ? ` - ${ROTULO_TIPO_BEBIDA[loteInfo.tipoBebida]}` : ""}
       </h1>
       {loteInfo && (
         <p>Produtor: <span className="mono">{loteInfo.produtor}</span></p>

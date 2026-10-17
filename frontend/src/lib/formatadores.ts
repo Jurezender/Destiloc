@@ -1,4 +1,4 @@
-import {
+﻿import {
   EstadoProducao,
   EtapaProducao,
   ResultadoAvaliacao,
@@ -6,7 +6,7 @@ import {
   TipoInsumo,
 } from "./tipos";
 
-export const RETULO_TIPO_INSUMO: Record<TipoInsumo, string> = {
+export const ROTULO_TIPO_INSUMO: Record<TipoInsumo, string> = {
   [TipoInsumo.NaoDefinido]: "Não definido",
   [TipoInsumo.MateriaPrimaAgricola]: "Matéria-prima agrícola",
   [TipoInsumo.BaseAlcoolica]: "Base alcoólica",
@@ -17,13 +17,13 @@ export const RETULO_TIPO_INSUMO: Record<TipoInsumo, string> = {
   [TipoInsumo.Outro]: "Outro",
 };
 
-export const RETULO_RESULTADO_AVALIACAO: Record<ResultadoAvaliacao, string> = {
+export const ROTULO_RESULTADO_AVALIACAO: Record<ResultadoAvaliacao, string> = {
   [ResultadoAvaliacao.NaoAvaliado]: "Não avaliado",
   [ResultadoAvaliacao.Aprovado]: "Aprovado",
   [ResultadoAvaliacao.Rejeitado]: "Rejeitado",
 };
 
-export const RETULO_TIPO_BEBIDA: Record<TipoBebida, string> = {
+export const ROTULO_TIPO_BEBIDA: Record<TipoBebida, string> = {
   [TipoBebida.NaoDefinido]: "Não definido",
   [TipoBebida.Cachaca]: "Cachaça",
   [TipoBebida.Whisky]: "Whisky",
@@ -31,14 +31,14 @@ export const RETULO_TIPO_BEBIDA: Record<TipoBebida, string> = {
   [TipoBebida.Gin]: "Gin",
 };
 
-export const RETULO_ESTADO_PRODUCAO: Record<EstadoProducao, string> = {
+export const ROTULO_ESTADO_PRODUCAO: Record<EstadoProducao, string> = {
   [EstadoProducao.Criado]: "Criado",
   [EstadoProducao.EmProducao]: "Em produção",
   [EstadoProducao.Concluido]: "Concluído",
   [EstadoProducao.Cancelado]: "Cancelado",
 };
 
-export const RETULO_ETAPA_PRODUCAO: Record<EtapaProducao, string> = {
+export const ROTULO_ETAPA_PRODUCAO: Record<EtapaProducao, string> = {
   [EtapaProducao.PreparacaoBase]: "Preparação da base",
   [EtapaProducao.Fermentacao]: "Fermentação",
   [EtapaProducao.Destilacao]: "Destilação",

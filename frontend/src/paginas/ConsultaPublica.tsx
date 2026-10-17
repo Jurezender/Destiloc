@@ -1,14 +1,14 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { MapaScans } from "../componentes/MapaScans";
 import { REDES } from "../contracts/redes";
 import {
   encurtarEndereco,
   formatarTimestamp,
-  RETULO_ESTADO_PRODUCAO,
-  RETULO_ETAPA_PRODUCAO,
-  RETULO_TIPO_BEBIDA,
-  RETULO_TIPO_INSUMO,
+  ROTULO_ESTADO_PRODUCAO,
+  ROTULO_ETAPA_PRODUCAO,
+  ROTULO_TIPO_BEBIDA,
+  ROTULO_TIPO_INSUMO,
 } from "../lib/formatadores";
 import { EstadoProducao, EtapaProducao, TipoBebida, TipoInsumo } from "../lib/tipos";
 import { ipfsParaUrl } from "../lib/ipfs";
@@ -419,7 +419,7 @@ export function ConsultaPublica() {
             <div className="cp-identidade__cabecalho">
               <span className="cp-identidade__rotulo">Garrafa certificada</span>
               <span className="cp-identidade__numero">#{dados.garrafa.tokenId}</span>
-              <span className="cp-identidade__bebida">{RETULO_TIPO_BEBIDA[dados.lote.tipoBebida]}</span>
+              <span className="cp-identidade__bebida">{ROTULO_TIPO_BEBIDA[dados.lote.tipoBebida]}</span>
             </div>
             <div className="cp-identidade__meta">
               <span>Lote #{dados.lote.id}</span>
@@ -462,7 +462,7 @@ export function ConsultaPublica() {
                     <dt className="cp-campo__rotulo">Ingredientes</dt>
                     <dd className="cp-campo__valor cp-tags">
                       {tiposInsumos.map((tipo) => (
-                        <span key={tipo} className="cp-tag">{RETULO_TIPO_INSUMO[tipo]}</span>
+                        <span key={tipo} className="cp-tag">{ROTULO_TIPO_INSUMO[tipo]}</span>
                       ))}
                     </dd>
                   </div>
@@ -483,7 +483,7 @@ export function ConsultaPublica() {
                     <li key={evento.indice} className="cp-timeline__item">
                       <div className="cp-timeline__ponto" aria-hidden="true" />
                       <div className="cp-timeline__conteudo">
-                        <span className="cp-timeline__etapa">{RETULO_ETAPA_PRODUCAO[evento.etapa]}</span>
+                        <span className="cp-timeline__etapa">{ROTULO_ETAPA_PRODUCAO[evento.etapa]}</span>
                         {(evento.inicioInformado !== "0" || evento.fimInformado !== "0") && (
                           <span className="cp-timeline__periodo">
                             {evento.inicioInformado !== "0" && formatarTimestamp(Number(evento.inicioInformado))}
@@ -642,7 +642,7 @@ export function ConsultaPublica() {
                   <dt className="cp-campo__rotulo">Estado do lote</dt>
                   <dd className="cp-campo__valor">
                     <span className={`cp-badge ${dados.lote.estado === EstadoProducao.Concluido ? "cp-badge--ok" : dados.lote.estado === EstadoProducao.Cancelado ? "cp-badge--erro" : "cp-badge--neutro"}`}>
-                      {RETULO_ESTADO_PRODUCAO[dados.lote.estado]}
+                      {ROTULO_ESTADO_PRODUCAO[dados.lote.estado]}
                     </span>
                   </dd>
                 </div>

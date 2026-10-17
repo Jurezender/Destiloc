@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useOutletContext, useParams } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
@@ -6,8 +6,8 @@ import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
 import {
   formatarTimestamp,
-  RETULO_ESTADO_PRODUCAO,
-  RETULO_TIPO_BEBIDA,
+  ROTULO_ESTADO_PRODUCAO,
+  ROTULO_TIPO_BEBIDA,
 } from "../lib/formatadores";
 import { EstadoProducao, EtapaProducao, TipoBebida, TipoInsumo } from "../lib/tipos";
 import {
@@ -214,9 +214,9 @@ export function LoteLayout() {
     <section>
       <Link className="link-voltar" to="/lotes">← Lotes de produção</Link>
       <div className="secao-titulo-area">
-        <h1>Lote #{lote.id.toString()} - {RETULO_TIPO_BEBIDA[lote.tipoBebida]}</h1>
+        <h1>Lote #{lote.id.toString()} - {ROTULO_TIPO_BEBIDA[lote.tipoBebida]}</h1>
         <span className={`badge ${lote.estado === EstadoProducao.Concluido ? "badge--ok" : lote.estado === EstadoProducao.EmProducao ? "badge--neutro" : lote.estado === EstadoProducao.Cancelado ? "badge--erro" : "badge--aviso"}`}>
-          {RETULO_ESTADO_PRODUCAO[lote.estado]}
+          {ROTULO_ESTADO_PRODUCAO[lote.estado]}
         </span>
       </div>
       <dl className="info-grade">

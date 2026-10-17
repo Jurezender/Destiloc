@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
-import { encurtarEndereco, formatarTimestamp, RETULO_RESULTADO_AVALIACAO } from "../lib/formatadores";
+﻿import { useCallback, useState } from "react";
+import { encurtarEndereco, formatarTimestamp, ROTULO_RESULTADO_AVALIACAO } from "../lib/formatadores";
 import { ResultadoAvaliacao } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
 import { adicionarJSON } from "../ipfs/kubo";
@@ -38,7 +38,7 @@ export function InsumoAvaliacao() {
         <>
           <p>
             Avaliação atual da sua conta:{" "}
-            {resultadoAtual !== null ? RETULO_RESULTADO_AVALIACAO[resultadoAtual] : "carregando…"}
+            {resultadoAtual !== null ? ROTULO_RESULTADO_AVALIACAO[resultadoAtual] : "carregando…"}
           </p>
           {invalidacao.invalidado && (
             <p className="dica">Lote invalidado, não aceita novas avaliações.</p>
@@ -51,7 +51,7 @@ export function InsumoAvaliacao() {
               {avaliacoes.map((avaliacao) => (
                 <li key={avaliacao.indice}>
                   {formatarTimestamp(avaliacao.registradoEm)}
-                  {" · "}{RETULO_RESULTADO_AVALIACAO[avaliacao.resultado]}
+                  {" · "}{ROTULO_RESULTADO_AVALIACAO[avaliacao.resultado]}
                   {" · "}<LinkMetadados uri={avaliacao.metadataURI} />
                 </li>
               ))}
@@ -163,7 +163,7 @@ function AvaliarInsumo({
           <option value="">Selecione…</option>
           {OPCOES_RESULTADO_AVALIACAO.map((opcao) => (
             <option key={opcao} value={opcao}>
-              {RETULO_RESULTADO_AVALIACAO[opcao]}
+              {ROTULO_RESULTADO_AVALIACAO[opcao]}
             </option>
           ))}
         </select>

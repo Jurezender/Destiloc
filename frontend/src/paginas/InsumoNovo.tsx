@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexto/AuthContexto";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { obterContrato } from "../contracts";
 import { feedbackDaTransacao, type FeedbackTx } from "../lib/erros";
-import { encurtarEndereco, RETULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
+import { encurtarEndereco, ROTULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
 import { PAPEL_PRODUTOR } from "../lib/papeis";
 import { TipoInsumo } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
@@ -166,7 +166,7 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
           <option value="">Selecione…</option>
           {OPCOES_TIPO_INSUMO.map((opcao) => (
             <option key={opcao} value={opcao}>
-              {RETULO_TIPO_INSUMO[opcao]}
+              {ROTULO_TIPO_INSUMO[opcao]}
             </option>
           ))}
         </select>

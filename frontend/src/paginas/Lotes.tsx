@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
-import { encurtarEndereco, formatarTimestamp, RETULO_ESTADO_PRODUCAO, RETULO_TIPO_BEBIDA } from "../lib/formatadores";
+import { encurtarEndereco, formatarTimestamp, ROTULO_ESTADO_PRODUCAO, ROTULO_TIPO_BEBIDA } from "../lib/formatadores";
 import { EstadoProducao, TipoBebida } from "../lib/tipos";
 
 interface LinhaLote {
@@ -71,10 +71,10 @@ export function Lotes() {
           <li key={linha.id.toString()}>
             <div className="item-lista__cabecalho">
               <Link className="item-lista__titulo" to={`/lotes/${linha.id}`}>
-                #{linha.id.toString()} - {RETULO_TIPO_BEBIDA[linha.tipoBebida]}
+                #{linha.id.toString()} - {ROTULO_TIPO_BEBIDA[linha.tipoBebida]}
               </Link>
               <span className={`badge ${linha.estado === EstadoProducao.Concluido ? "badge--ok" : linha.estado === EstadoProducao.EmProducao ? "badge--neutro" : "badge--aviso"}`}>
-                {RETULO_ESTADO_PRODUCAO[linha.estado]}
+                {ROTULO_ESTADO_PRODUCAO[linha.estado]}
               </span>
             </div>
             <p className="item-lista__meta">

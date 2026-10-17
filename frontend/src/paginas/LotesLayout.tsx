@@ -13,7 +13,7 @@ export function LotesLayout() {
           end
           className={({ isActive }) => `abas__item${isActive ? " abas__item--ativa" : ""}`}
         >
-          Lotes
+          Todos
         </NavLink>
         {papeis.produtor && (
           <NavLink

@@ -1,9 +1,9 @@
-import { useCallback, useState } from "react";
+﻿import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { obterContrato } from "../contracts";
 import { feedbackDaTransacao, type FeedbackTx } from "../lib/erros";
-import { RETULO_TIPO_BEBIDA } from "../lib/formatadores";
+import { ROTULO_TIPO_BEBIDA } from "../lib/formatadores";
 import { TipoBebida } from "../lib/tipos";
 import { motivoReferenciaInvalida } from "../lib/validacaoIpfs";
 import { adicionarJSON } from "../ipfs/kubo";
@@ -126,7 +126,7 @@ function NovoLoteProducao({ onCriado }: { onCriado: () => void }) {
           <option value="">Selecione…</option>
           {OPCOES_TIPO_BEBIDA.map((opcao) => (
             <option key={opcao} value={opcao}>
-              {RETULO_TIPO_BEBIDA[opcao]}
+              {ROTULO_TIPO_BEBIDA[opcao]}
             </option>
           ))}
         </select>

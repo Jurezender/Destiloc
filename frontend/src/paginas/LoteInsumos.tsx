@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { obterContrato } from "../contracts";
 import { feedbackDaTransacao, type FeedbackTx } from "../lib/erros";
-import { encurtarEndereco, RETULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
+import { encurtarEndereco, ROTULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
 import { EstadoProducao, TipoInsumo } from "../lib/tipos";
 import { useLoteContexto, type Signer } from "./LoteLayout";
 
@@ -34,7 +34,7 @@ export function LoteInsumos() {
       <ul>
         {insumosVinculados.map((insumo) => (
           <li key={insumo.id.toString()}>
-            #{insumo.id.toString()} - {RETULO_TIPO_INSUMO[insumo.tipo]} - fornecedor {encurtarEndereco(insumo.fornecedor)}
+            #{insumo.id.toString()} - {ROTULO_TIPO_INSUMO[insumo.tipo]} - fornecedor {encurtarEndereco(insumo.fornecedor)}
           </li>
         ))}
         {insumosVinculados.length === 0 && <li className="lista-vazia">Nenhum insumo vinculado ainda.</li>}
@@ -143,7 +143,7 @@ function VincularInsumo({
             <option value="">Selecione…</option>
             {opcoes.map((op) => (
               <option key={op.id.toString()} value={op.id.toString()}>
-                #{op.id.toString()} — {RETULO_TIPO_INSUMO[op.tipo]} · {op.quantidade.toString()} {UNIDADE_INSUMO[op.tipo]}
+                #{op.id.toString()} — {ROTULO_TIPO_INSUMO[op.tipo]} · {op.quantidade.toString()} {UNIDADE_INSUMO[op.tipo]}
               </option>
             ))}
           </select>

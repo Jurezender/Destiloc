@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useOutletContext, useParams } from "react-router-dom";
 import { useCarteira } from "../contexto/CarteiraContexto";
 import { usePapeis } from "../contexto/PapeisContexto";
 import { obterContrato } from "../contracts";
 import { mapearErroContrato } from "../lib/erros";
-import { formatarTimestamp, RETULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
+import { formatarTimestamp, ROTULO_TIPO_INSUMO, UNIDADE_INSUMO } from "../lib/formatadores";
 import { ResultadoAvaliacao, TipoInsumo } from "../lib/tipos";
 
 export type Signer = NonNullable<ReturnType<typeof useCarteira>["signer"]>;
@@ -180,7 +180,7 @@ export function InsumoLayout() {
     <section>
       <Link className="link-voltar" to="/insumos">← Lotes de insumo</Link>
       <div className="secao-titulo-area">
-        <h1>Insumo #{lote.id.toString()} - {RETULO_TIPO_INSUMO[lote.tipo]}</h1>
+        <h1>Insumo #{lote.id.toString()} - {ROTULO_TIPO_INSUMO[lote.tipo]}</h1>
         <span className={`badge ${invalidacao.invalidado ? "badge--erro" : "badge--ok"}`}>
           {invalidacao.invalidado ? "Invalidado" : "Válido"}
         </span>

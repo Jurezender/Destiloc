@@ -1,11 +1,11 @@
-import { useCallback, useState } from "react";
+﻿import { useCallback, useState } from "react";
 import { obterContrato } from "../contracts";
 import { feedbackDaTransacao, type FeedbackTx } from "../lib/erros";
 import {
   encurtarEndereco,
   formatarTimestamp,
-  RETULO_ETAPA_PRODUCAO,
-  RETULO_TIPO_INSUMO,
+  ROTULO_ETAPA_PRODUCAO,
+  ROTULO_TIPO_INSUMO,
   UNIDADE_INSUMO,
 } from "../lib/formatadores";
 import { EstadoProducao, EtapaProducao, TipoBebida } from "../lib/tipos";
@@ -84,7 +84,7 @@ function TabelaEtapas({ etapas }: { etapas: EtapaRegistrada[] }) {
         <tbody>
           {etapas.map((evento) => (
             <tr key={evento.indice}>
-              <td>{RETULO_ETAPA_PRODUCAO[evento.etapa]}</td>
+              <td>{ROTULO_ETAPA_PRODUCAO[evento.etapa]}</td>
               <td>{encurtarEndereco(evento.executadoPor)}</td>
               <td>{formatarTimestamp(evento.inicioInformado)}</td>
               <td>{formatarTimestamp(evento.fimInformado)}</td>
@@ -292,7 +292,7 @@ function RegistrarEtapa({
           <option value="">Selecione…</option>
           {etapasPendentes.map((etapa) => (
             <option key={etapa} value={etapa}>
-              {RETULO_ETAPA_PRODUCAO[etapa]}
+              {ROTULO_ETAPA_PRODUCAO[etapa]}
             </option>
           ))}
         </select>
@@ -314,7 +314,7 @@ function RegistrarEtapa({
                   checked={selecionado}
                   onChange={() => alternarInsumo(idStr)}
                 />
-                #{idStr} - {RETULO_TIPO_INSUMO[insumo.tipo]}
+                #{idStr} - {ROTULO_TIPO_INSUMO[insumo.tipo]}
               </label>
               {selecionado && (
                 <label style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
