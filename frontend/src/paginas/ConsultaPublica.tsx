@@ -200,11 +200,17 @@ export function ConsultaPublica() {
         let erroMsg = garrafaResposta.status >= 500
           ? "Serviço temporariamente indisponível."
           : "Erro desconhecido.";
-        try {
-          const corpo = (await garrafaResposta.json()) as { erro?: string };
-          if (corpo.erro) erroMsg = corpo.erro;
-        } catch {
-          // Corpo não é JSON (ex: 504 HTML da Vercel) usa mensagem pelo status
+        // Para erros 4xx, tenta ler o corpo para mostrar mensagem específica
+        // (ex: garrafa não encontrada, link inválido). Para 5xx, mantém a
+        // mensagem genérica de status — a mensagem técnica do backend não
+        // passa pelo filtro de mensagemAmigavel e causaria texto genérico.
+        if (garrafaResposta.status < 500) {
+          try {
+            const corpo = (await garrafaResposta.json()) as { erro?: string };
+            if (corpo.erro) erroMsg = corpo.erro;
+          } catch {
+            // Corpo não é JSON, usa mensagem pelo status
+          }
         }
         setMensagemErro(mensagemAmigavel(erroMsg));
         setEstado("erro-consulta");
