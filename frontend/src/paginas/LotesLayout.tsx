@@ -15,6 +15,14 @@ export function LotesLayout() {
         >
           Todos
         </NavLink>
+        {papeis.envasador && (
+          <NavLink
+            to="/lotes/para-mim"
+            className={({ isActive }) => `abas__item${isActive ? " abas__item--ativa" : ""}`}
+          >
+            Para mim
+          </NavLink>
+        )}
         {papeis.produtor && (
           <NavLink
             to="/lotes/novo"

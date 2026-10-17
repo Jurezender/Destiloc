@@ -31,6 +31,7 @@ import { LoteLayout } from "./paginas/LoteLayout";
 import { LoteNovo } from "./paginas/LoteNovo";
 import { Lotes } from "./paginas/Lotes";
 import { LotesLayout } from "./paginas/LotesLayout";
+import { LotesParaMim } from "./paginas/LotesParaMim";
 import { PapeisParticipantes } from "./paginas/PapeisParticipantes";
 import { Participantes } from "./paginas/Participantes";
 import { Registrar } from "./paginas/Registrar";
@@ -138,6 +139,7 @@ export function App() {
             }
           >
             <Route index element={<Lotes />} />
+            <Route path="para-mim" element={<LotesParaMim />} />
             <Route path="novo" element={<LoteNovo />} />
           </Route>
           <Route
