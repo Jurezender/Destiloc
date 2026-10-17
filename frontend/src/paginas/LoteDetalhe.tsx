@@ -151,19 +151,21 @@ function CancelarLote({
 
   if (!confirmando) {
     return (
-      <div style={{ marginTop: "2rem", borderTop: "1px solid var(--cor-borda)", paddingTop: "1.5rem" }}>
+      <>
+        <hr />
         <h2>Cancelar lote</h2>
         <p className="dica">O cancelamento é permanente e irreversível. O lote ficará registrado como cancelado na blockchain.</p>
         <p className="dica">Não inclua dados pessoais na justificativa nem nos documentos: o conteúdo enviado ao IPFS é público e permanente.</p>
         <button type="button" onClick={() => setConfirmando(true)}>
           Cancelar este lote
         </button>
-      </div>
+      </>
     );
   }
 
   return (
-    <div style={{ marginTop: "2rem", borderTop: "1px solid var(--cor-borda)", paddingTop: "1.5rem" }}>
+    <>
+      <hr />
       <h2>Confirmar cancelamento</h2>
       <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
         <label>
@@ -198,7 +200,7 @@ function CancelarLote({
         </div>
         {feedback && <p className={feedback.tipo}>{feedback.texto}</p>}
       </fieldset>
-    </div>
+    </>
   );
 }
 
