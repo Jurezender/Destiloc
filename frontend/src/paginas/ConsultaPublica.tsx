@@ -251,6 +251,14 @@ export function ConsultaPublica() {
       setFeedbackDenuncia({ tipo: "erro", texto: "Descreva o motivo com pelo menos 10 caracteres." });
       return;
     }
+    if (!formDenuncia.localConsumo.trim()) {
+      setFeedbackDenuncia({ tipo: "erro", texto: "Informe onde o produto foi consumido." });
+      return;
+    }
+    if (!formDenuncia.dataConsumo) {
+      setFeedbackDenuncia({ tipo: "erro", texto: "Informe a data do consumo." });
+      return;
+    }
     setEnviandoDenuncia(true);
     setFeedbackDenuncia(null);
     try {
@@ -262,8 +270,8 @@ export function ConsultaPublica() {
           loteId: dados.lote.id,
           tokenId,
           motivo: formDenuncia.motivo.trim(),
-          localConsumo: formDenuncia.localConsumo.trim() || undefined,
-          dataConsumo: formDenuncia.dataConsumo || undefined,
+          localConsumo: formDenuncia.localConsumo.trim(),
+          dataConsumo: formDenuncia.dataConsumo,
         }),
       });
       if (!res.ok) {
@@ -574,20 +582,22 @@ export function ConsultaPublica() {
                   />
                 </label>
                 <label>
-                  Onde consumiu <span className="cp-denuncia__opcional">(opcional)</span>
+                  Onde consumiu
                   <input
                     type="text"
                     maxLength={200}
                     placeholder="Ex.: Bar do João, São Paulo – SP"
+                    required
                     value={formDenuncia.localConsumo}
                     onChange={(e) => setFormDenuncia((f) => ({ ...f, localConsumo: e.target.value }))}
                   />
                 </label>
                 <label>
-                  Data do consumo <span className="cp-denuncia__opcional">(opcional)</span>
+                  Data do consumo
                   <input
                     type="date"
                     max={new Date().toISOString().slice(0, 10)}
+                    required
                     value={formDenuncia.dataConsumo}
                     onChange={(e) => setFormDenuncia((f) => ({ ...f, dataConsumo: e.target.value }))}
                   />

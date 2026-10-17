@@ -9,8 +9,8 @@ const denuncia: FastifyPluginAsync = async (app) => {
       loteId: string;
       tokenId: string;
       motivo: string;
-      localConsumo?: string;
-      dataConsumo?: string;
+      localConsumo: string;
+      dataConsumo: string;
     };
   }>(
     '/denuncia',
@@ -18,13 +18,13 @@ const denuncia: FastifyPluginAsync = async (app) => {
       schema: {
         body: {
           type: 'object',
-          required: ['chainId', 'loteId', 'tokenId', 'motivo'],
+          required: ['chainId', 'loteId', 'tokenId', 'motivo', 'localConsumo', 'dataConsumo'],
           properties: {
             chainId:      { type: 'integer', minimum: 1 },
             loteId:       { type: 'string', minLength: 1 },
             tokenId:      { type: 'string', minLength: 1 },
             motivo:       { type: 'string', minLength: 10, maxLength: 1000 },
-            localConsumo: { type: 'string', maxLength: 200 },
+            localConsumo: { type: 'string', minLength: 1, maxLength: 200 },
             dataConsumo:  { type: 'string', format: 'date' },
           },
           additionalProperties: false,
@@ -37,7 +37,7 @@ const denuncia: FastifyPluginAsync = async (app) => {
       await obterPool().query(
         `INSERT INTO denuncias (chain_id, lote_id, token_id, motivo, local_consumo, data_consumo)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [chainId, loteId, tokenId, motivo, localConsumo ?? null, dataConsumo ?? null],
+        [chainId, loteId, tokenId, motivo, localConsumo, dataConsumo],
       );
 
       return reply.status(201).send({ mensagem: 'Denúncia registrada com sucesso.' });
