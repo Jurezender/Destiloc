@@ -205,6 +205,41 @@ export function podeRegistrarEtapa(dados: DadosRegistroEtapa): boolean {
   return validarRegistroEtapa(dados) === null;
 }
 
+/**
+ * Espelha _etapasOk de ContratoProducao.
+ * Antecipa o revert RequisitoDeEtapaNaoAtendido antes de enviar a transação.
+ */
+export function validarEtapasParaConclusao(
+  tipoBebida: TipoBebida,
+  configuracao: ConfiguracaoProducao,
+  etapasRegistradas: readonly EtapaProducao[]
+): string | null {
+  const tem = (etapa: EtapaProducao) => etapasRegistradas.includes(etapa);
+
+  if (tipoBebida === TipoBebida.Cachaca || tipoBebida === TipoBebida.Whisky) {
+    if (!tem(EtapaProducao.Destilacao))
+      return "Falta registrar a etapa de Destilação, obrigatória para esta bebida.";
+    if (!tem(EtapaProducao.Maturacao))
+      return "Falta registrar a etapa de Maturação, obrigatória para esta bebida.";
+    if (configuracao.blendagemAplicavel && !tem(EtapaProducao.Blendagem))
+      return "Falta registrar a etapa de Blendagem, configurada como obrigatória neste lote.";
+    if (configuracao.ajusteFinalAplicavel && !tem(EtapaProducao.AjusteFinal))
+      return "Falta registrar a etapa de Ajuste Final, configurada como obrigatória neste lote.";
+  } else if (tipoBebida === TipoBebida.Vodca) {
+    if (configuracao.retificacaoAplicavel && !tem(EtapaProducao.Retificacao))
+      return "Falta registrar a etapa de Retificação, configurada como obrigatória neste lote.";
+    if (configuracao.ajusteFinalAplicavel && !tem(EtapaProducao.AjusteFinal))
+      return "Falta registrar a etapa de Ajuste Final, configurada como obrigatória neste lote.";
+  } else if (tipoBebida === TipoBebida.Gin) {
+    if (!tem(EtapaProducao.Aromatizacao))
+      return "Falta registrar a etapa de Aromatização, obrigatória para gin.";
+    if (configuracao.ajusteFinalAplicavel && !tem(EtapaProducao.AjusteFinal))
+      return "Falta registrar a etapa de Ajuste Final, configurada como obrigatória neste lote.";
+  }
+
+  return null;
+}
+
 export interface InsumoVinculadoInfo {
   id: bigint;
   tipo: TipoInsumo;

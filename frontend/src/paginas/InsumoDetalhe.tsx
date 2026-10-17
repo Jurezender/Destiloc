@@ -17,7 +17,7 @@ export function InsumoDetalhe() {
           className="botao--compacto"
           onClick={() => window.open(ipfsParaUrl(lote.metadataURI), "_blank", "noopener,noreferrer")}
         >
-          Ver metadata
+          Ver metadados
         </button>
       </div>
       <DocumentosAnexados metadataUri={lote.metadataURI} />

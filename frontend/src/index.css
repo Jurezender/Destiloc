@@ -1847,6 +1847,27 @@ details[open] .cp-tecnico__chevron {
   color: var(--cor-primaria-hover);
 }
 
+.botao--primario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1.125rem;
+  border-radius: var(--raio-sm);
+  background-color: var(--cor-primaria);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.15s, box-shadow 0.15s;
+}
+
+.botao--primario:hover {
+  background-color: var(--cor-primaria-hover);
+  box-shadow: 0 2px 8px rgba(76, 61, 25, 0.32);
+  text-decoration: none;
+  color: #fff;
+}
+
 .botao--perigo {
   background-color: var(--cor-erro);
 }

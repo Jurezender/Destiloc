@@ -14,6 +14,7 @@ import type { DadosParticipante } from "../lib/useNomesParticipantes";
 import { EstadoProducao, EtapaProducao, TipoBebida, TipoInsumo } from "../lib/tipos";
 import {
   obterEtapasAplicaveis,
+  validarEtapasParaConclusao,
   validarInsumosParaConclusao,
   type ConfiguracaoProducao,
 } from "../lib/validacaoSequencia";
@@ -67,6 +68,7 @@ export interface LoteContexto {
   etapasPendentes: EtapaProducao[];
   etapasRegistradas: EtapaProducao[];
   erroInsumosConclusao: string | null;
+  erroEtapasConclusao: string | null;
   carregar: () => void;
 }
 
@@ -197,6 +199,7 @@ export function LoteLayout() {
   );
   const idsUtilizados = etapas.flatMap((e) => e.insumosUtilizados);
   const erroInsumosConclusao = validarInsumosParaConclusao(lote.tipoBebida, idsUtilizados, insumosVinculados);
+  const erroEtapasConclusao = validarEtapasParaConclusao(lote.tipoBebida, configuracao, etapasRegistradas);
 
   const ctx: LoteContexto = {
     lote,
@@ -211,6 +214,7 @@ export function LoteLayout() {
     etapasPendentes,
     etapasRegistradas,
     erroInsumosConclusao,
+    erroEtapasConclusao,
     carregar,
   };
 

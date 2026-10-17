@@ -19,7 +19,7 @@ export function LinkMetadados({ uri, exibirDocumentos = false }: Props) {
             rel="noopener noreferrer"
             className="link-ipfs"
           >
-            Ver metadata
+            Ver metadados
           </a>
           {exibirDocumentos && <DocumentosAnexados metadataUri={uri} />}
         </>

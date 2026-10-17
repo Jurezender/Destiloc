@@ -24,6 +24,7 @@ export function LoteConclusao() {
     lote,
     podeOperar,
     erroInsumosConclusao,
+    erroEtapasConclusao,
     chainId,
     signer,
     carregar,
@@ -33,19 +34,27 @@ export function LoteConclusao() {
     <>
       <h2>Conclusão</h2>
       {lote.estado === EstadoProducao.Concluido ? (
-        <div className="ok">
-          Produção concluída em {formatarTimestamp(lote.concluidoEm)}.
-          <br />
-          Metadados de conclusão: <LinkMetadados uri={lote.metadataURIConclusao} />
-          <br />
-          Envasador designado: <span className="mono">{lote.envasadorDesignado}</span>
-          <br />
-          Produção concluída, apta para envasamento.{" "}
-          <Link to={`/lotes/${lote.id.toString()}/emitir`}>Ir para envasamento e emissão</Link>
-        </div>
+        <>
+          <p className="ok">Produção concluída em {formatarTimestamp(lote.concluidoEm)}.</p>
+          <dl className="info-grade">
+            <div className="info-campo info-campo--largo">
+              <dt className="info-campo__rotulo">Metadados de conclusão</dt>
+              <dd className="info-campo__valor"><LinkMetadados uri={lote.metadataURIConclusao} /></dd>
+            </div>
+            <div className="info-campo info-campo--largo">
+              <dt className="info-campo__rotulo">Envasador designado</dt>
+              <dd className="info-campo__valor mono">{lote.envasadorDesignado}</dd>
+            </div>
+          </dl>
+          <Link className="botao--primario" to={`/lotes/${lote.id.toString()}/emitir`}>
+            Ir para envasamento e emissão
+          </Link>
+        </>
       ) : lote.estado === EstadoProducao.EmProducao ? (
         podeOperar ? (
-          erroInsumosConclusao ? (
+          erroEtapasConclusao ? (
+            <p className="dica">{erroEtapasConclusao}</p>
+          ) : erroInsumosConclusao ? (
             <p className="dica">{erroInsumosConclusao}</p>
           ) : (
             <ConcluirProducao loteId={lote.id} chainId={chainId} signer={signer} aoConcluir={carregar} />
