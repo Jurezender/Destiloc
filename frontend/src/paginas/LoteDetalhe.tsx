@@ -185,7 +185,7 @@ function CancelarLote({
         </button>
         {erroIpfs && <p className="erro">{erroIpfs}</p>}
         <label>
-          Metadados (ipfs://…)
+          Metadados
           <input value={metadataURI} onChange={(e) => setMetadataURI(e.target.value.trim())} />
         </label>
         <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>

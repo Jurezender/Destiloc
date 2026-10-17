@@ -161,7 +161,7 @@ function InvalidarLote({
       </button>
       {erroIpfs && <p className="erro">{erroIpfs}</p>}
       <label>
-        Metadados (ipfs://…, preenchido automaticamente pelo botão acima, ou cole uma referência já existente)
+        Metadados
         <input value={metadataURI} onChange={(e) => setMetadataURI(e.target.value.trim())} />
       </label>
       <label>
@@ -265,7 +265,7 @@ function RegistrarCorrecao({
       </button>
       {erroIpfs && <p className="erro">{erroIpfs}</p>}
       <label>
-        Metadados (ipfs://…, preenchido automaticamente pelo botão acima, ou cole uma referência já existente)
+        Metadados
         <input value={metadataURI} onChange={(e) => setMetadataURI(e.target.value.trim())} />
       </label>
       <button type="button" onClick={() => void enviar()}>
