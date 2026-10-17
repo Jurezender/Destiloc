@@ -17,7 +17,10 @@ import { InsumoAvaliacao } from "./paginas/InsumoAvaliacao";
 import { InsumoCorrecoes } from "./paginas/InsumoCorrecoes";
 import { InsumoDetalhe } from "./paginas/InsumoDetalhe";
 import { InsumoLayout } from "./paginas/InsumoLayout";
+import { InsumoNovo } from "./paginas/InsumoNovo";
 import { Insumos } from "./paginas/Insumos";
+import { InsumosLayout } from "./paginas/InsumosLayout";
+import { InsumosParaMim } from "./paginas/InsumosParaMim";
 import { EsqueciSenha } from "./paginas/EsqueciSenha";
 import { Login } from "./paginas/Login";
 import { LoteConclusao } from "./paginas/LoteConclusao";
@@ -25,7 +28,9 @@ import { LoteDetalhe } from "./paginas/LoteDetalhe";
 import { LoteEtapas } from "./paginas/LoteEtapas";
 import { LoteInsumos } from "./paginas/LoteInsumos";
 import { LoteLayout } from "./paginas/LoteLayout";
+import { LoteNovo } from "./paginas/LoteNovo";
 import { Lotes } from "./paginas/Lotes";
+import { LotesLayout } from "./paginas/LotesLayout";
 import { PapeisParticipantes } from "./paginas/PapeisParticipantes";
 import { Participantes } from "./paginas/Participantes";
 import { Registrar } from "./paginas/Registrar";
@@ -104,10 +109,14 @@ export function App() {
             path="insumos"
             element={
               <RotaProtegida>
-                <Insumos />
+                <InsumosLayout />
               </RotaProtegida>
             }
-          />
+          >
+            <Route index element={<Insumos />} />
+            <Route path="para-mim" element={<InsumosParaMim />} />
+            <Route path="novo" element={<InsumoNovo />} />
+          </Route>
           <Route
             path="insumos/:id"
             element={
@@ -124,10 +133,13 @@ export function App() {
             path="lotes"
             element={
               <RotaProtegida>
-                <Lotes />
+                <LotesLayout />
               </RotaProtegida>
             }
-          />
+          >
+            <Route index element={<Lotes />} />
+            <Route path="novo" element={<LoteNovo />} />
+          </Route>
           <Route
             path="lotes/:id"
             element={

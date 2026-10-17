@@ -54,7 +54,12 @@ export function LoteDetalhe() {
         <div className="aviso-acesso">
           <h2>Lote cancelado</h2>
           <p>Cancelado em {formatarTimestamp(lote.canceladoEm)}.</p>
-          <p>Justificativa: <LinkMetadados uri={lote.metadataURICancelamento} /></p>
+          <dl className="info-grade">
+            <div className="info-campo info-campo--largo">
+              <dt className="info-campo__rotulo">Justificativa</dt>
+              <dd className="info-campo__valor"><LinkMetadados uri={lote.metadataURICancelamento} /></dd>
+            </div>
+          </dl>
         </div>
       )}
 
