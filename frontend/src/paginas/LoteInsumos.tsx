@@ -137,7 +137,15 @@ function VincularInsumo({
       {carregandoOpcoes ? (
         <p className="dica">Carregando insumos disponíveis…</p>
       ) : opcoes.length === 0 ? (
-        <p className="dica">Nenhum insumo aprovado e disponível para vincular. Certifique-se de que o insumo foi aprovado por você e ainda não está vinculado a este lote.</p>
+        <>
+          <p className="dica">
+            <strong>Nenhum insumo disponível para vincular a este lote.</strong>
+          </p>
+          <p className="dica">
+            Aqui aparecem apenas os insumos enviados a você que já foram aprovados
+            e ainda não foram vinculados a outro lote.
+          </p>
+        </>
       ) : (
         <label>
           Insumo
