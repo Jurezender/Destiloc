@@ -9,6 +9,7 @@ const {
   MEGAETH_TESTNET_RPC_URL,
   LINEA_SEPOLIA_RPC_URL,
   PRIVATE_KEY,
+  ETHERSCAN_API_KEY,
 } = process.env;
 
 /** @type import('hardhat/config').HardhatUserConfig */
@@ -23,6 +24,19 @@ module.exports = {
   },
   gasReporter: {
     enabled: true,
+  },
+  etherscan: {
+    apiKey: ETHERSCAN_API_KEY || "",
+    customChains: [
+      {
+        network: "megaethTestnet",
+        chainId: 6343,
+        urls: {
+          apiURL: "https://mega.etherscan.io/api",
+          browserURL: "https://mega.etherscan.io",
+        },
+      },
+    ],
   },
   networks: {
     // Rede local em memória (padrão dos testes automatizados)

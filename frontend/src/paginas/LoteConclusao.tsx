@@ -13,6 +13,7 @@ import { AnexosIpfs } from "../componentes/AnexosIpfs";
 import { LinkMetadados } from "../componentes/LinkMetadados";
 import { useLoteContexto, type Signer } from "./LoteLayout";
 import { API_URL, fetchApi } from "../lib/api";
+import { useNomesParticipantes } from "../lib/useNomesParticipantes";
 
 interface OpcaoEnvasador {
   address: string;
@@ -29,6 +30,8 @@ export function LoteConclusao() {
     signer,
     carregar,
   } = useLoteContexto();
+  const nomes = useNomesParticipantes();
+  const dadosEnvasador = nomes.get(lote.envasadorDesignado.toLowerCase());
 
   return (
     <>
@@ -41,8 +44,20 @@ export function LoteConclusao() {
               <dt className="info-campo__rotulo">Metadados de conclusão</dt>
               <dd className="info-campo__valor"><LinkMetadados uri={lote.metadataURIConclusao} /></dd>
             </div>
+            {dadosEnvasador?.empresa && (
+              <div className="info-campo info-campo--largo">
+                <dt className="info-campo__rotulo">Empresa envasadora</dt>
+                <dd className="info-campo__valor">{dadosEnvasador.empresa}</dd>
+              </div>
+            )}
+            {dadosEnvasador?.responsavel && (
+              <div className="info-campo info-campo--largo">
+                <dt className="info-campo__rotulo">Responsável pelo envasamento</dt>
+                <dd className="info-campo__valor">{dadosEnvasador.responsavel}</dd>
+              </div>
+            )}
             <div className="info-campo info-campo--largo">
-              <dt className="info-campo__rotulo">Envasador designado</dt>
+              <dt className="info-campo__rotulo">Carteira do envasador</dt>
               <dd className="info-campo__valor mono">{lote.envasadorDesignado}</dd>
             </div>
           </dl>
