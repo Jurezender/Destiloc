@@ -36,12 +36,6 @@ const scans: FastifyPluginAsync = async (app) => {
       return reply.status(400).send({ erro: "Parâmetros inválidos." });
     }
 
-    const ip =
-      (req.headers["x-forwarded-for"] as string | undefined)
-        ?.split(",")[0]
-        .trim() ?? req.ip;
-    const userAgent = req.headers["user-agent"] ?? "";
-
     try {
       await registrarScan({
         chainId: chainId as number,
@@ -49,8 +43,6 @@ const scans: FastifyPluginAsync = async (app) => {
         latitude: latitude as number,
         longitude: longitude as number,
         precisao,
-        ip: ip ?? null,
-        userAgent,
       });
       return reply.status(201).send({ registrado: true });
     } catch (erro) {

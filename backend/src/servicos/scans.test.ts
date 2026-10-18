@@ -6,7 +6,6 @@ vi.mock("../db/cliente.js", () => ({ obterPool: vi.fn() }));
 import {
   haversine,
   detectarComportamentoIncomum,
-  detectarTipoDispositivo,
   registrarScan,
   listarScans,
 } from "./scans.js";
@@ -66,30 +65,6 @@ describe("detectarComportamentoIncomum", () => {
   });
 });
 
-// ─── detectarTipoDispositivo ────────────────────────────────────────────────
-
-describe("detectarTipoDispositivo", () => {
-  it("iPhone → mobile", () => {
-    expect(detectarTipoDispositivo("Mozilla/5.0 (iPhone; CPU iPhone OS 16_0)")).toBe("mobile");
-  });
-
-  it("Android phone → mobile", () => {
-    expect(detectarTipoDispositivo("Mozilla/5.0 (Linux; Android 13; Pixel 7) Mobile Safari")).toBe("mobile");
-  });
-
-  it("iPad → tablet", () => {
-    expect(detectarTipoDispositivo("Mozilla/5.0 (iPad; CPU OS 16_0)")).toBe("tablet");
-  });
-
-  it("Android tablet (sem 'mobile') → tablet", () => {
-    expect(detectarTipoDispositivo("Mozilla/5.0 (Linux; Android 12; SM-T870) AppleWebKit")).toBe("tablet");
-  });
-
-  it("desktop Chrome → desktop", () => {
-    expect(detectarTipoDispositivo("Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/115")).toBe("desktop");
-  });
-});
-
 // ─── registrarScan ──────────────────────────────────────────────────────────
 
 describe("registrarScan", () => {
@@ -113,8 +88,6 @@ describe("registrarScan", () => {
     latitude: -23.55,
     longitude: -46.63,
     precisao: 42,
-    userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0) Mobile",
-    ip: "192.168.1.100",
   };
 
   it("garrafa no cache: registra sem chamar blockchain", async () => {
@@ -198,9 +171,9 @@ describe("registrarScan", () => {
     );
     expect(insertCall).toBeDefined();
     const params = insertCall![1] as unknown[];
-    const suspeito = params[10]; // posição 10 = suspeito (índice 0-base: $11)
+    const suspeito = params[8];
     expect(suspeito).toBe(true);
-    const motivo = params[11];   // posição 11 = motivo_suspeita
+    const motivo = params[9];
     expect(motivo).toContain("km/h");
   });
 
@@ -215,7 +188,7 @@ describe("registrarScan", () => {
     const insertCall = mockQuery.mock.calls.find(
       (c) => (c[0] as string).includes("INSERT")
     );
-    const suspeito = (insertCall![1] as unknown[])[10];
+    const suspeito = (insertCall![1] as unknown[])[8];
     expect(suspeito).toBe(false);
   });
 

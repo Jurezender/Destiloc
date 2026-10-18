@@ -10,8 +10,6 @@ export interface EntradaScan {
   latitude: number;
   longitude: number;
   precisao?: number;
-  userAgent: string;
-  ip: string | null;
 }
 
 export interface ItemHistorico {
@@ -83,16 +81,6 @@ export function detectarComportamentoIncomum(
   return { suspeito: false, motivo: null };
 }
 
-// Classifica o dispositivo do consumidor (mobile, tablet ou desktop) pelo User-Agent.
-export function detectarTipoDispositivo(
-  userAgent: string
-): "mobile" | "tablet" | "desktop" {
-  const ua = userAgent.toLowerCase();
-  if (/ipad|tablet|(android(?!.*mobile))/.test(ua)) return "tablet";
-  if (/mobile|android|iphone|ipod|windows phone/.test(ua)) return "mobile";
-  return "desktop";
-}
-
 interface DadosGeo {
   cidade?: string;
   estado?: string;
@@ -140,13 +128,6 @@ async function geocodificarReverso(lat: number, lon: number): Promise<DadosGeo> 
   }
 }
 
-function truncarPrefixoIp(ip: string): string | null {
-  const partes = ip.split(".");
-  if (partes.length === 4) return partes.slice(0, 3).join(".");
-  if (ip.includes(":")) return ip.split(":").slice(0, 4).join(":");
-  return null;
-}
-
 // Salva um scan no banco: verifica existência da garrafa, geocodifica, detecta comportamento suspeito.
 export async function registrarScan(entrada: EntradaScan): Promise<void> {
   const pool = obterPool();
@@ -174,9 +155,6 @@ export async function registrarScan(entrada: EntradaScan): Promise<void> {
   const lon = Math.round(entrada.longitude * 100) / 100;
 
   const geo = await geocodificarReverso(lat, lon);
-
-  const tipoDispositivo = detectarTipoDispositivo(entrada.userAgent);
-  const ipPrefixo = entrada.ip ? truncarPrefixoIp(entrada.ip) : null;
 
   const anteriorRes = await pool.query<{
     latitude: string;
@@ -206,8 +184,8 @@ export async function registrarScan(entrada: EntradaScan): Promise<void> {
   await pool.query(
     `INSERT INTO scan_garrafa
      (chain_id, token_id, latitude, longitude, precisao_m, cidade, estado, pais,
-      tipo_dispositivo, ip_prefixo, suspeito, motivo_suspeita)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+      suspeito, motivo_suspeita)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
     [
       entrada.chainId,
       entrada.tokenId,
@@ -217,8 +195,6 @@ export async function registrarScan(entrada: EntradaScan): Promise<void> {
       geo.cidade ?? null,
       geo.estado ?? null,
       geo.pais ?? null,
-      tipoDispositivo,
-      ipPrefixo,
       suspeito,
       motivo,
     ]

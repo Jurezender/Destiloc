@@ -328,7 +328,6 @@ export function ConsultaPublica() {
             <ul className="cp-consentimento__lista">
               <li>Sua localização aproximada, com precisão de cerca de 1 km (nunca o endereço exato).</li>
               <li>A cidade, o estado e o país dessa localização, obtidos por um serviço externo (OpenStreetMap). Eles podem não estar disponíveis.</li>
-              <li>O tipo de aparelho (celular, tablet ou computador) e só o começo do número de IP, nunca o IP completo.</li>
             </ul>
             <p className="cp-consentimento__texto">
               <strong>Para que usamos:</strong> também verificamos se há
