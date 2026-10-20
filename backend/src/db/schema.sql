@@ -30,8 +30,6 @@ CREATE TABLE IF NOT EXISTS scan_garrafa (
   cidade           TEXT,
   estado           TEXT,
   pais             TEXT,
-  tipo_dispositivo TEXT         CHECK (tipo_dispositivo IN ('mobile', 'tablet', 'desktop')),
-  ip_prefixo       TEXT,
   escaneado_em     TIMESTAMPTZ  NOT NULL DEFAULT now(),
   suspeito         BOOLEAN      NOT NULL DEFAULT false,
   motivo_suspeita  TEXT

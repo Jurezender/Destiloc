@@ -150,6 +150,8 @@ function InvalidarLote({
         Motivo (opcional, vai para os metadados enviados ao IPFS)
         <input value={motivo} onChange={(e) => setMotivo(e.target.value)} />
       </label>
+      <p className="dica">O conteúdo enviado ao IPFS e à blockchain é público e permanente.</p>
+      <p className="dica">Não inclua dados pessoais em documentos ou campos de texto.</p>
       <AnexosIpfs
         key={chaveAnexos}
         rotulo="Documentos de suporte (PDF, JPG, PNG - opcional)"
@@ -254,6 +256,8 @@ function RegistrarCorrecao({
 
   return (
     <fieldset disabled={enviando} style={{ border: "none", boxShadow: "none", padding: 0, background: "none", marginBlock: 0 }}>
+      <p className="dica">O conteúdo enviado ao IPFS e à blockchain é público e permanente.</p>
+      <p className="dica">Não inclua dados pessoais em documentos ou campos de texto.</p>
       <AnexosIpfs
         key={chaveAnexos}
         rotulo="Documentos da correção (PDF, JPG, PNG - opcional)"

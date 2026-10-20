@@ -172,6 +172,8 @@ function AvaliarInsumo({
         Observações (opcional, vai para os metadados enviados ao IPFS)
         <input value={observacoes} onChange={(e) => setObservacoes(e.target.value)} />
       </label>
+      <p className="dica">O conteúdo enviado ao IPFS e à blockchain é público e permanente.</p>
+      <p className="dica">Não inclua dados pessoais em documentos ou campos de texto.</p>
       <AnexosIpfs
         key={chaveAnexos}
         rotulo="Documentos/evidências (PDF, JPG, PNG - opcional)"

@@ -212,6 +212,8 @@ function NovoLoteInsumo({ onCriado }: { onCriado: () => void }) {
         Origem (opcional)
         <input value={origem} onChange={(e) => setOrigem(e.target.value)} />
       </label>
+      <p className="dica">O conteúdo enviado ao IPFS e à blockchain é público e permanente.</p>
+      <p className="dica">Não inclua dados pessoais em documentos ou campos de texto.</p>
       <AnexosIpfs
         key={chaveAnexos}
         onChange={atualizarAnexos}
