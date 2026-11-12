@@ -656,12 +656,22 @@ export function ConsultaPublica() {
                   <dd className="cp-campo__valor">{formatarTimestamp(Number(dados.lote.criadoEm))}</dd>
                 </div>
                 <div className="cp-campo cp-campo--largo">
-                  <dt className="cp-campo__rotulo">Endereço do produtor</dt>
-                  <dd className="cp-campo__valor cp-mono">{dados.lote.produtor}</dd>
+                  <dt className="cp-campo__rotulo">Produtor</dt>
+                  <dd className="cp-campo__valor">
+                    {dados.nomesCarteiras[dados.lote.produtor] && (
+                      <span className="cp-campo__nome">{dados.nomesCarteiras[dados.lote.produtor]}</span>
+                    )}
+                    <span className="cp-mono">{dados.lote.produtor}</span>
+                  </dd>
                 </div>
                 <div className="cp-campo cp-campo--largo">
-                  <dt className="cp-campo__rotulo">Endereço do envasador</dt>
-                  <dd className="cp-campo__valor cp-mono">{dados.envasamento.envasador}</dd>
+                  <dt className="cp-campo__rotulo">Envasador</dt>
+                  <dd className="cp-campo__valor">
+                    {dados.nomesCarteiras[dados.envasamento.envasador] && (
+                      <span className="cp-campo__nome">{dados.nomesCarteiras[dados.envasamento.envasador]}</span>
+                    )}
+                    <span className="cp-mono">{dados.envasamento.envasador}</span>
+                  </dd>
                 </div>
                 {dados.lote.metadataURI && (
                   <div className="cp-campo">

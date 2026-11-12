@@ -1021,6 +1021,12 @@ hr {
   min-width: 48rem;
 }
 
+/* Nome legível acima do endereço técnico ─────────────────────────────────────── */
+.cp-campo__nome {
+  display: block;
+  margin-bottom: var(--s-xs);
+}
+
 /* Célula monospace ───────────────────────────────────────────────────────────── */
 .cp-mono {
   font-family: 'JetBrains Mono', 'Cascadia Code', 'SF Mono', Consolas, 'Courier New', monospace;

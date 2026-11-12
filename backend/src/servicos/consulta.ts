@@ -312,7 +312,8 @@ export async function consultarGarrafa(
     ),
   ]);
 
-  // Apelidos de carteiras — única query ao banco para todos os endereços.
+  // Nomes de carteiras: prioridade para apelido manual (carteiras_conhecidas);
+  // fallback para nome_empresa / nome_responsavel do usuário vinculado.
   const enderecoUnicos = [
     ...new Set([
       dadoLote.produtor as string,
@@ -324,11 +325,24 @@ export async function consultarGarrafa(
   const nomesCarteiras: Record<string, string> = {};
   try {
     const pool = obterPool();
-    const resultado = await pool.query<{ address: string; apelido: string }>(
-      "SELECT address, apelido FROM carteiras_conhecidas WHERE address = ANY($1)",
-      [enderecoUnicos]
-    );
-    for (const row of resultado.rows) {
+    const [resVinculadas, resConhecidas] = await Promise.all([
+      pool.query<{ address: string; nome_empresa: string; nome_responsavel: string }>(
+        `SELECT cv.address, u.nome_empresa, u.nome_responsavel
+         FROM carteiras_vinculadas cv
+         JOIN usuarios u ON u.id = cv.usuario_id
+         WHERE cv.address = ANY($1)`,
+        [enderecoUnicos]
+      ),
+      pool.query<{ address: string; apelido: string }>(
+        "SELECT address, apelido FROM carteiras_conhecidas WHERE address = ANY($1)",
+        [enderecoUnicos]
+      ),
+    ]);
+    for (const row of resVinculadas.rows) {
+      const nome = row.nome_empresa || row.nome_responsavel;
+      if (nome) nomesCarteiras[row.address] = nome;
+    }
+    for (const row of resConhecidas.rows) {
       nomesCarteiras[row.address] = row.apelido;
     }
   } catch {
